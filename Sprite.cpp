@@ -1,17 +1,19 @@
 #include "Sprite.h"
 
-Sprite::Sprite(Bitmap* pBitmap)
+Sprite::Sprite(Bitmap** pBitmap)
 {	 // Initialize the member variables
 	m_pBitmap = pBitmap;
-	SetRect(&m_rcPosition, 0, 0, pBitmap->GetWidth(), pBitmap->GetHeight());
+	SetRect(&m_rcPosition, 0, 0, (*pBitmap)->GetWidth(), (*pBitmap)->GetHeight());
 	m_ptVelocity.x = m_ptVelocity.y = 0;
 	m_iZOrder = 0;
 	SetRect(&m_rcBounds, 0, 0, 640, 480);
 	m_baBoundsAction = BA_STOP;
 	m_bHidden = FALSE;
+	animCount = 0;
+	frameCount = 0;
 }
 
-Sprite::Sprite(Bitmap* pBitmap, RECT& rcBounds, BOUNDSACTION baBoundsAction)
+Sprite::Sprite(Bitmap** pBitmap, RECT& rcBounds, BOUNDSACTION baBoundsAction)
 {
 	// Calculate a random position
 	int iXPos = rand() % (rcBounds.right - rcBounds.left);
@@ -19,22 +21,23 @@ Sprite::Sprite(Bitmap* pBitmap, RECT& rcBounds, BOUNDSACTION baBoundsAction)
 
 	// Initialize the member variables
 	m_pBitmap = pBitmap;
-	SetRect(&m_rcPosition, iXPos, iYPos, iXPos + pBitmap->GetWidth(),
-		iYPos + pBitmap->GetHeight());
+	SetRect(&m_rcPosition, iXPos, iYPos, iXPos + (*pBitmap)->GetWidth(),
+		iYPos + (*pBitmap)->GetHeight());
 	m_ptVelocity.x = m_ptVelocity.y = 0;
 	m_iZOrder = 0;
 	CopyRect(&m_rcBounds, &rcBounds);
 	m_baBoundsAction = baBoundsAction;
 	m_bHidden = FALSE;
+	animCount = 0;
 }
 
-Sprite::Sprite(Bitmap* pBitmap, POINT ptPosition, POINT ptVelocity,
+Sprite::Sprite(Bitmap** pBitmap, POINT ptPosition, POINT ptVelocity,
 	int iZOrder, RECT& rcBounds, BOUNDSACTION baBoundsAction)
 {
 	// Initialize the member variables
 	m_pBitmap = pBitmap;
-	SetRect(&m_rcPosition, ptPosition.x, ptPosition.y, pBitmap->GetWidth(),
-		pBitmap->GetHeight());
+	SetRect(&m_rcPosition, ptPosition.x, ptPosition.y, (*pBitmap)->GetWidth(),
+		(*pBitmap)->GetHeight());
 	m_ptVelocity = ptPosition;
 	m_iZOrder = iZOrder;
 	CopyRect(&m_rcBounds, &rcBounds);
@@ -42,6 +45,7 @@ Sprite::Sprite(Bitmap* pBitmap, POINT ptPosition, POINT ptVelocity,
 
 
 	m_bHidden = FALSE;
+	animCount = 0;
 }
 
 Sprite::~Sprite()
@@ -50,6 +54,19 @@ Sprite::~Sprite()
 }
 void Sprite::Update()
 {
+	if (frameCount++ % 10 == 0 ) {
+		m_pBitmap++;
+		animCount++;
+		if (animCount == 3) {
+			animCount = 0;
+			m_pBitmap -= 3;
+		}
+		if (frameCount == 30) {
+			frameCount = 0;
+		}
+	}
+	
+	
 	// Update the position
 	POINT ptNewPosition, ptSpriteSize, ptBoundsSize;
 	ptNewPosition.x = m_rcPosition.left + m_ptVelocity.x;
@@ -132,7 +149,7 @@ void Sprite::Draw(HDC hDC)
 {
 	// Draw the sprite if it isn’t hidden
 	if (m_pBitmap != NULL && !m_bHidden)
-		m_pBitmap->Draw(hDC, m_rcPosition.left, m_rcPosition.top, TRUE);
+		(*m_pBitmap)->Draw(hDC, m_rcPosition.left, m_rcPosition.top, TRUE);
 }
 
 BOOL Sprite::IsPointInside(int x, int y)

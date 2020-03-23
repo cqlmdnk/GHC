@@ -11,20 +11,21 @@ class Sprite
 {
 protected:
 	// Member Variables
-	Bitmap * m_pBitmap;
+	Bitmap ** m_pBitmap;
 	RECT m_rcPosition;
 	POINT m_ptVelocity;
 	int m_iZOrder;
 	RECT m_rcBounds;
 	BOUNDSACTION m_baBoundsAction;
 	BOOL m_bHidden;
+	int animCount, frameCount ;
 
 public:
 	// Constructor(s)/Destructor
-	Sprite(Bitmap* pBitmap);
-	Sprite(Bitmap* pBitmap, RECT& rcBounds,
+	Sprite(Bitmap** pBitmap);
+	Sprite(Bitmap** pBitmap, RECT& rcBounds,
 		BOUNDSACTION baBoundsAction = BA_STOP);
-	Sprite(Bitmap* pBitmap, POINT ptPosition, POINT ptVelocity, int iZOrder,
+	Sprite(Bitmap** pBitmap, POINT ptPosition, POINT ptVelocity, int iZOrder,
 		RECT & rcBounds, BOUNDSACTION baBoundsAction = BA_STOP);
 	virtual ~Sprite();
 
@@ -51,7 +52,7 @@ public:
 	void SetBoundsAction(BOUNDSACTION ba) { m_baBoundsAction = ba; };
 	BOOL IsHidden() { return m_bHidden; };
 	void SetHidden(BOOL bHidden) { m_bHidden = bHidden; };
-	int GetWidth() { return m_pBitmap->GetWidth(); };
-	int GetHeight() { return m_pBitmap->GetHeight(); };
+	int GetWidth() { return (*m_pBitmap)->GetWidth(); };
+	int GetHeight() { return (*m_pBitmap)->GetHeight(); };
 
 };

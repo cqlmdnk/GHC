@@ -21,3 +21,4 @@ HINSTANCE   _hInstance;
 GameEngine* _pGame;
 const int   _iMAXSPEED = 8;
 Bitmap*     _pBackground;
+Sprite*		_sCharacter;

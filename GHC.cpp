@@ -15,12 +15,12 @@ BOOL GameInitialize(HINSTANCE hInstance)
 {
   // Create the game engine
   _pGame = new GameEngine(hInstance, TEXT("GHC"),
-    TEXT("GHC"), IDI_UFO, IDI_UFO_SM, 1280, 720);
+    TEXT("GHC"), IDI_UFO, IDI_UFO_SM, 860, 720);
   if (_pGame == NULL)
     return FALSE;
   // Set the frame rate
   _pGame->SetFrameRate(30);
-
+ 
   // Store the instance handle
   _hInstance = hInstance;
 
@@ -32,6 +32,13 @@ void GameStart(HWND hWindow)
   // Create and load the background and saucer bitmaps
   HDC hDC = GetDC(hWindow);
   _pBackground = new Bitmap(hDC, TEXT("BG.bmp")); // will be changed
+  Bitmap** _bCharAnim = new Bitmap*[3];
+  *(_bCharAnim) = new Bitmap(hDC, TEXT("char_idle/adventurer-idle-00.bmp"));
+  *(_bCharAnim+1) = new Bitmap(hDC, TEXT("char_idle/adventurer-idle-01.bmp"));
+  *(_bCharAnim+2) = new Bitmap(hDC, TEXT("char_idle/adventurer-idle-02.bmp"));
+  _sCharacter = new Sprite(_bCharAnim);
+  _sCharacter->SetPosition(300, 400);
+  
 
   // Set the initial saucer position and speed
  
@@ -59,13 +66,13 @@ void GamePaint(HDC hDC)
 {
   // Draw the background and saucer bitmaps
   _pBackground->Draw(hDC, 0, 0);
-  
+  _sCharacter->Draw(hDC);
 }
 
 void GameCycle()
 {
   // Update the saucer position
-  
+	_sCharacter->Update();
   // Force a repaint to redraw the saucer
   InvalidateRect(_pGame->GetWindow(), NULL, FALSE);
 }
@@ -100,6 +107,7 @@ void HandleKeys()
 
 void MouseButtonDown(int x, int y, BOOL bLeft)
 {
+
   if (bLeft)
   {
    
