@@ -1,43 +1,43 @@
 #include "Sprite.h"
 
-Sprite::Sprite(Bitmap** pBitmap)
+Sprite::Sprite(Bitmap* pBitmap)
 {	 // Initialize the member variables
+	m_iCurFrame = m_iFrameDelay = m_iFrameTrigger = 0;
 	m_pBitmap = pBitmap;
-	SetRect(&m_rcPosition, 0, 0, (*pBitmap)->GetWidth(), (*pBitmap)->GetHeight());
+	SetRect(&m_rcPosition, 0, 0, pBitmap->GetWidth(), pBitmap->GetHeight());
 	m_ptVelocity.x = m_ptVelocity.y = 0;
 	m_iZOrder = 0;
 	SetRect(&m_rcBounds, 0, 0, 640, 480);
 	m_baBoundsAction = BA_STOP;
 	m_bHidden = FALSE;
-	animCount = 0;
-	frameCount = 0;
+
 }
 
-Sprite::Sprite(Bitmap** pBitmap, RECT& rcBounds, BOUNDSACTION baBoundsAction)
+Sprite::Sprite(Bitmap* pBitmap, RECT& rcBounds, BOUNDSACTION baBoundsAction)
 {
 	// Calculate a random position
 	int iXPos = rand() % (rcBounds.right - rcBounds.left);
 	int iYPos = rand() % (rcBounds.bottom - rcBounds.top);
-
+	m_iCurFrame = m_iFrameDelay = m_iFrameTrigger = 0;
 	// Initialize the member variables
 	m_pBitmap = pBitmap;
-	SetRect(&m_rcPosition, iXPos, iYPos, iXPos + (*pBitmap)->GetWidth(),
-		iYPos + (*pBitmap)->GetHeight());
+	SetRect(&m_rcPosition, iXPos, iYPos, iXPos + pBitmap->GetWidth(),
+		iYPos + pBitmap->GetHeight());
 	m_ptVelocity.x = m_ptVelocity.y = 0;
 	m_iZOrder = 0;
 	CopyRect(&m_rcBounds, &rcBounds);
 	m_baBoundsAction = baBoundsAction;
 	m_bHidden = FALSE;
-	animCount = 0;
 }
 
-Sprite::Sprite(Bitmap** pBitmap, POINT ptPosition, POINT ptVelocity,
+Sprite::Sprite(Bitmap* pBitmap, POINT ptPosition, POINT ptVelocity,
 	int iZOrder, RECT& rcBounds, BOUNDSACTION baBoundsAction)
 {
+	m_iCurFrame = m_iFrameDelay = m_iFrameTrigger = 0;
 	// Initialize the member variables
 	m_pBitmap = pBitmap;
-	SetRect(&m_rcPosition, ptPosition.x, ptPosition.y, (*pBitmap)->GetWidth(),
-		(*pBitmap)->GetHeight());
+	SetRect(&m_rcPosition, ptPosition.x, ptPosition.y, pBitmap->GetWidth(),
+		pBitmap->GetHeight());
 	m_ptVelocity = ptPosition;
 	m_iZOrder = iZOrder;
 	CopyRect(&m_rcBounds, &rcBounds);
@@ -45,28 +45,18 @@ Sprite::Sprite(Bitmap** pBitmap, POINT ptPosition, POINT ptVelocity,
 
 
 	m_bHidden = FALSE;
-	animCount = 0;
+
 }
 
 Sprite::~Sprite()
 {
 
 }
-void Sprite::Update()
+SPRITEACTION Sprite::Update()
 {
-	if (frameCount++ % 10 == 0 ) {
-		m_pBitmap++;
-		animCount++;
-		if (animCount == 3) {
-			animCount = 0;
-			m_pBitmap -= 3;
-		}
-		if (frameCount == 30) {
-			frameCount = 0;
-		}
-	}
-	
-	
+	UpdateFrame();
+
+
 	// Update the position
 	POINT ptNewPosition, ptSpriteSize, ptBoundsSize;
 	ptNewPosition.x = m_rcPosition.left + m_ptVelocity.x;
@@ -124,6 +114,16 @@ void Sprite::Update()
 			SetVelocity(ptNewVelocity);
 	}
 	// Stop (default)
+
+	else if (m_baBoundsAction == BA_DIE)
+	{
+		if ((ptNewPosition.x + ptSpriteSize.x) < m_rcBounds.left ||
+			ptNewPosition.x > m_rcBounds.right ||
+			(ptNewPosition.y + ptSpriteSize.y) < m_rcBounds.top ||
+			ptNewPosition.y > m_rcBounds.bottom)
+			return SA_KILL;
+	}
+
 	else
 	{
 		if (ptNewPosition.x < m_rcBounds.left ||
@@ -143,19 +143,27 @@ void Sprite::Update()
 		}
 	}
 	SetPosition(ptNewPosition);
+	return SA_NONE;
+
 }
 
 void Sprite::Draw(HDC hDC)
 {
 	// Draw the sprite if it isn’t hidden
 	if (m_pBitmap != NULL && !m_bHidden)
-		(*m_pBitmap)->Draw(hDC, m_rcPosition.left, m_rcPosition.top, TRUE);
+	{
+		int a = GetWidth();
+		// Draw the appropriate frame, if necessary
+		if (m_iNumFrames == 1)
+			m_pBitmap->Draw(hDC, m_rcPosition.left, m_rcPosition.top, TRUE);
+		else
+			m_pBitmap->DrawPart(hDC, m_rcPosition.left, m_rcPosition.top,
+				m_iCurFrame * GetWidth(), 0, GetWidth(), GetHeight(), TRUE);
+
+	}
 }
 
-BOOL Sprite::IsPointInside(int x, int y)
-{
-	return 0;
-}
+
 
 void Sprite::SetPosition(int x, int y)
 {
@@ -184,4 +192,27 @@ void Sprite::SetVelocity(POINT ptVelocity)
 {
 	m_ptVelocity.x = ptVelocity.x;
 	m_ptVelocity.y = ptVelocity.y;
+}
+
+inline void Sprite::UpdateFrame()
+{
+	if ((m_iFrameDelay >= 0) && (--m_iFrameTrigger <= 0))
+	{
+		// Reset the frame trigger;
+		m_iFrameTrigger = m_iFrameDelay;
+
+		// Increment the frame
+		if (++m_iCurFrame >= m_iNumFrames)
+			m_iCurFrame = 0;
+	}
+
+}
+void Sprite::SetNumFrames(int iNumFrames)
+{
+	// Set the number of frames
+	m_iNumFrames = iNumFrames;
+	// Recalculate the position
+	RECT rect = GetPosition();
+	rect.right = rect.left + ((rect.right - rect.left) / iNumFrames);
+	SetPosition(rect);
 }

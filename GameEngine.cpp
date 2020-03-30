@@ -73,6 +73,27 @@ LRESULT CALLBACK WndProc(HWND hWindow, UINT msg, WPARAM wParam, LPARAM lParam)
   return GameEngine::GetEngine()->HandleEvent(hWindow, msg, wParam, lParam);
 }
 
+BOOL GameEngine::CheckSpriteCollision(Sprite* pTestSprite)
+{
+	// See if the sprite has collided with any other sprites
+	vector<Sprite*>::iterator siSprite;
+	for (siSprite = m_vSprites.begin(); siSprite != m_vSprites.end(); siSprite++)
+	{
+		// Make sure not to check for collision with itself
+		if (pTestSprite == (*siSprite))
+			continue;
+
+		// Test the collision
+		if (pTestSprite->TestCollision(*siSprite))
+			// Collision detected
+			return SpriteCollision((*siSprite), pTestSprite);
+	}
+
+	// No collision
+	return FALSE;
+}
+
+
 //-----------------------------------------------------------------
 // GameEngine Constructor(s)/Destructor
 //-----------------------------------------------------------------
@@ -224,3 +245,94 @@ void GameEngine::ErrorQuit(LPTSTR szErrorMsg)
   MessageBox(GetWindow(), szErrorMsg, TEXT("Critical Error"), MB_OK | MB_ICONERROR);
   PostQuitMessage(0);
 }
+
+
+
+void GameEngine::AddSprite(Sprite* pSprite)
+{
+	// Add a sprite to the sprite vector
+	if (pSprite != NULL)
+	{
+		// See if there are sprites already in the sprite vector
+		if (m_vSprites.size() > 0)
+		{
+			// Find a spot in the sprite vector to insert the sprite by its z-order
+			vector<Sprite*>::iterator siSprite;
+			for (siSprite = m_vSprites.begin(); siSprite != m_vSprites.end(); siSprite++)
+				if (pSprite->GetZOrder() < (*siSprite)->GetZOrder())
+				{
+					// Insert the sprite into the sprite vector
+					m_vSprites.insert(siSprite, pSprite);
+					return;
+				}
+		}
+
+		// The sprite's z-order is highest, so add it to the end of the vector
+		m_vSprites.push_back(pSprite);
+	}
+}
+
+void GameEngine::DrawSprites(HDC hDC)
+{
+	// Draw the sprites in the sprite vector
+	vector<Sprite*>::iterator siSprite;
+	for (siSprite = m_vSprites.begin(); siSprite != m_vSprites.end(); siSprite++)
+		(*siSprite)->Draw(hDC);
+}
+
+void GameEngine::UpdateSprites()
+{
+	// Update the sprites in the sprite vector
+	RECT          rcOldSpritePos;
+	SPRITEACTION  saSpriteAction;
+	vector<Sprite*>::iterator siSprite;
+	for (siSprite = m_vSprites.begin(); siSprite != m_vSprites.end(); siSprite++)
+	{
+		// Save the old sprite position in case we need to restore it
+		rcOldSpritePos = (*siSprite)->GetPosition();
+
+		// Update the sprite
+		saSpriteAction = (*siSprite)->Update();
+
+		// Handle the SA_KILL sprite action
+		if (saSpriteAction & SA_KILL)
+		{
+			delete (*siSprite);
+			m_vSprites.erase(siSprite);
+			siSprite--;
+			continue;
+		}
+
+		// See if the sprite collided with any others
+		if (CheckSpriteCollision(*siSprite))
+			// Restore the old sprite position
+			(*siSprite)->SetPosition(rcOldSpritePos);
+	}
+}
+
+void GameEngine::CleanupSprites()
+{
+	// Delete and remove the sprites in the sprite vector
+	vector<Sprite*>::iterator siSprite;
+	for (siSprite = m_vSprites.begin(); siSprite != m_vSprites.end(); siSprite++)
+	{
+		delete (*siSprite);
+		m_vSprites.erase(siSprite);
+		siSprite--;
+	}
+}
+
+Sprite* GameEngine::IsPointInSprite(int x, int y)
+{
+	// See if the point is in a sprite in the sprite vector
+	vector<Sprite*>::reverse_iterator siSprite;
+	for (siSprite = m_vSprites.rbegin(); siSprite != m_vSprites.rend(); siSprite++)
+		if (!(*siSprite)->IsHidden() && (*siSprite)->IsPointInside(x, y))
+			return (*siSprite);
+
+	// The point is not in a sprite
+	return NULL;
+}
+
+
+

@@ -9,7 +9,10 @@
 // Include Files
 //-----------------------------------------------------------------
 #include <windows.h>
-
+#include <mmsystem.h>
+#include <vector>
+#include "Sprite.h"
+using namespace std;
 //-----------------------------------------------------------------
 // Windows Function Declarations
 //-----------------------------------------------------------------
@@ -31,7 +34,7 @@ void HandleKeys();
 void MouseButtonDown(int x, int y, BOOL bLeft);
 void MouseButtonUp(int x, int y, BOOL bLeft);
 void MouseMove(int x, int y);
-
+BOOL SpriteCollision(Sprite* pSpriteHitter, Sprite* pSpriteHittee);
 //-----------------------------------------------------------------
 // GameEngine Class
 //-----------------------------------------------------------------
@@ -48,6 +51,9 @@ protected:
   int                 m_iWidth, m_iHeight;
   int                 m_iFrameDelay;
   BOOL                m_bSleep;
+  vector<Sprite*>     m_vSprites;
+
+  BOOL                CheckSpriteCollision(Sprite* pTestSprite);
 
 public:
   // Constructor(s)/Destructor
@@ -61,6 +67,11 @@ public:
   LRESULT             HandleEvent(HWND hWindow, UINT msg, WPARAM wParam,
                         LPARAM lParam);
   void                ErrorQuit(LPTSTR szErrorMsg);
+  void                AddSprite(Sprite* pSprite);
+  void                DrawSprites(HDC hDC);
+  void                UpdateSprites();
+  void                CleanupSprites();
+  Sprite*             IsPointInSprite(int x, int y);
 
   // Accessor Methods
   HINSTANCE GetInstance() { return m_hInstance; };

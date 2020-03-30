@@ -32,12 +32,13 @@ void GameStart(HWND hWindow)
   // Create and load the background and saucer bitmaps
   HDC hDC = GetDC(hWindow);
   _pBackground = new Bitmap(hDC, TEXT("BG.bmp")); // will be changed
-  Bitmap** _bCharAnim = new Bitmap*[3];
-  *(_bCharAnim) = new Bitmap(hDC, TEXT("char_idle/adventurer-idle-00.bmp"));
-  *(_bCharAnim+1) = new Bitmap(hDC, TEXT("char_idle/adventurer-idle-01.bmp"));
-  *(_bCharAnim+2) = new Bitmap(hDC, TEXT("char_idle/adventurer-idle-02.bmp"));
+
+  _bCharAnim = new Bitmap(hDC, TEXT("resources/character_idle.bmp"));
   _sCharacter = new Sprite(_bCharAnim);
+  
   _sCharacter->SetPosition(300, 400);
+  _sCharacter->SetNumFrames(4);
+  _sCharacter->SetFrameDelay(5);
   
 
   // Set the initial saucer position and speed
@@ -124,4 +125,9 @@ void MouseButtonUp(int x, int y, BOOL bLeft)
 
 void MouseMove(int x, int y)
 {
+}
+
+BOOL SpriteCollision(Sprite * pSpriteHitter, Sprite * pSpriteHittee)
+{
+	return 0;
 }
