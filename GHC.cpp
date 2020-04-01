@@ -15,7 +15,7 @@ BOOL GameInitialize(HINSTANCE hInstance)
 {
   // Create the game engine
   _pGame = new GameEngine(hInstance, TEXT("GHC"),
-    TEXT("GHC"), IDI_UFO, IDI_UFO_SM, 860, 720);
+    TEXT("GHC"), NULL, NULL, 860, 720);
   if (_pGame == NULL)
     return FALSE;
   // Set the frame rate
