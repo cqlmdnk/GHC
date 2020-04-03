@@ -12,6 +12,7 @@
 #include "Resource.h"
 #include "GameEngine.h"
 #include "Bitmap.h"
+#include "Scene.h";
 
 //-----------------------------------------------------------------
 // Global Variables
@@ -21,6 +22,10 @@ HBITMAP		_hOffscreenBitmap;
 HDC	        _hOffscreenDC;
 GameEngine* _pGame;
 const int   _iMAXSPEED = 8;
-Bitmap*     _pBackground;
-Bitmap*     _bCharAnim;
-Sprite*		_sCharacter;
+Bitmap* _pBackground;
+Bitmap* _bCharAnim;
+Sprite* _sCharacter;
+Scene* _Scene;   // Scene pointer her cheapter bir scene den oluþur diye düþündüm ama birden fazla oluþabilir.
+
+
+int x = 0;
