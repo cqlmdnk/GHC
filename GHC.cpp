@@ -1,4 +1,4 @@
-//-----------------------------------------------------------------
+Ôªø//-----------------------------------------------------------------
 // UFO Application
 // C++ Source - UFO.cpp
 //-----------------------------------------------------------------
@@ -15,7 +15,7 @@ BOOL GameInitialize(HINSTANCE hInstance)
 {
     // Create the game engine
     _pGame = new GameEngine(hInstance, TEXT("GHC"),
-        TEXT("GHC"), IDI_UFO, IDI_UFO_SM, 1920, 1080); // Bununla oynarsan scenede de dei˛iklik yapman laz˝m!!!!
+        TEXT("GHC"), IDI_UFO, IDI_UFO_SM, 1920, 1080); // Bununla oynarsan scenede de de√∞i√æiklik yapman laz√Ωm!!!!
     if (_pGame == NULL)
         return FALSE;
     // Set the frame rate
@@ -36,29 +36,30 @@ void GameStart(HWND hWindow)
 
     // Create and load the background and saucer bitmaps
     HDC hDC = GetDC(hWindow);
-    // Arkaplan resimleri sceneye ekleme i˛lemleri
+    // Arkaplan resimleri sceneye ekleme i√ælemleri
     //-------------------------------------------------------------------------------------------------
-    _pBackground = new Bitmap(hDC, TEXT("bg/1.bmp")); // will be changed
-    _Scene = new Scene();
+    _pBackground = new Bitmap(hDC, TEXT("resources/bg/1.bmp")); // will be changed
+    _Scene = new Scene(hDC);
     _Scene->addBackground(_pBackground);
-    _pBackground = new Bitmap(hDC, TEXT("bg/2.bmp"));
+    _pBackground = new Bitmap(hDC, TEXT("resources/bg/2.bmp"));  // scenein i√ßine g√∂m√ºlebilir
     _Scene->addBackground(_pBackground);
-    _pBackground = new Bitmap(hDC, TEXT("bg/3.bmp"));
+    _pBackground = new Bitmap(hDC, TEXT("resources/bg/3.bmp"));
     _Scene->addBackground(_pBackground);
-    _pBackground = new Bitmap(hDC, TEXT("bg/4.bmp"));
+    _pBackground = new Bitmap(hDC, TEXT("resources/bg/4.bmp"));
     _Scene->addBackground(_pBackground);
-    _pBackground = new Bitmap(hDC, TEXT("bg/5.bmp"));
+    _pBackground = new Bitmap(hDC, TEXT("resources/bg/5.bmp"));
     _Scene->addBackground(_pBackground);
     //--------------------------------------------------------------------------------------------------
-                                                                                                                  //÷NER›
-                                                                              //Actor diye class olu˛tural˝m. Player extend etsin enemyde extend etsin
-                                                                              // inharetance yap˝ i˛imizi kolayla˛t˝r˝r.
-    _bCharAnim = new Bitmap(hDC, TEXT("resources/character_idle.bmp"));
-    _sCharacter = new Sprite(_bCharAnim);                                     //H.D Kendime not
-                                                                             // Sprite scale etmeye bak!!!!
-    _sCharacter->SetPosition(200, 800);
-    _sCharacter->SetNumFrames(4);
-    _sCharacter->SetFrameDelay(5);
+                                                                                                                  //√ñNER√ù
+                                                                              //Actor diye class olu√ætural√Ωm. Player extend etsin enemyde extend etsin  +1
+                                                                              // inharetance yap√Ω i√æimizi kolayla√æt√Ωr√Ωr.
+ 
+
+    _sCharacter = new Character();
+	_sCharacter->loadChar(hDC);
+																			//H.D Kendime not
+                                                                     // Sprite scale etmeye bak!!!!
+	
 
 
     // Set the initial saucer position and speed
@@ -86,8 +87,14 @@ void GameDeactivate(HWND hWindow)
 
 void GamePaint(HDC hDC)
 {
-    // Draw the background and saucer bitmaps
     _Scene->drawBackground(hDC, x);
+
+	if (editMod) {
+		LPCSTR message = TEXT("Dev Mod Activated");
+		RECT rect = { 0,0,0,0 };
+		DrawTextA(hDC, message, -1, &rect, DT_SINGLELINE | DT_NOCLIP);
+		//
+	}
     //_pBackground->Draw(hDC, 0, 0);
     _sCharacter->Draw(hDC);
 }
@@ -95,9 +102,7 @@ void GamePaint(HDC hDC)
 void GameCycle()
 {
 
-    // Update the saucer position
     _sCharacter->Update();
-    // Force a repaint to redraw the saucer
 
     HWND  hWindow = _pGame->GetWindow();
     HDC   hDC = GetDC(hWindow);
@@ -114,17 +119,26 @@ void HandleKeys()
 {
     // Change the speed of the saucer in response to arrow key presses
     if (GetAsyncKeyState(VK_LEFT) < 0) {
+		_sCharacter->changeState(S_RUN);
+        if (x > 0)              // sola gidemesin diye b√∂yle yap√Ωld√Ω.
+            x -= 1;
 
-        if (x < 0)              // sola gidemesin diye bˆyle yap˝ld˝.
-            x += 10;                                                                                // Koordinat sistemi ˛ˆyle bir˛ey oldu 
-    }                                                                                             //      |+y
+	}                                                                                             //      |+y
                                                                                                   //      |
     else if (GetAsyncKeyState(VK_RIGHT) < 0) {                                                    //      |
-        x -= 10;                                                                                  //      |______________________ -x
-                                                                                                // x bizim sahnenin neresinde olduumuzu tutuyor.
+        x += 1;                                                                                  //      |______________________ +x
+		_sCharacter->changeState(S_RUN);
+
+
+																								// x bizim sahnenin neresinde oldu√∞umuzu tutuyor.
     }
+	else {
+		_sCharacter->changeState(S_IDLE);
+
+	}
 
     if (GetAsyncKeyState(VK_UP) < 0) {
+		_sCharacter->changeState(S_JUMP);
 
     }
 
@@ -138,15 +152,72 @@ void HandleKeys()
 
 
     }
+	else if (GetAsyncKeyState(VK_TAB) < 0) { // tab ile edit mod a giriliyor
+		editMod = !editMod;
+		Sleep(100);
+
+
+
+	}
+	else if (GetAsyncKeyState('S') < 0) { 
+		if (editMod) {
+			POINT p = {0,0};
+			GetCursorPos(&p);
+			_Scene->addTile(x + p.x / 35 ,p.y / 35, 1);
+		}
+		
+
+		
+
+
+
+	}
+	else if (GetAsyncKeyState('A') < 0) { 
+		if (editMod) {
+			POINT p = { 0,0 };
+			GetCursorPos(&p);
+			_Scene->addTile(x + p.x/35, p.y/35, 2);
+			
+		}
+
+
+
+	}
+	else if (GetAsyncKeyState('D') < 0) { //delete
+		if (editMod) {
+			POINT p = { 0,0 };
+			GetCursorPos(&p);
+			_Scene->addTile(x + p.x / 35, p.y / 35, 0);
+
+		}
+	
+
+	}
+	else if (GetAsyncKeyState('L') < 0) { 
+		if (editMod) {
+			_Scene->loadLevel("leveld.dat");
+
+		}
+
+
+	}
+	else if (GetAsyncKeyState('T') < 0) { 
+		if (editMod) {
+			_Scene->saveLevel("leveld.dat");
+
+		}
+
+
+	}
 
 }
 
 void MouseButtonDown(int x, int y, BOOL bLeft)
 {
 
-    if (bLeft)
+    if (bLeft )
     {
-
+		
     }
     else
     {

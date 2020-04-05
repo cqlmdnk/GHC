@@ -1,4 +1,4 @@
-//-----------------------------------------------------------------
+ï»¿//-----------------------------------------------------------------
 // UFO Application
 // C++ Header - UFO.h
 //-----------------------------------------------------------------
@@ -23,9 +23,8 @@ HDC	        _hOffscreenDC;
 GameEngine* _pGame;
 const int   _iMAXSPEED = 8;
 Bitmap* _pBackground;
-Bitmap* _bCharAnim;
-Sprite* _sCharacter;
-Scene* _Scene;   // Scene pointer her cheapter bir scene den oluþur diye düþündüm ama birden fazla oluþabilir.
+Character* _sCharacter;
+Scene* _Scene;   // Scene pointer her chapter bir scene den oluÅŸur diye dÃ¼Ã¾Ã¼ndÃ¼m ama birden fazla oluÅŸabilir.
 
-
+bool editMod = false; // mod kontrol iÃ§in tutuluyor
 int x = 0;
