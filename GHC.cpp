@@ -111,7 +111,7 @@ void GameCycle()
 
     BitBlt(hDC, 0, 0, _pGame->GetWidth(), _pGame->GetHeight(),
         _hOffscreenDC, 0, 0, SRCCOPY);
-
+	
     ReleaseDC(hWindow, hDC);
 }
 
@@ -119,26 +119,33 @@ void HandleKeys()
 {
     // Change the speed of the saucer in response to arrow key presses
     if (GetAsyncKeyState(VK_LEFT) < 0) {
-		_sCharacter->changeState(S_RUN);
-        if (x > 0)              // sola gidemesin diye böyle yapýldý.
-            x -= 1;
+		if (x > 0)              // sola gidemesin diye böyle yapýldý.
+			x -= 1;
+
+		if (_sCharacter->IsAnimDef() && !_sCharacter->checkState(S_RUN))
+			_sCharacter->changeState(S_RUN);
+       
 
 	}                                                                                             //      |+y
                                                                                                   //      |
     else if (GetAsyncKeyState(VK_RIGHT) < 0) {                                                    //      |
         x += 1;                                                                                  //      |______________________ +x
-		_sCharacter->changeState(S_RUN);
+		if (_sCharacter->IsAnimDef() && !_sCharacter->checkState(S_RUN))
+			_sCharacter->changeState(S_RUN);
 
 
 																								// x bizim sahnenin neresinde olduðumuzu tutuyor.
     }
 	else {
-		_sCharacter->changeState(S_IDLE);
-
+		if (_sCharacter->IsAnimDef() &&  !_sCharacter->checkState(S_IDLE)) {
+			_sCharacter->changeState(S_IDLE);
+		}
 	}
+	
 
     if (GetAsyncKeyState(VK_UP) < 0) {
-		_sCharacter->changeState(S_JUMP);
+		if(!_sCharacter->checkState(S_JUMP))
+			_sCharacter->changeState(S_JUMP);
 
     }
 

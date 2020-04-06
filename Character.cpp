@@ -5,23 +5,22 @@ void Character::loadChar(HDC hDC) // constructor içinden çağrılması gereken
 	_bCharAnimIdle = new Bitmap(hDC, TEXT("resources/character_idle.bmp")); 
 	_bCharAnimRun = new Bitmap(hDC, TEXT("resources/character_run.bmp"));
 	_bCharAnimJump = new Bitmap(hDC, TEXT("resources/character_jump.bmp"));
-	SetRect(&m_rcBounds, 0, 0, 1920, 980);
+	SetRect(&m_rcBounds, 0, 0, 1920, 1020);
 	this->SetBitmap(_bCharAnimIdle);
-	SetRect(&m_rcPosition,100, 980, 100 + _bCharAnimIdle->GetWidth(),
-		980 + _bCharAnimIdle->GetHeight());
+	SetRect(&m_rcPosition,100, 1020, 100 + _bCharAnimIdle->GetWidth(),
+		1020 + _bCharAnimIdle->GetHeight());
 	
 	this->SetNumFrames(4);
 	this->SetFrameDelay(5);
-	m_iCurFrame = m_iFrameDelay = m_iFrameTrigger = 0;
-	m_ptVelocity.x = m_ptVelocity.y = 0;
-	m_iZOrder = 0;
-	m_baBoundsAction = BA_STOP;
-	m_bHidden = FALSE;
+	
 
 }
 
 void Character::changeState(STATE state)
 {
+	_bCharState = state;
+	this->m_iCurFrame = 0;
+
 	switch (state)
 	{
 	case S_IDLE:
@@ -33,14 +32,21 @@ void Character::changeState(STATE state)
 		this->SetBitmap(_bCharAnimRun);
 		this->SetNumFrames(6);
 		this->SetFrameDelay(1);
+		
 		break;
 	case S_JUMP:
 		this->SetVelocity(0, -30);
 		this->SetBitmap(_bCharAnimJump); // bir kere bastıktan sonra 7 kareyi de basması ve animasyonu bitirmesi lazım
 		this->SetNumFrames(7);
-		this->SetFrameDelay(2);
+		this->SetFrameDelay(1);
+		this->SetAnimDef(FALSE);
 		break;
 	default:
 		break;
 	}
+}
+
+bool Character::checkState(STATE state)
+{
+	return state == _bCharState;
 }

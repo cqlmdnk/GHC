@@ -11,6 +11,7 @@ Sprite::Sprite(Bitmap* pBitmap)
 	m_baBoundsAction = BA_STOP;
 	m_bHidden = FALSE;
 
+
 }
 
 Sprite::Sprite(Bitmap* pBitmap, RECT& rcBounds, BOUNDSACTION baBoundsAction)
@@ -86,7 +87,7 @@ SPRITEACTION Sprite::Update()
 	}
 
 	SetPosition(ptNewPosition);
-	this->SetVelocity(this->GetVelocity().x, this->GetVelocity().y + 4);
+	this->SetVelocity(this->GetVelocity().x, this->GetVelocity().y + 10);
 	return SA_NONE;
 
 }
@@ -119,8 +120,10 @@ inline void Sprite::UpdateFrame()
 		m_iFrameTrigger = m_iFrameDelay;
 		
 		// Increment the frame
-		if (++m_iCurFrame >= m_iNumFrames) // jump bitince burası state i değiştirecek
+		if (++m_iCurFrame >= m_iNumFrames) { // jump bitince burası state i değiştirecek
 			m_iCurFrame = 0;
+			this->SetAnimDef(TRUE);
+		}
 	}
 
 }

@@ -11,9 +11,10 @@ class Character :
 {
 	using Sprite::Sprite;
 	Bitmap *_bCharAnimIdle, *_bCharAnimRun, *_bCharAnimJump;
-
+	STATE _bCharState;
 public:
 	void loadChar(HDC hDC);
 	void changeState(STATE state);
+	bool checkState(STATE state);
 };
 

@@ -22,12 +22,20 @@ protected:
 	int m_iZOrder;
 	RECT m_rcBounds;
 	BOUNDSACTION m_baBoundsAction;
-	BOOL m_bHidden;
+	BOOL m_bHidden, m_bAnimDef;
 	int m_iFrameDelay = 0, m_iFrameTrigger = 0, m_iCurFrame, m_iNumFrames;
 
 public:
 	// Constructor(s)/Destructor
-	Sprite() {}
+	Sprite() {
+		m_iCurFrame = m_iFrameDelay = m_iFrameTrigger = 0;
+		m_ptVelocity.x = m_ptVelocity.y = 0;
+		m_iZOrder = 0;
+		m_baBoundsAction = BA_STOP;
+		m_bHidden = FALSE;
+		m_bAnimDef = TRUE;
+	
+	}
 	Sprite(Bitmap* pBitmap);
 	Sprite(Bitmap* pBitmap, RECT& rcBounds,
 		BOUNDSACTION baBoundsAction = BA_STOP);
@@ -35,7 +43,7 @@ public:
 		RECT & rcBounds, BOUNDSACTION baBoundsAction = BA_STOP);
 	virtual ~Sprite();
 	virtual void  CalcCollisionRect();
-
+	
 	// General Methods
 	virtual SPRITEACTION Update();
 	void Draw(HDC hDC);
@@ -66,6 +74,8 @@ public:
 	void SetBoundsAction(BOUNDSACTION ba) { m_baBoundsAction = ba; };
 	BOOL IsHidden() { return m_bHidden; };
 	void SetHidden(BOOL bHidden) { m_bHidden = bHidden; };
+	BOOL IsAnimDef() { return m_bAnimDef; };
+	void SetAnimDef(BOOL bAnimDef) { m_bAnimDef = bAnimDef; };
 	void SetBitmap(Bitmap* pBitmap) { m_pBitmap = pBitmap; }
 	int GetWidth() { return (m_pBitmap->GetWidth() / m_iNumFrames); };
 	int GetHeight() { return m_pBitmap->GetHeight(); };
