@@ -53,13 +53,15 @@ Sprite::~Sprite()
 {
 
 }
-SPRITEACTION Sprite::Update()
+SPRITEACTION Sprite::Update(bool top, bool bottom, bool right, bool left)
 {
 	UpdateFrame();
 
 
 	// Update the position
 	POINT ptNewPosition, ptSpriteSize, ptBoundsSize;
+
+
 	ptNewPosition.x = m_rcPosition.left + m_ptVelocity.x;
 	ptNewPosition.y = m_rcPosition.top + m_ptVelocity.y;
 	ptSpriteSize.x = m_rcPosition.right - m_rcPosition.left;
@@ -67,16 +69,18 @@ SPRITEACTION Sprite::Update()
 	ptBoundsSize.x = m_rcBounds.right - m_rcBounds.left;
 	ptBoundsSize.y = m_rcBounds.bottom - m_rcBounds.top;
 
-	
 
+	this->SetVelocity(this->GetVelocity().x, this->GetVelocity().y + 10);
 
 	if (ptNewPosition.x < m_rcBounds.left ||
 		ptNewPosition.x >(m_rcBounds.right - ptSpriteSize.x))
 	{
 		ptNewPosition.x = max(m_rcBounds.left, min(ptNewPosition.x,
 			m_rcBounds.right - ptSpriteSize.x));
+
 		SetVelocity(0, 0);
 	}
+
 
 	if (ptNewPosition.y < m_rcBounds.top ||
 		ptNewPosition.y >(m_rcBounds.bottom - ptSpriteSize.y))
@@ -86,8 +90,37 @@ SPRITEACTION Sprite::Update()
 		SetVelocity(0, 0);
 	}
 
+
+
+	
+
+
+	if (top) {
+		if (GetVelocity().y < 0) {
+			ptNewPosition.y = m_rcPosition.top;
+			SetVelocity(0, 0);
+		}
+	}
+	else if (bottom) {
+		if (GetVelocity().y > 0) {
+			ptNewPosition.y = m_rcPosition.top;
+			SetVelocity(0, 0);
+			
+		}
+	}
+	else if (right) {
+		if (GetVelocity().x > 0) {
+			ptNewPosition.x = m_rcPosition.left;
+			SetVelocity(0, 0);
+		}
+	}
+	else if (left) {
+		if (GetVelocity().x < 0) {
+			ptNewPosition.x = m_rcPosition.left;
+			SetVelocity(0, 0);
+		}
+	}
 	SetPosition(ptNewPosition);
-	this->SetVelocity(this->GetVelocity().x, this->GetVelocity().y + 10);
 	return SA_NONE;
 
 }
@@ -118,7 +151,7 @@ inline void Sprite::UpdateFrame()
 	{
 		// Reset the frame trigger;
 		m_iFrameTrigger = m_iFrameDelay;
-		
+
 		// Increment the frame
 		if (++m_iCurFrame >= m_iNumFrames) { // jump bitince burası state i değiştirecek
 			m_iCurFrame = 0;

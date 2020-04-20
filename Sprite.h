@@ -3,7 +3,9 @@
 
 typedef WORD        SPRITEACTION;
 const SPRITEACTION  SA_NONE = 0x0000L,
-SA_KILL = 0x0001L;
+SA_KILL = 0x0001L,
+SA_BLOCK_RIGHT = 0x0002L,
+SA_BLOCK_LEFT = 0x0003L;
 
 
 typedef WORD BOUNDSACTION;
@@ -45,7 +47,7 @@ public:
 	virtual void  CalcCollisionRect();
 	
 	// General Methods
-	virtual SPRITEACTION Update();
+	virtual SPRITEACTION Update(bool top, bool bottom, bool right, bool left);
 	void Draw(HDC hDC);
 	BOOL                  IsPointInside(int x, int y);
 	BOOL                  TestCollision(Sprite* pTestSprite);

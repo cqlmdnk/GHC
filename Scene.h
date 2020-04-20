@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include<windows.h>
 #include <vector>
 #include <iostream>
@@ -8,24 +8,30 @@
 #include "Character.h"
 
 
-// Bu class daha yarým içine scenede olmasý gereken herþey olucak
-// Düþmanlarda dahil.
+// Bu class daha yarÃ½m iÃ§ine scenede olmasÃ½ gereken herÃ¾ey olucak
+// DÃ¼Ã¾manlarda dahil.
 
 class Scene
 {
 public:
-	int p_iPlatform[6000][30] = { 0 }; // 200 -> x ekseni // 14 -> y ekseni
+	//int array yerine uint32_t[6000] oluÅŸturulacak ve bitwise iÅŸlem yapÄ±lacak
+	int p_iPlatform[40000][27]; // 200 -> x ekseni // 14 -> y ekseni
 	Scene(HDC hDC);
 	void addBackground(Bitmap* img);
-	void addGameObject(GameObject* obj);
+	void addGameObject(Sprite* obj);
+	void drawScene(HDC hDc);
 	void drawBackground(HDC hDc, int x);
-	void addTile(int x, int y, int type);
+	HBITMAP CreateOffscreenBmp(int wd, int hgt, int x);
+	void BlitToHdc(HDC hdcDst, HBITMAP hbmSrc, int x, int y, int wd, int hgt);
+	bool** getMap(int x);
+	void addTile(int xCur, int yCur, int type, int x);
 	void saveLevel(char* levelName);
 	void loadLevel(char* levelName);
+	int p = 0;
 	Bitmap* tiles[3];
-
+	HBITMAP platform;
 private:
-	std::vector<Bitmap*> background; // resimlerin tutulduðu array
-	std::vector <GameObject*> objects;// objeler tutulacak
+	std::vector<Bitmap*> background; // resimlerin tutulduÃ°u array
+	std::vector <Sprite*> objects;// objeler tutulacak
 };
 

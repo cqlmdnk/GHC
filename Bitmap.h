@@ -51,4 +51,5 @@ public:
 		COLORREF crTransColor = RGB(255, 0, 255));
 	int  GetWidth() { return m_iWidth; };
 	int  GetHeight() { return m_iHeight; };
+	HBITMAP GetHbitmap() { return m_hBitmap; };
 };

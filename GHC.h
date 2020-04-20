@@ -28,3 +28,5 @@ Scene* _Scene;   // Scene pointer her chapter bir scene den oluşur diye düþü
 
 bool editMod = false; // mod kontrol için tutuluyor
 int x = 0;
+int vx = 0;
+int sceneBlock = 2;

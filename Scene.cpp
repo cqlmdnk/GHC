@@ -1,56 +1,130 @@
-#include "Scene.h"
+ï»¿#include "Scene.h"
 
 
-// Bu class daha yarým içine scenede olmasý gereken herþey olucak
-// Düþmanlarda dahil.
+// Bu class daha yarÃ½m iÃ§ine scenede olmasÃ½ gereken herÃ¾ey olucak
+// DÃ¼Ã¾manlarda dahil.
 Scene::Scene(HDC hDC) {
 	tiles[0] = new Bitmap(hDC, TEXT("resources/tile1.bmp"));
 	tiles[1] = new Bitmap(hDC, TEXT("resources/tile2.bmp"));
-	tiles[2] = new Bitmap(hDC, TEXT("resources/tile2.bmp")); // tile tipleri buradan yüklenecek
+	tiles[2] = new Bitmap(hDC, TEXT("resources/tile2.bmp")); // tile tipleri buradan yÃ¼klenecek
 	memset(p_iPlatform, 0, sizeof(p_iPlatform));
-
 }
 
 
 void Scene::addBackground(Bitmap* img) {
 	background.push_back(img); // gelen obje sona ekleniyor
 }
-void Scene::addGameObject(GameObject* obj) { // game objeler bir kez yüklenicek çok defa kullanýcak ram kullanýmý azalsýn diye böyle yapýldý
+void Scene::addGameObject(Sprite* obj) { // game objeler bir kez yÃ¼klenicek Ã§ok defa kullanÃ½cak ram kullanÃ½mÃ½ azalsÃ½n diye bÃ¶yle yapÃ½ldÃ½
 	objects.push_back(obj);// gelen obje sona ekleniyor
 }
 
+void Scene::drawScene(HDC hDc)
+{
+}
+
 void Scene::drawBackground(HDC hDc, int x) {
-	int sp = 1;// Burasý için class oluþturulabilir ama ben gerek duymadým. Background þeklinde attributeeleri bitmap ve speed olabilirdi ama onun yerine hýzý yavaþ olana göre ekleyip burda hýz 
-				//oluþturup çarptým.
+	int sp = 1;// BurasÃ½ iÃ§in class oluÃ¾turulabilir ama ben gerek duymadÃ½m. Background Ã¾eklinde attributeeleri bitmap ve speed olabilirdi ama onun yerine hÃ½zÃ½ yavaÃ¾ olana gÃ¶re ekleyip burda hÃ½z 
+				//oluÃ¾turup Ã§arptÃ½m.
 	for (Bitmap* i : background) {
-		i->Draw(hDc, (sp * (-x)*10 % 1920 + 960 + 1920) % 1920, 0, TRUE); 
-		i->Draw(hDc, (sp * (-x)*10 % 1920 - 960) % 1920, 0, TRUE);
-		sp = sp + 1;
+		i->Draw(hDc, (sp * (-x) % 1920 + 960 + 1920) % 1920, 0, TRUE); 
+		i->Draw(hDc, (sp * (-x) % 1920 - 960) % 1920, 0, TRUE); // en Ã¶ndeki katman ile platformun hÄ±zÄ± eÅŸit olmalÄ±
+		sp++;
 	}
-	for (size_t i = 0; i < 55; i++)
+	if (x / 40 != p  && x != 0) { // hÄ±z a baÄŸlÄ± olarak girmeye biliyor // hÄ±zdan baÄŸÄ±smÄ±z baÅŸka bir x e ihtiyaÃ§ var // p eklendi durum dÃ¼zeldi
+		
+				platform = CreateOffscreenBmp(2000, 1080, x);
+				p = x / 40;
+	}
+	
+	BlitToHdc(hDc, platform, -(x% 40), 0, 2000, 1080);
+
+}
+HBITMAP Scene::CreateOffscreenBmp(int wd, int hgt, int x) {
+	// Get a device context to the screen.
+	HDC hdcScreen = GetDC(NULL);
+
+	// Create a device context
+	HDC hdcBmp = CreateCompatibleDC(hdcScreen);
+
+	// Create a bitmap and attach it to the device context we created above...
+	HBITMAP bmp = CreateCompatibleBitmap(hdcScreen, wd, hgt);
+	HBITMAP hbmOld = static_cast<HBITMAP>(SelectObject(hdcBmp, bmp));
+	HBRUSH solidPurple = CreateSolidBrush(RGB(255, 0, 255));
+	RECT r = { 0, 0, 2000, 1080 };
+	FillRect(hdcBmp, &r, solidPurple);
+	// Now, you can draw into bmp using the device context hdcBmp...0
+
+	HBRUSH tile_0 = CreatePatternBrush(tiles[0]->GetHbitmap());
+	HBRUSH tile_1 = CreatePatternBrush(tiles[1]->GetHbitmap());
+	for (int i = 0; i < 57; i++)
 	{
-		for (size_t j = 0; j < 30; j++)
+		for (int j = 0; j < 27; j++)
 		{
-			switch (p_iPlatform[i+x][j])
+			RECT rect = { i*40, j*40,( i* 40)+40, (j * 40)+40 };
+			switch (p_iPlatform[i + x/40][j])
 			{
 			case 1:
-				tiles[0]-> Draw(hDc, i*35, j * 35, TRUE);
+				FillRect(hdcBmp, &rect, tile_0);
 				break;
 			case 2:
-				tiles[1]->Draw(hDc, i * 35, j * 35, TRUE);
+				FillRect(hdcBmp, &rect, tile_1);
 				break;
 			default:
 				break;
 			}
-			
+
 		}
 	}
+	
+	
 
+	// etc...
+
+	// Clean up the GDI objects we've created.
+	SelectObject(hdcBmp, hbmOld);
+	DeleteDC(hdcBmp);
+	ReleaseDC(NULL, hdcScreen);
+
+	return bmp;
 }
 
-void Scene::addTile(int x, int y, int type)
+void Scene::BlitToHdc(HDC hdcDst, HBITMAP hbmSrc, int x, int y, int wd, int hgt) {
+	HDC hdcScreen = GetDC(NULL);
+	HDC hdcSrc = CreateCompatibleDC(hdcScreen);
+	HBITMAP hbmOld = static_cast<HBITMAP>(SelectObject(hdcSrc, hbmSrc));
+
+	//BitBlt(hdcDst, x, y, wd, hgt, hdcSrc, 0, 0, SRCCOPY);
+	TransparentBlt(hdcDst, x, y, wd, hgt, hdcSrc, 0, 0,wd,hgt , RGB(255, 0, 255));
+	SelectObject(hdcSrc, hbmOld);
+	DeleteDC(hdcSrc);
+	ReleaseDC(NULL, hdcScreen);
+}
+
+
+
+
+bool** Scene::getMap(int x)
 {
-		p_iPlatform[x][y] = type;
+	bool** map = 0;
+	map = new bool* [48];
+
+	for (size_t i = 0; i < 48; i++)
+	{
+		map[i] = new bool[27];
+		for (size_t j = 0; j < 27; j++)
+		{
+			//map[i][j] = p_iPlatform[i + x*10][j] != 0;
+			
+
+		}
+		
+	}
+	return map;
+}
+
+void Scene::addTile(int xCur, int yCur, int type, int x)
+{
+		p_iPlatform[x/40+xCur][yCur] = type;
 }
 
 void Scene::saveLevel(char* levelName)

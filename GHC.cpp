@@ -49,6 +49,7 @@ void GameStart(HWND hWindow)
     _Scene->addBackground(_pBackground);
     _pBackground = new Bitmap(hDC, TEXT("resources/bg/5.bmp"));
     _Scene->addBackground(_pBackground);
+    
     //--------------------------------------------------------------------------------------------------
                                                                                                                   //ÖNERÝ
                                                                               //Actor diye class oluþturalým. Player extend etsin enemyde extend etsin  +1
@@ -57,9 +58,9 @@ void GameStart(HWND hWindow)
 
     _sCharacter = new Character();
 	_sCharacter->loadChar(hDC);
-																			//H.D Kendime not
+																		//H.D Kendime not
                                                                      // Sprite scale etmeye bak!!!!
-	
+    _pGame->AddSprite(_sCharacter);
 
 
     // Set the initial saucer position and speed
@@ -88,28 +89,36 @@ void GameDeactivate(HWND hWindow)
 void GamePaint(HDC hDC)
 {
     _Scene->drawBackground(hDC, x);
+    RECT rect = { 0,0,0,0 };
 
 	if (editMod) {
-		LPCSTR message = TEXT("Dev Mod Activated");
-		RECT rect = { 0,0,0,0 };
+
+		LPCSTR message = TEXT("Dev Mod Activated  X ");
 		DrawTextA(hDC, message, -1, &rect, DT_SINGLELINE | DT_NOCLIP);
+        
 		//
 	}
+
+    LPCSTR message1 = (to_string(x).c_str());
+    rect.left = 0;
+    rect.top = 50;
+    DrawTextA(hDC, message1, 10, &rect, DT_SINGLELINE | DT_NOCLIP);
     //_pBackground->Draw(hDC, 0, 0);
-    _sCharacter->Draw(hDC);
+    _pGame->DrawSprites(hDC);
+    
 }
 
 void GameCycle()
 {
-
-    _sCharacter->Update();
+    
+     _pGame->UpdateSprites(_Scene->getMap(x / 10));
 
     HWND  hWindow = _pGame->GetWindow();
     HDC   hDC = GetDC(hWindow);
 
     GamePaint(_hOffscreenDC);
 
-    BitBlt(hDC, 0, 0, _pGame->GetWidth(), _pGame->GetHeight(),
+    BitBlt(hDC, 0, 0, _pGame->GetWidth(), _pGame->GetHeight(),//???
         _hOffscreenDC, 0, 0, SRCCOPY);
 	
     ReleaseDC(hWindow, hDC);
@@ -117,35 +126,53 @@ void GameCycle()
 
 void HandleKeys()
 {
-    // Change the speed of the saucer in response to arrow key presses
-    if (GetAsyncKeyState(VK_LEFT) < 0) {
-		if (x > 0)              // sola gidemesin diye böyle yapýldý.
-			x -= 1;
+    //yatay collision burada hesaplanacak ona göre x te değişim yapılacak
+    x += vx; // sınır kontrolleri eklenmeli ( p_iPlatform[x][])
+    if (GetAsyncKeyState(VK_LEFT) < 0 && (!_sCharacter->checkState(S_RJUMP) || _sCharacter->checkState(S_RJUMP))) {
+        vx--;
+        vx = max(vx, -10);
+        if (_sCharacter->IsAnimDef() && !_sCharacter->checkState(S_RUNL)) {
+            _sCharacter->changeState(S_RUNL);
+        }
 
-		if (_sCharacter->IsAnimDef() && !_sCharacter->checkState(S_RUN))
-			_sCharacter->changeState(S_RUN);
-       
-
-	}                                                                                             //      |+y
-                                                                                                  //      |
-    else if (GetAsyncKeyState(VK_RIGHT) < 0) {                                                    //      |
-        x += 1;                                                                                  //      |______________________ +x
-		if (_sCharacter->IsAnimDef() && !_sCharacter->checkState(S_RUN))
-			_sCharacter->changeState(S_RUN);
-
-
-																								// x bizim sahnenin neresinde olduðumuzu tutuyor.
+	}                                                                                             
+                                                                                                  
+    else if (GetAsyncKeyState(VK_RIGHT) < 0 && (!_sCharacter->checkState(S_RJUMP) || _sCharacter->checkState(S_RJUMP))) {                                                    
+        
+        // x eklemeyi buradan çıkar
+        // sadece hızı artırıp azaltmayı burada bırak
+        //zıplamıyor iken sağa ve sola gidişler hızı artırsın (max a kadar)
+        
+        vx++;
+        vx = min(vx, 10);
+        if (_sCharacter->IsAnimDef() && !_sCharacter->checkState(S_RUNR)) {
+            _sCharacter->changeState(S_RUNR);
+        }
     }
 	else {
-		if (_sCharacter->IsAnimDef() &&  !_sCharacter->checkState(S_IDLE)) {
+		if (_sCharacter->IsAnimDef()) {
 			_sCharacter->changeState(S_IDLE);
+            int sign = (vx > 0) - (vx < 0);
+            vx = sign/*getting sign(- or +)*/ * (abs(vx) -3); //
+            if (sign != ((vx > 0) - (vx < 0)))
+                vx = 0;
 		}
+        
 	}
 	
-
+    
     if (GetAsyncKeyState(VK_UP) < 0) {
-		if(!_sCharacter->checkState(S_JUMP))
-			_sCharacter->changeState(S_JUMP);
+        if (!_sCharacter->checkState(S_JUMP) && !_sCharacter->checkState(S_RJUMP)) { // düşüyorsa yürüme ve koşma çalışmamalı
+            if (GetAsyncKeyState(VK_RIGHT) < 0 || GetAsyncKeyState(VK_LEFT) < 0) {
+                _sCharacter->changeState(S_RJUMP);
+            }
+            else {
+                _sCharacter->changeState(S_LJUMP);
+            }
+           
+
+        }
+			
 
     }
 
@@ -170,7 +197,7 @@ void HandleKeys()
 		if (editMod) {
 			POINT p = {0,0};
 			GetCursorPos(&p);
-			_Scene->addTile(x + p.x / 35 ,p.y / 35, 1);
+			_Scene->addTile(x + p.x / 40 ,p.y / 40, 1, x);
 		}
 		
 
@@ -183,7 +210,7 @@ void HandleKeys()
 		if (editMod) {
 			POINT p = { 0,0 };
 			GetCursorPos(&p);
-			_Scene->addTile(x + p.x/35, p.y/35, 2);
+			_Scene->addTile(x  + p.x/40, p.y/40, 2, x);
 			
 		}
 
@@ -194,7 +221,7 @@ void HandleKeys()
 		if (editMod) {
 			POINT p = { 0,0 };
 			GetCursorPos(&p);
-			_Scene->addTile(x + p.x / 35, p.y / 35, 0);
+			_Scene->addTile(x + p.x / 40, p.y / 40, 0, x);
 
 		}
 	
