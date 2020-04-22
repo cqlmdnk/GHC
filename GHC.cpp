@@ -91,18 +91,43 @@ void GamePaint(HDC hDC)
     _Scene->drawBackground(hDC, x);
     RECT rect = { 0,0,0,0 };
 
+
 	if (editMod) {
 
 		LPCSTR message = TEXT("Dev Mod Activated  X ");
 		DrawTextA(hDC, message, -1, &rect, DT_SINGLELINE | DT_NOCLIP);
-        
+
 		//
 	}
-
-    LPCSTR message1 = (to_string(x).c_str());
+    char buffer[30];
+    snprintf(buffer, sizeof(buffer), "X cordinate : %d",  x);
+    LPCSTR message1 = (buffer);
+    rect.left = 0;
+    rect.top = 25;
+    DrawTextA(hDC, message1,sizeof(buffer), &rect, DT_SINGLELINE | DT_NOCLIP);
+   
+    POINT p = { 0,0 };
+    GetCursorPos(&p);
+    snprintf(buffer, sizeof(buffer), "mause X cordinate : %ld ", p.x);
+   message1 = (buffer);
     rect.left = 0;
     rect.top = 50;
-    DrawTextA(hDC, message1, 10, &rect, DT_SINGLELINE | DT_NOCLIP);
+    DrawTextA(hDC, message1, sizeof(buffer), &rect, DT_SINGLELINE | DT_NOCLIP);
+    snprintf(buffer, sizeof(buffer), "mause Y cordinate : %ld ", p.y);
+    message1 = (buffer);
+    rect.left = 0;
+    rect.top = 75;
+    DrawTextA(hDC, message1, sizeof(buffer), &rect, DT_SINGLELINE | DT_NOCLIP);
+
+    snprintf(buffer, sizeof(buffer), "platform x : %d                      ", x /40+ p.x / 40);
+    message1 = (buffer);
+    rect.left = 0;
+    rect.top = 100;
+    DrawTextA(hDC, message1, sizeof(buffer), &rect, DT_SINGLELINE | DT_NOCLIP);
+
+
+
+
     //_pBackground->Draw(hDC, 0, 0);
     _pGame->DrawSprites(hDC);
     
@@ -130,7 +155,7 @@ void HandleKeys()
     x += vx; // sınır kontrolleri eklenmeli ( p_iPlatform[x][])
     if (GetAsyncKeyState(VK_LEFT) < 0 && (!_sCharacter->checkState(S_RJUMP) || _sCharacter->checkState(S_RJUMP))) {
         vx--;
-        vx = max(vx, -10);
+        //vx = max(vx, -10);
         if (_sCharacter->IsAnimDef() && !_sCharacter->checkState(S_RUNL)) {
             _sCharacter->changeState(S_RUNL);
         }
@@ -144,7 +169,7 @@ void HandleKeys()
         //zıplamıyor iken sağa ve sola gidişler hızı artırsın (max a kadar)
         
         vx++;
-        vx = min(vx, 10);
+       // vx = min(vx, 10);
         if (_sCharacter->IsAnimDef() && !_sCharacter->checkState(S_RUNR)) {
             _sCharacter->changeState(S_RUNR);
         }
@@ -162,7 +187,7 @@ void HandleKeys()
 	
     
     if (GetAsyncKeyState(VK_UP) < 0) {
-        if (!_sCharacter->checkState(S_JUMP) && !_sCharacter->checkState(S_RJUMP)) { // düşüyorsa yürüme ve koşma çalışmamalı
+        if (!_sCharacter->checkState(S_LJUMP) && !_sCharacter->checkState(S_RJUMP)) { // düşüyorsa yürüme ve koşma çalışmamalı
             if (GetAsyncKeyState(VK_RIGHT) < 0 || GetAsyncKeyState(VK_LEFT) < 0) {
                 _sCharacter->changeState(S_RJUMP);
             }
@@ -197,7 +222,7 @@ void HandleKeys()
 		if (editMod) {
 			POINT p = {0,0};
 			GetCursorPos(&p);
-			_Scene->addTile(x + p.x / 40 ,p.y / 40, 1, x);
+			_Scene->addTile(x/40 + p.x / 40 ,p.y / 40, 1, x);
 		}
 		
 
@@ -221,7 +246,7 @@ void HandleKeys()
 		if (editMod) {
 			POINT p = { 0,0 };
 			GetCursorPos(&p);
-			_Scene->addTile(x + p.x / 40, p.y / 40, 0, x);
+			_Scene->addTile(x/40 + p.x / 40, p.y / 40, 0, x);
 
 		}
 	

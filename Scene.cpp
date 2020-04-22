@@ -23,11 +23,11 @@ void Scene::drawScene(HDC hDc)
 }
 
 void Scene::drawBackground(HDC hDc, int x) {
-	int sp = 1;// Burasý için class oluþturulabilir ama ben gerek duymadým. Background þeklinde attributeeleri bitmap ve speed olabilirdi ama onun yerine hýzý yavaþ olana göre ekleyip burda hýz 
+	int sp =1;// Burasý için class oluþturulabilir ama ben gerek duymadým. Background þeklinde attributeeleri bitmap ve speed olabilirdi ama onun yerine hýzý yavaþ olana göre ekleyip burda hýz 
 				//oluþturup çarptým.
 	for (Bitmap* i : background) {
-		i->Draw(hDc, (sp * (-x) % 1920 + 960 + 1920) % 1920, 0, TRUE); 
-		i->Draw(hDc, (sp * (-x) % 1920 - 960) % 1920, 0, TRUE); // en öndeki katman ile platformun hızı eşit olmalı
+		i->Draw(hDc, (sp * (-x)/5 % 1920 + 960 + 1920) % 1920, 0, TRUE); 
+		i->Draw(hDc, (sp * (-x) /5% 1920 - 960) % 1920, 0, TRUE); // en öndeki katman ile platformun hızı eşit olmalı
 		sp++;
 	}
 	if (x / 40 != p  && x != 0) { // hız a bağlı olarak girmeye biliyor // hızdan bağısmız başka bir x e ihtiyaç var // p eklendi durum düzeldi
@@ -61,6 +61,7 @@ HBITMAP Scene::CreateOffscreenBmp(int wd, int hgt, int x) {
 		for (int j = 0; j < 27; j++)
 		{
 			RECT rect = { i*40, j*40,( i* 40)+40, (j * 40)+40 };
+
 			switch (p_iPlatform[i + x/40][j])
 			{
 			case 1:
@@ -124,7 +125,7 @@ bool** Scene::getMap(int x)
 
 void Scene::addTile(int xCur, int yCur, int type, int x)
 {
-		p_iPlatform[x/40+xCur][yCur] = type;
+		p_iPlatform[xCur][yCur] = type;
 }
 
 void Scene::saveLevel(char* levelName)
