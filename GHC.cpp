@@ -126,6 +126,12 @@ void GamePaint(HDC hDC)
     DrawTextA(hDC, message1, sizeof(buffer), &rect, DT_SINGLELINE | DT_NOCLIP);
 
 
+    snprintf(buffer, sizeof(buffer), "collison : %d", _Scene->testCollisionRight(x, (_sCharacter->GetPosition().top + _sCharacter->GetPosition().bottom) / 2));
+    message1 = (buffer);
+    rect.left = 0;
+    rect.top = 125;
+    DrawTextA(hDC, message1, sizeof(buffer), &rect, DT_SINGLELINE | DT_NOCLIP);
+
 
 
     //_pBackground->Draw(hDC, 0, 0);
@@ -136,7 +142,7 @@ void GamePaint(HDC hDC)
 void GameCycle()
 {
     
-     _pGame->UpdateSprites(_Scene->getMap(x / 10));
+    _pGame->UpdateSprites(_Scene->getMap(x), x);
 
     HWND  hWindow = _pGame->GetWindow();
     HDC   hDC = GetDC(hWindow);
@@ -152,13 +158,21 @@ void GameCycle()
 void HandleKeys()
 {
     //yatay collision burada hesaplanacak ona göre x te değişim yapılacak
-    x += vx; // sınır kontrolleri eklenmeli ( p_iPlatform[x][])
+   
     if (GetAsyncKeyState(VK_LEFT) < 0 && (!_sCharacter->checkState(S_RJUMP) || _sCharacter->checkState(S_RJUMP))) {
-        vx--;
+        if (_Scene->testCollisionLeft(x+180, (_sCharacter->GetPosition().top + _sCharacter->GetPosition().bottom) / 2) == 2) {
+            vx = 0;
+
+        }
+        else {
+            vx--;
+        }
+      
         //vx = max(vx, -10);
         if (_sCharacter->IsAnimDef() && !_sCharacter->checkState(S_RUNL)) {
             _sCharacter->changeState(S_RUNL);
         }
+        
 
 	}                                                                                             
                                                                                                   
@@ -167,8 +181,14 @@ void HandleKeys()
         // x eklemeyi buradan çıkar
         // sadece hızı artırıp azaltmayı burada bırak
         //zıplamıyor iken sağa ve sola gidişler hızı artırsın (max a kadar)
-        
-        vx++;
+        if (_Scene->testCollisionRight(x+120, (_sCharacter->GetPosition().top + _sCharacter->GetPosition().bottom) / 2) == 1) {
+            vx = 0;
+
+        }
+        else {
+            vx++;
+        }
+      
        // vx = min(vx, 10);
         if (_sCharacter->IsAnimDef() && !_sCharacter->checkState(S_RUNR)) {
             _sCharacter->changeState(S_RUNR);
@@ -268,7 +288,7 @@ void HandleKeys()
 
 
 	}
-
+    x += vx; // sınır kontrolleri eklenmeli ( p_iPlatform[x][])
 }
 
 void MouseButtonDown(int x, int y, BOOL bLeft)

@@ -106,7 +106,7 @@ void Scene::BlitToHdc(HDC hdcDst, HBITMAP hbmSrc, int x, int y, int wd, int hgt)
 
 bool** Scene::getMap(int x)
 {
-	bool** map = 0;
+	bool **map = 0;
 	map = new bool* [48];
 
 	for (size_t i = 0; i < 48; i++)
@@ -114,15 +114,14 @@ bool** Scene::getMap(int x)
 		map[i] = new bool[27];
 		for (size_t j = 0; j < 27; j++)
 		{
-			//map[i][j] = p_iPlatform[i + x*10][j] != 0;
-			
+			map[i][j] = p_iPlatform[i + x / 40][j] != 0;
+
 
 		}
-		
+
 	}
 	return map;
 }
-
 void Scene::addTile(int xCur, int yCur, int type, int x)
 {
 		p_iPlatform[xCur][yCur] = type;
@@ -167,4 +166,42 @@ void Scene::loadLevel(char * levelName)
 		i++;
 	}
 	file.close();
+}
+int Scene::testCollisionRight(int x,int y) {
+
+
+
+
+		switch (p_iPlatform[1 + x / 40][y/40])
+		{
+		case 1:
+			return 1;
+			break;
+		case 2:
+			return 1;
+			break;
+		default:
+			break;
+		}
+
+	
+	return 0;
+}
+int Scene::testCollisionLeft(int x,int y) {
+
+
+		switch (p_iPlatform[(x / 40) - 1][y/40])
+		{
+		case 1:
+			return 2;
+			break;
+		case 2:
+			return 2;
+			break;
+		default:
+			break;
+		}
+
+
+	return 0;
 }

@@ -8,7 +8,7 @@ void Character::loadChar(HDC hDC) // constructor içinden çağrılması gereken
 	_bCharAnimJump = new Bitmap(hDC, TEXT("resources/character_jump.bmp"));
 	SetRect(&m_rcBounds, 0, 0, 1920, 1020);
 	this->SetBitmap(_bCharAnimIdle);
-	SetRect(&m_rcPosition,100, 1020, 100 + _bCharAnimIdle->GetWidth(),
+	SetRect(&m_rcPosition,120, 1020, 100 + _bCharAnimIdle->GetWidth(),
 		1020 + _bCharAnimIdle->GetHeight());
 	
 	this->SetNumFrames(4);

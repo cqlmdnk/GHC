@@ -27,6 +27,8 @@ public:
 	void addTile(int xCur, int yCur, int type, int x);
 	void saveLevel(char* levelName);
 	void loadLevel(char* levelName);
+	int testCollisionRight(int x, int y);
+	int testCollisionLeft(int x, int y);
 	int p = 0;
 	Bitmap* tiles[3];
 	HBITMAP platform;

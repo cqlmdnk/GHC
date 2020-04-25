@@ -280,7 +280,7 @@ void GameEngine::DrawSprites(HDC hDC)
 		(*siSprite)->Draw(hDC);
 }
 
-void GameEngine::UpdateSprites(bool** map)
+void GameEngine::UpdateSprites(bool** map, int x)
 {
 	// Update the sprites in the sprite vector
 	RECT          rcOldSpritePos;
@@ -290,12 +290,13 @@ void GameEngine::UpdateSprites(bool** map)
 	{
 		// Save the old sprite position in case we need to restore it
 		rcOldSpritePos = (*siSprite)->GetPosition();
-		bool top	= map[((rcOldSpritePos.left + rcOldSpritePos.right) / 80) + 1][rcOldSpritePos.top	  / 40];     // works both ai and player characters
-		bool bottom = map[((rcOldSpritePos.left + rcOldSpritePos.right) / 70) + 1][ rcOldSpritePos.bottom / 40];
+		//sprite lara x'in modu eklenmeli
+		bool top = map[(((rcOldSpritePos.right + rcOldSpritePos.left) / 2 - x % 40) / 40) + 2][(rcOldSpritePos.top) / 40];     // works both ai and player characters
+		bool bottom = map[(((rcOldSpritePos.right + rcOldSpritePos.left) / 2 - x % 40) / 40) + 2][(rcOldSpritePos.bottom) / 40];     // works both ai and player characters
 
-		bool right = map[( rcOldSpritePos.right / 40) + 1] [(rcOldSpritePos.top + rcOldSpritePos.bottom) / 80]; // for moving enemies 
-		bool left  = map[( rcOldSpritePos.left  / 40) + 1] [(rcOldSpritePos.top + rcOldSpritePos.bottom) / 80];	// does not work for player character
-		
+		bool right = 0;// for moving enemies
+			bool left = 0;        // does not work for player character
+
 		// Update the sprite
 		// Update the sprite
 		saSpriteAction = (*siSprite)->Update(top, bottom, right, left);
@@ -313,7 +314,7 @@ void GameEngine::UpdateSprites(bool** map)
 		if (CheckSpriteCollision(*siSprite))
 			// Restore the old sprite position
 			(*siSprite)->SetPosition(rcOldSpritePos);
-		
+
 	}
 }
 

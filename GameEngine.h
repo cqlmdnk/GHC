@@ -69,7 +69,7 @@ public:
   void                ErrorQuit(LPTSTR szErrorMsg);
   void                AddSprite(Sprite* pSprite);
   void                DrawSprites(HDC hDC);
-  void                UpdateSprites(bool** map);
+  void                UpdateSprites(bool** map, int x);
   void                CleanupSprites();
   Sprite*             IsPointInSprite(int x, int y);
 
