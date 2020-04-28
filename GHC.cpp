@@ -56,9 +56,18 @@ void GameStart(HWND hWindow)
                                                                               // inharetance yapý iþimizi kolaylaþtýrýr.
  
 
-    _sCharacter = new Character();
-	_sCharacter->loadChar(hDC);
-																		//H.D Kendime not
+    _sCharacter = new Character(hDC);
+    for (int i = 0; i < 2; i++)
+    {
+        SimpleAI* temp_ai = new SimpleAI(hDC);
+       
+        temp_ai->SetPosition(rand() % 1000 ,rand() % 1080);
+        ais.push_back(temp_ai);
+        _pGame->AddSprite(temp_ai);
+
+    }
+    
+    //H.D Kendime not
                                                                      // Sprite scale etmeye bak!!!!
     _pGame->AddSprite(_sCharacter);
 
@@ -143,7 +152,12 @@ void GameCycle()
 {
     
     _pGame->UpdateSprites(_Scene->getMap(x), x);
-
+    for (auto ai : ais) {
+        if (rand() % 2 == 0) {
+            ai->act();
+        }
+        
+    }
     HWND  hWindow = _pGame->GetWindow();
     HDC   hDC = GetDC(hWindow);
 
@@ -168,7 +182,7 @@ void HandleKeys()
             vx--;
         }
       
-        //vx = max(vx, -10);
+        vx = max(vx, -10);
         if (_sCharacter->IsAnimDef() && !_sCharacter->checkState(S_RUNL)) {
             _sCharacter->changeState(S_RUNL);
         }
@@ -189,7 +203,7 @@ void HandleKeys()
             vx++;
         }
       
-       // vx = min(vx, 10);
+        vx = min(vx, 10);
         if (_sCharacter->IsAnimDef() && !_sCharacter->checkState(S_RUNR)) {
             _sCharacter->changeState(S_RUNR);
         }
@@ -288,6 +302,13 @@ void HandleKeys()
 
 
 	}
+    else if (GetAsyncKeyState('Q') < 0) {
+        if (editMod) {
+           
+        }
+
+
+    }
     x += vx; // sınır kontrolleri eklenmeli ( p_iPlatform[x][])
 }
 

@@ -15,7 +15,7 @@ class Character :
 	Bitmap *_bCharAnimIdle, *_bCharAnimRunR, * _bCharAnimRunL, *_bCharAnimJump;
 	STATE _bCharState;
 public:
-	void loadChar(HDC hDC);
+	Character(HDC hDC);
 	void changeState(STATE state);
 	bool checkState(STATE state);
 };

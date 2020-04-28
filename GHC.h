@@ -12,7 +12,8 @@
 #include "Resource.h"
 #include "GameEngine.h"
 #include "Bitmap.h"
-#include "Scene.h";
+#include "Scene.h"
+#include "SimpleAI.h"
 
 //-----------------------------------------------------------------
 // Global Variables
@@ -25,7 +26,7 @@ const int   _iMAXSPEED = 8;
 Bitmap* _pBackground;
 Character* _sCharacter;
 Scene* _Scene;   // Scene pointer her chapter bir scene den oluşur diye düþündüm ama birden fazla oluşabilir.
-
+std::vector<SimpleAI*> ais;
 bool editMod = false; // mod kontrol için tutuluyor
 int x = 0;
 int vx = 0;

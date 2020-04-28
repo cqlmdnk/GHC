@@ -100,6 +100,7 @@
     <ClCompile Include="GameEngine.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Scene.cpp" />
+    <ClCompile Include="SimpleAI.cpp" />
     <ClCompile Include="Sprite.cpp" />
     <ClCompile Include="GHC.cpp" />
   </ItemGroup>
@@ -110,6 +111,7 @@
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="Scene.h" />
+    <ClInclude Include="SimpleAI.h" />
     <ClInclude Include="Sprite.h" />
     <ClInclude Include="GHC.h" />
   </ItemGroup>

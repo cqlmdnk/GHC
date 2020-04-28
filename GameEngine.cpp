@@ -294,8 +294,8 @@ void GameEngine::UpdateSprites(bool** map, int x)
 		bool top = map[(((rcOldSpritePos.right + rcOldSpritePos.left) / 2 - x % 40) / 40) + 2][(rcOldSpritePos.top) / 40];     // works both ai and player characters
 		bool bottom = map[(((rcOldSpritePos.right + rcOldSpritePos.left) / 2 - x % 40) / 40) + 2][(rcOldSpritePos.bottom) / 40];     // works both ai and player characters
 
-		bool right = 0;// for moving enemies
-			bool left = 0;        // does not work for player character
+		bool right = map[((rcOldSpritePos.right - x % 40) / 40) + 2][(rcOldSpritePos.top+ rcOldSpritePos.bottom) / 80];// for moving enemies
+		bool left = map[((rcOldSpritePos.left - x % 40) / 40) + 2][(rcOldSpritePos.top + rcOldSpritePos.bottom) / 80]; // does not work for player character
 
 		// Update the sprite
 		// Update the sprite

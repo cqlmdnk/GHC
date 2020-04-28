@@ -1,6 +1,6 @@
 ﻿#include "Character.h"
 
-void Character::loadChar(HDC hDC) // constructor içinden çağrılması gerekenleri buraya yazmak zorunda kaldım değişmesi lazım
+Character::Character(HDC hDC) // constructor içinden çağrılması gerekenleri buraya yazmak zorunda kaldım değişmesi lazım
 {
 	_bCharAnimIdle = new Bitmap(hDC, TEXT("resources/character_idle.bmp")); 
 	_bCharAnimRunR = new Bitmap(hDC, TEXT("resources/character_run.bmp"));
