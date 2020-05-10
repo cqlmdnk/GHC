@@ -5,7 +5,8 @@ Character::Character(HDC hDC) // constructor içinden çağrılması gerekenleri
 	_bCharAnimIdle = new Bitmap(hDC, TEXT("resources/character_idle.bmp")); 
 	_bCharAnimRunR = new Bitmap(hDC, TEXT("resources/character_run.bmp"));
 	_bCharAnimRunL = new Bitmap(hDC, TEXT("resources/character_run_l.bmp"));
-	_bCharAnimJump = new Bitmap(hDC, TEXT("resources/character_jump.bmp"));
+	_bCharAnimJumpR = new Bitmap(hDC, TEXT("resources/character_jump.bmp"));
+	_bCharAnimJumpL = new Bitmap(hDC, TEXT("resources/character_jump_l.bmp"));
 	SetRect(&m_rcBounds, 0, 0, 1920, 1020);
 	this->SetBitmap(_bCharAnimIdle);
 	SetRect(&m_rcPosition,120, 1020, 100 + _bCharAnimIdle->GetWidth(),
@@ -43,14 +44,14 @@ void Character::changeState(STATE state)
 		break;
 	case S_LJUMP:
 		this->SetVelocity(0, -30);
-		this->SetBitmap(_bCharAnimJump); // bir kere bastıktan sonra 7 kareyi de basması ve animasyonu bitirmesi lazım
+		this->SetBitmap(_bCharAnimJumpL); // bir kere bastıktan sonra 7 kareyi de basması ve animasyonu bitirmesi lazım
 		this->SetNumFrames(7);
 		this->SetFrameDelay(1);
 		this->SetAnimDef(FALSE);
 		break;
 	case S_RJUMP:
 		this->SetVelocity(0, -30);
-		this->SetBitmap(_bCharAnimJump); // bir kere bastıktan sonra 7 kareyi de basması ve animasyonu bitirmesi lazım
+		this->SetBitmap(_bCharAnimJumpR); // bir kere bastıktan sonra 7 kareyi de basması ve animasyonu bitirmesi lazım
 		this->SetNumFrames(7);
 		this->SetFrameDelay(1);
 		this->SetAnimDef(FALSE);

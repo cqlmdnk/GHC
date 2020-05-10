@@ -12,6 +12,8 @@
 #include <mmsystem.h>
 #include <vector>
 #include "Sprite.h"
+#include "SimpleAI.h"
+
 using namespace std;
 //-----------------------------------------------------------------
 // Windows Function Declarations
@@ -69,7 +71,7 @@ public:
   void                ErrorQuit(LPTSTR szErrorMsg);
   void                AddSprite(Sprite* pSprite);
   void                DrawSprites(HDC hDC);
-  void                UpdateSprites(bool** map, int x);
+  void                UpdateSprites(bool** map, int x, int vx);
   void                CleanupSprites();
   Sprite*             IsPointInSprite(int x, int y);
 

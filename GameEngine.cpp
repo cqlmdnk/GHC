@@ -1,4 +1,4 @@
-//-----------------------------------------------------------------
+﻿//-----------------------------------------------------------------
 // Game Engine Object
 // C++ Source - GameEngine.cpp
 //-----------------------------------------------------------------
@@ -280,7 +280,7 @@ void GameEngine::DrawSprites(HDC hDC)
 		(*siSprite)->Draw(hDC);
 }
 
-void GameEngine::UpdateSprites(bool** map, int x)
+void GameEngine::UpdateSprites(bool** map, int x, int vx)
 {
 	// Update the sprites in the sprite vector
 	RECT          rcOldSpritePos;
@@ -288,33 +288,49 @@ void GameEngine::UpdateSprites(bool** map, int x)
 	vector<Sprite*>::iterator siSprite;
 	for (siSprite = m_vSprites.begin(); siSprite != m_vSprites.end(); siSprite++)
 	{
-		// Save the old sprite position in case we need to restore it
-		rcOldSpritePos = (*siSprite)->GetPosition();
-		//sprite lara x'in modu eklenmeli
-		bool top = map[(((rcOldSpritePos.right + rcOldSpritePos.left) / 2 - x % 40) / 40) + 2][(rcOldSpritePos.top) / 40];     // works both ai and player characters
-		bool bottom = map[(((rcOldSpritePos.right + rcOldSpritePos.left) / 2 - x % 40) / 40) + 2][(rcOldSpritePos.bottom) / 40];     // works both ai and player characters
-
-		bool right = map[((rcOldSpritePos.right - x % 40) / 40) + 2][(rcOldSpritePos.top+ rcOldSpritePos.bottom) / 80];// for moving enemies
-		bool left = map[((rcOldSpritePos.left - x % 40) / 40) + 2][(rcOldSpritePos.top + rcOldSpritePos.bottom) / 80]; // does not work for player character
-
-		// Update the sprite
-		// Update the sprite
-		saSpriteAction = (*siSprite)->Update(top, bottom, right, left);
-
-		// Handle the SA_KILL sprite action
-		if (saSpriteAction & SA_KILL)
-		{
-			delete (*siSprite);
-			m_vSprites.erase(siSprite);
-			siSprite--;
-			continue;
+		if ((*siSprite)->IsStateHalt()) {
+			// change stateHalt if it is supposed to be in screen
+			if ((*siSprite)->GetAbsX() >= x || (*siSprite)->GetAbsX() >= x + 1080/*Ekran genişiliği makrosu*/) {
+				(*siSprite)->SetStateHalt(FALSE);
+				(*siSprite)->SetHidden( FALSE); //sleep and wake functions can be written for this
+				
+			}
 		}
+		else {
+			if (dynamic_cast<const SimpleAI*>((*siSprite)) != nullptr) { // checking if sprite is a AI or not // SimpleAI Class >> BaseAI Class
+																	//  can't check for character, since all AIs are characters
+				(*siSprite)->SetPosition((*siSprite)->GetPosition().left - vx, (*siSprite)->GetPosition().top);
+			}
+			// Save the old sprite position in case we need to restore it
+			rcOldSpritePos = (*siSprite)->GetPosition();
+			//sprite lara x'in modu eklenmeli
+			bool top = map[(((rcOldSpritePos.right + rcOldSpritePos.left) / 2 - x % 40) / 40) + 2][(rcOldSpritePos.top) / 40];     // works both ai and player characters
+			bool bottom = map[(((rcOldSpritePos.right + rcOldSpritePos.left) / 2 - x % 40) / 40) + 2][(rcOldSpritePos.bottom) / 40];     // works both ai and player characters
 
-		// See if the sprite collided with any others
-		if (CheckSpriteCollision(*siSprite))
-			// Restore the old sprite position
-			(*siSprite)->SetPosition(rcOldSpritePos);
+			bool right = map[((rcOldSpritePos.right - x % 40) / 40) + 2][(rcOldSpritePos.top + rcOldSpritePos.bottom) / 80];// for moving enemies
+			bool left = map[((rcOldSpritePos.left - x % 40) / 40) + 2][(rcOldSpritePos.top + rcOldSpritePos.bottom) / 80]; // does not work for player character
 
+			// Update the sprite
+			// Update the sprite
+			saSpriteAction = (*siSprite)->Update(top, bottom, right, left, x);
+
+
+			// Handle the SA_KILL sprite action
+			if (saSpriteAction & SA_KILL)
+			{
+				delete (*siSprite);
+				m_vSprites.erase(siSprite);
+				siSprite--;
+				continue;
+			}
+
+			// See if the sprite collided with any others
+			if (CheckSpriteCollision(*siSprite))
+				// Restore the old sprite position
+				(*siSprite)->SetPosition(rcOldSpritePos);
+
+		}
+		
 	}
 }
 

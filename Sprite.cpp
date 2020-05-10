@@ -53,7 +53,7 @@ Sprite::~Sprite()
 {
 
 }
-SPRITEACTION Sprite::Update(bool top, bool bottom, bool right, bool left)
+SPRITEACTION Sprite::Update(bool top, bool bottom, bool right, bool left, int x)
 {
 	UpdateFrame();
 
@@ -71,23 +71,42 @@ SPRITEACTION Sprite::Update(bool top, bool bottom, bool right, bool left)
 
 
 	this->SetVelocity(this->GetVelocity().x, this->GetVelocity().y + 10);
+	if (m_baBoundsAction == BA_STOP) { //kontrol blokları bool dönen fonksiyona konulabilir
 
-	if (ptNewPosition.x < m_rcBounds.left ||
-		ptNewPosition.x >(m_rcBounds.right - ptSpriteSize.x))
-	{
-		ptNewPosition.x = max(m_rcBounds.left, min(ptNewPosition.x,
-			m_rcBounds.right - ptSpriteSize.x));
+		if (ptNewPosition.x < m_rcBounds.left ||
+			ptNewPosition.x >(m_rcBounds.right - ptSpriteSize.x))
+		{
+			ptNewPosition.x = max(m_rcBounds.left, min(ptNewPosition.x,
+				m_rcBounds.right - ptSpriteSize.x));
 
-		SetVelocity(0, 0);
+			SetVelocity(0, 0);
+		}
+
+
+		if (ptNewPosition.y < m_rcBounds.top ||
+			ptNewPosition.y >(m_rcBounds.bottom - ptSpriteSize.y))
+		{
+			ptNewPosition.y = max(m_rcBounds.top, min(ptNewPosition.y,
+				m_rcBounds.bottom - ptSpriteSize.y));
+			SetVelocity(0, 0);
+		}
 	}
+	else if(m_baBoundsAction == BA_HALT){
+
+		if (ptNewPosition.x < m_rcBounds.left ||
+			ptNewPosition.x >(m_rcBounds.right - ptSpriteSize.x))
+		{
+			ptNewPosition.x = max(m_rcBounds.left, min(ptNewPosition.x,
+				m_rcBounds.right - ptSpriteSize.x));
+			m_bStateHalt = TRUE; //sleep and wake functiopns can be written for this
+			m_bHidden = TRUE;
+			SetAbsX(x); //in case of halt save x position;
+			SetVelocity(0, 0);
+		}
+	
 
 
-	if (ptNewPosition.y < m_rcBounds.top ||
-		ptNewPosition.y >(m_rcBounds.bottom - ptSpriteSize.y))
-	{
-		ptNewPosition.y = max(m_rcBounds.top, min(ptNewPosition.y,
-			m_rcBounds.bottom - ptSpriteSize.y));
-		SetVelocity(0, 0);
+		
 	}
 
 

@@ -12,7 +12,8 @@ typedef WORD BOUNDSACTION;
 const BOUNDSACTION BA_STOP = 0,
 BA_WRAP = 1,
 BA_BOUNCE = 2,
-BA_DIE = 3;
+BA_DIE = 3,
+BA_HALT = 4;
 
 class Sprite
 {
@@ -24,9 +25,10 @@ protected:
 	int m_iZOrder;
 	RECT m_rcBounds;
 	BOUNDSACTION m_baBoundsAction;
-	BOOL m_bHidden, m_bAnimDef;
+	BOOL m_bHidden, m_bAnimDef, m_bStateHalt;
 	int m_iFrameDelay = 0, m_iFrameTrigger = 0, m_iCurFrame, m_iNumFrames;
-
+	int m_iAbsX = 0;
+	
 public:
 	// Constructor(s)/Destructor
 	Sprite() {
@@ -36,7 +38,7 @@ public:
 		m_baBoundsAction = BA_STOP;
 		m_bHidden = FALSE;
 		m_bAnimDef = TRUE;
-	
+		m_bStateHalt = FALSE;
 	}
 	Sprite(Bitmap* pBitmap);
 	Sprite(Bitmap* pBitmap, RECT& rcBounds,
@@ -47,7 +49,7 @@ public:
 	virtual void  CalcCollisionRect();
 	
 	// General Methods
-	virtual SPRITEACTION Update(bool top, bool bottom, bool right, bool left);
+	virtual SPRITEACTION Update(bool top, bool bottom, bool right, bool left, int x);
 	void Draw(HDC hDC);
 	BOOL                  IsPointInside(int x, int y);
 	BOOL                  TestCollision(Sprite* pTestSprite);
@@ -78,9 +80,13 @@ public:
 	void SetHidden(BOOL bHidden) { m_bHidden = bHidden; };
 	BOOL IsAnimDef() { return m_bAnimDef; };
 	void SetAnimDef(BOOL bAnimDef) { m_bAnimDef = bAnimDef; };
+	BOOL IsStateHalt() { return m_bStateHalt; };
+	void SetStateHalt(BOOL bStateHalt) { m_bStateHalt = bStateHalt; };
 	void SetBitmap(Bitmap* pBitmap) { m_pBitmap = pBitmap; }
 	int GetWidth() { return (m_pBitmap->GetWidth() / m_iNumFrames); };
 	int GetHeight() { return m_pBitmap->GetHeight(); };
+	void SetAbsX(int absX) { m_iAbsX = absX; }
+	int GetAbsX() { return m_iAbsX; };
 	void SetFrameDelay(int iFrameDelay) { m_iFrameDelay = iFrameDelay; };
 };
 	inline void Sprite::CalcCollisionRect()

@@ -60,8 +60,17 @@ void GameStart(HWND hWindow)
     for (int i = 0; i < 2; i++)
     {
         SimpleAI* temp_ai = new SimpleAI(hDC);
-       
-        temp_ai->SetPosition(rand() % 1000 ,rand() % 1080);
+        temp_ai->SetBoundsAction(BA_HALT);
+        if (i == 0) {
+            temp_ai->SetPosition(200, 1000);
+            temp_ai->changeState(S_RUNR);
+            temp_ai->SetVelocity(10, 0);
+        }
+        else{
+            temp_ai->SetPosition(700, 1000);
+            temp_ai->changeState(S_RUNL);
+            temp_ai->SetVelocity(-10, 0);
+        }
         ais.push_back(temp_ai);
         _pGame->AddSprite(temp_ai);
 
@@ -150,13 +159,17 @@ void GamePaint(HDC hDC)
 
 void GameCycle()
 {
-    
-    _pGame->UpdateSprites(_Scene->getMap(x), x);
-    for (auto ai : ais) {
-        if (rand() % 2 == 0) {
-            ai->act();
+    _pGame->UpdateSprites(_Scene->getMap(x), x, vx);
+    for (int i = 0; i < 2; i++) // wil be removed
+    {
+        if (i == 0) {
+            ais.at(i)->SetVelocity(5, 0);
         }
-        
+        else {
+           
+            ais.at(i)->SetVelocity(-10, 0);
+        }
+
     }
     HWND  hWindow = _pGame->GetWindow();
     HDC   hDC = GetDC(hWindow);
@@ -222,11 +235,11 @@ void HandleKeys()
     
     if (GetAsyncKeyState(VK_UP) < 0) {
         if (!_sCharacter->checkState(S_LJUMP) && !_sCharacter->checkState(S_RJUMP)) { // düşüyorsa yürüme ve koşma çalışmamalı
-            if (GetAsyncKeyState(VK_RIGHT) < 0 || GetAsyncKeyState(VK_LEFT) < 0) {
-                _sCharacter->changeState(S_RJUMP);
+            if (GetAsyncKeyState(VK_LEFT) < 0) {
+                _sCharacter->changeState(S_LJUMP);
             }
             else {
-                _sCharacter->changeState(S_LJUMP);
+                _sCharacter->changeState(S_RJUMP);
             }
            
 
@@ -335,5 +348,5 @@ void MouseMove(int x, int y)
 
 BOOL SpriteCollision(Sprite* pSpriteHitter, Sprite* pSpriteHittee)
 {
-    return 0;
+    return TRUE;
 }

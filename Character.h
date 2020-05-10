@@ -12,7 +12,7 @@ class Character :
 	public Sprite
 {
 	using Sprite::Sprite;
-	Bitmap *_bCharAnimIdle, *_bCharAnimRunR, * _bCharAnimRunL, *_bCharAnimJump;
+	Bitmap *_bCharAnimIdle, *_bCharAnimRunR, * _bCharAnimRunL, *_bCharAnimJumpR, * _bCharAnimJumpL;
 	STATE _bCharState;
 public:
 	Character(HDC hDC);

@@ -1,8 +1,18 @@
 #include "SimpleAI.h"
 
-void SimpleAI::act() {
+void SimpleAI::act(int dir) {
 	int action = rand() % 3;
-	switch (action)
+
+
+	if (dir == 0) {
+		this->changeState(S_RUNR);
+		this->SetVelocity(this->GetVelocity().x + rand() % 5, 0);
+	}
+	else {
+		this->changeState(S_RUNL);
+		this->SetVelocity(this->GetVelocity().x - rand() % 5, 0);
+	}
+	/*switch (action)
 	{
 	case 0:
 		//this->changeState(S_RUNL);
@@ -10,14 +20,14 @@ void SimpleAI::act() {
 		break;
 	case 1:
 		this->changeState(S_RUNR);
-		this->SetVelocity(this->GetVelocity().x+rand()%10, 0);
+		this->SetVelocity(this->GetVelocity().x+rand()%5, 0);
 		break;
 	case 2:
 		this->changeState(S_IDLE);
 		break;
 	default:
 		break;
-	}
+	}*/
 }
 
 SimpleAI::SimpleAI(HDC hDC) : Character(hDC)
