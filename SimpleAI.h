@@ -4,7 +4,7 @@ class SimpleAI :
 	public Character
 {
 public:
-	void act(int dir);
+	virtual void act(int dir) = 0;
 	SimpleAI(HDC hDC);
 };
 

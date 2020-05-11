@@ -5,7 +5,8 @@
 #include <fstream>
 #include <string>
 #include "GameObject.h"
-#include "Character.h"
+#include "PlayerCharacter.h"
+#include "SpellCaster.h"
 
 
 // Bu class daha yarým içine scenede olmasý gereken herþey olucak
@@ -14,11 +15,12 @@
 class Scene
 {
 public:
-	//int array yerine uint32_t[6000] oluşturulacak ve bitwise işlem yapılacak
-	int p_iPlatform[40000][27]; // 200 -> x ekseni // 14 -> y ekseni
+	int p_iPlatform[40000][18]; 
 	Scene(HDC hDC);
 	void addBackground(Bitmap* img);
-	void addGameObject(Sprite* obj);
+	void addSpellCaster(SpellCaster* obj);
+	void addSpell(Spell* obj);
+
 	void drawScene(HDC hDc);
 	void drawBackground(HDC hDc, int x);
 	HBITMAP CreateOffscreenBmp(int wd, int hgt, int x);
@@ -32,8 +34,10 @@ public:
 	int p = 0;
 	Bitmap* tiles[3];
 	HBITMAP platform;
+	std::vector <SpellCaster*> spCasters;
+	std::vector <Spell*> spells;
+
 private:
 	std::vector<Bitmap*> background; // resimlerin tutulduðu array
-	std::vector <Sprite*> objects;// objeler tutulacak
 };
 

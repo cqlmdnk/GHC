@@ -97,21 +97,29 @@
   <ItemGroup>
     <ClCompile Include="Bitmap.cpp" />
     <ClCompile Include="Character.cpp" />
+    <ClCompile Include="FireBurst.cpp" />
     <ClCompile Include="GameEngine.cpp" />
     <ClCompile Include="GameObject.cpp" />
+    <ClCompile Include="PlayerCharacter.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SimpleAI.cpp" />
+    <ClCompile Include="Spell.cpp" />
+    <ClCompile Include="SpellCaster.cpp" />
     <ClCompile Include="Sprite.cpp" />
     <ClCompile Include="GHC.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bitmap.h" />
     <ClInclude Include="Character.h" />
+    <ClInclude Include="FireBurst.h" />
     <ClInclude Include="GameEngine.h" />
     <ClInclude Include="GameObject.h" />
+    <ClInclude Include="PlayerCharacter.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="SimpleAI.h" />
+    <ClInclude Include="Spell.h" />
+    <ClInclude Include="SpellCaster.h" />
     <ClInclude Include="Sprite.h" />
     <ClInclude Include="GHC.h" />
   </ItemGroup>

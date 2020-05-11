@@ -2,8 +2,6 @@
 
 
 
-GameObject::GameObject(Bitmap* obj, int x, int y) {
+GameObject::GameObject(Bitmap* obj) {
 	this->obj = obj;
-	this->x = x;
-	this->y = y;
 }

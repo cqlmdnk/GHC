@@ -24,7 +24,7 @@ HDC	        _hOffscreenDC;
 GameEngine* _pGame;
 const int   _iMAXSPEED = 8;
 Bitmap* _pBackground;
-Character* _sCharacter;
+PlayerCharacter* _sCharacter;
 Scene* _Scene;   // Scene pointer her chapter bir scene den oluşur diye düþündüm ama birden fazla oluşabilir.
 std::vector<SimpleAI*> ais;
 bool editMod = false; // mod kontrol için tutuluyor

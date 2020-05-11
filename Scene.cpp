@@ -14,8 +14,13 @@ Scene::Scene(HDC hDC) {
 void Scene::addBackground(Bitmap* img) {
 	background.push_back(img); // gelen obje sona ekleniyor
 }
-void Scene::addGameObject(Sprite* obj) { // game objeler bir kez yüklenicek çok defa kullanýcak ram kullanýmý azalsýn diye böyle yapýldý
-	objects.push_back(obj);// gelen obje sona ekleniyor
+void Scene::addSpellCaster(SpellCaster* obj) { // game objeler bir kez yüklenicek çok defa kullanýcak ram kullanýmý azalsýn diye böyle yapýldý
+	this->spCasters.push_back(obj);
+											   
+											   // gelen obje sona ekleniyor
+}
+void Scene::addSpell(Spell* obj) { // game objeler bir kez yüklenicek çok defa kullanýcak ram kullanýmý azalsýn diye böyle yapýldý
+	this->spells.push_back(obj);
 }
 
 void Scene::drawScene(HDC hDc)
@@ -30,13 +35,13 @@ void Scene::drawBackground(HDC hDc, int x) {
 		i->Draw(hDc, (sp * (-x) /5% 1920 - 960) % 1920, 0, TRUE); // en öndeki katman ile platformun hızı eşit olmalı
 		sp++;
 	}
-	if (x / 40 != p  && x != 0) { // hız a bağlı olarak girmeye biliyor // hızdan bağısmız başka bir x e ihtiyaç var // p eklendi durum düzeldi
+	if (x / tiles[0]->GetHeight() != p  && x != 0) { // hız a bağlı olarak girmeye biliyor // hızdan bağısmız başka bir x e ihtiyaç var // p eklendi durum düzeldi
 		
 				platform = CreateOffscreenBmp(2000, 1080, x);
-				p = x / 40;
+				p = x / tiles[0]->GetHeight();
 	}
 	
-	BlitToHdc(hDc, platform, -(x% 40), 0, 2000, 1080);
+	BlitToHdc(hDc, platform, -(x% tiles[0]->GetHeight()), 0, 2000, 1080);
 
 }
 HBITMAP Scene::CreateOffscreenBmp(int wd, int hgt, int x) {
@@ -56,13 +61,13 @@ HBITMAP Scene::CreateOffscreenBmp(int wd, int hgt, int x) {
 
 	HBRUSH tile_0 = CreatePatternBrush(tiles[0]->GetHbitmap());
 	HBRUSH tile_1 = CreatePatternBrush(tiles[1]->GetHbitmap());
-	for (int i = 0; i < 57; i++)
+	for (int i = 0; i < 36; i++)
 	{
-		for (int j = 0; j < 27; j++)
+		for (int j = 0; j < 18; j++)
 		{
-			RECT rect = { i*40, j*40,( i* 40)+40, (j * 40)+40 };
+			RECT rect = { i*PLATFORM_S, j* PLATFORM_S,( i* PLATFORM_S)+ PLATFORM_S, (j * PLATFORM_S)+ PLATFORM_S };
 
-			switch (p_iPlatform[i + x/40][j])
+			switch (p_iPlatform[i + x/ PLATFORM_S][j])
 			{
 			case 1:
 				FillRect(hdcBmp, &rect, tile_0);
@@ -107,14 +112,14 @@ void Scene::BlitToHdc(HDC hdcDst, HBITMAP hbmSrc, int x, int y, int wd, int hgt)
 bool** Scene::getMap(int x)
 {
 	bool **map = 0;
-	map = new bool* [48];
+	map = new bool* [36];
 
-	for (size_t i = 0; i < 48; i++)
+	for (size_t i = 0; i < 36; i++)
 	{
-		map[i] = new bool[27];
-		for (size_t j = 0; j < 27; j++)
+		map[i] = new bool[18];
+		for (size_t j = 0; j < 18; j++)
 		{
-			map[i][j] = p_iPlatform[i + x / 40][j] != 0;
+			map[i][j] = p_iPlatform[i + x / tiles[0]->GetHeight()][j] != 0;
 
 
 		}
@@ -133,10 +138,10 @@ void Scene::saveLevel(char* levelName)
 	afile.open(levelName);
 	for (size_t i = 0; i < 6000; i++)
 	{
-		for (size_t j = 0; j < 30; j++)
+		for (size_t j = 0; j < 18; j++)
 		{
 			afile << std::to_string(p_iPlatform[i][j]);
-			if(j != 29) // end of line
+			if(j != 17) // end of line
 				afile << " ";
 		}
 		if(i != 5999) // end of file
@@ -172,7 +177,7 @@ int Scene::testCollisionRight(int x,int y) {
 
 
 
-		switch (p_iPlatform[1 + x / 40][y/40])
+		switch (p_iPlatform[1 + x / tiles[0]->GetHeight()][y/ tiles[0]->GetHeight()])
 		{
 		case 1:
 			return 1;
@@ -190,7 +195,7 @@ int Scene::testCollisionRight(int x,int y) {
 int Scene::testCollisionLeft(int x,int y) {
 
 
-		switch (p_iPlatform[(x / 40) - 1][y/40])
+		switch (p_iPlatform[(x / tiles[0]->GetHeight()) - 1][y/ tiles[0]->GetHeight()])
 		{
 		case 1:
 			return 2;

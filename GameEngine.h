@@ -4,17 +4,24 @@
 //-----------------------------------------------------------------
 
 #pragma once
-
+#define PLATFORM_S 60
 //-----------------------------------------------------------------
 // Include Files
 //-----------------------------------------------------------------
 #include <windows.h>
 #include <mmsystem.h>
+#include <algorithm>
 #include <vector>
 #include "Sprite.h"
 #include "SimpleAI.h"
+#include "PlayerCharacter.h"
+#include "Spell.h"
 
 using namespace std;
+template<typename Base, typename T>
+inline bool instanceof(const T* ptr) {
+    return dynamic_cast<const Base*>(ptr) != nullptr;
+}
 //-----------------------------------------------------------------
 // Windows Function Declarations
 //-----------------------------------------------------------------
@@ -53,7 +60,7 @@ protected:
   int                 m_iWidth, m_iHeight;
   int                 m_iFrameDelay;
   BOOL                m_bSleep;
-  vector<Sprite*>     m_vSprites;
+
 
   BOOL                CheckSpriteCollision(Sprite* pTestSprite);
 
@@ -62,7 +69,7 @@ public:
           GameEngine(HINSTANCE hInstance, LPTSTR szWindowClass, LPTSTR szTitle,
             WORD wIcon, WORD wSmallIcon, int iWidth = 640, int iHeight = 480);
   virtual ~GameEngine();
-
+  vector<Sprite*>     m_vSprites;
   // General Methods
   static GameEngine*  GetEngine() { return m_pGameEngine; };
   BOOL                Initialize(int iCmdShow);

@@ -1,6 +1,6 @@
 #pragma once
 #include "Bitmap.h"
-
+#define PLATFORM_S 60
 typedef WORD        SPRITEACTION;
 const SPRITEACTION  SA_NONE = 0x0000L,
 SA_KILL = 0x0001L,
@@ -49,7 +49,7 @@ public:
 	virtual void  CalcCollisionRect();
 	
 	// General Methods
-	virtual SPRITEACTION Update(bool top, bool bottom, bool right, bool left, int x);
+	virtual SPRITEACTION Update(bool** map, int x);
 	void Draw(HDC hDC);
 	BOOL                  IsPointInside(int x, int y);
 	BOOL                  TestCollision(Sprite* pTestSprite);
@@ -65,6 +65,8 @@ public:
 	void SetPosition(RECT& rcPosition)
 	{
 		CopyRect(&m_rcPosition, &rcPosition);
+		CalcCollisionRect();
+
 	};
 	void OffsetPosition(int x, int y);
 	RECT&   GetCollision() { return m_rcCollision; };
@@ -82,25 +84,34 @@ public:
 	void SetAnimDef(BOOL bAnimDef) { m_bAnimDef = bAnimDef; };
 	BOOL IsStateHalt() { return m_bStateHalt; };
 	void SetStateHalt(BOOL bStateHalt) { m_bStateHalt = bStateHalt; };
-	void SetBitmap(Bitmap* pBitmap) { m_pBitmap = pBitmap; }
+	void SetBitmap(Bitmap* pBitmap) { 
+		m_pBitmap = pBitmap; 
+		
+
+	}
 	int GetWidth() { return (m_pBitmap->GetWidth() / m_iNumFrames); };
 	int GetHeight() { return m_pBitmap->GetHeight(); };
 	void SetAbsX(int absX) { m_iAbsX = absX; }
 	int GetAbsX() { return m_iAbsX; };
 	void SetFrameDelay(int iFrameDelay) { m_iFrameDelay = iFrameDelay; };
+	BOOL OnLeft(int x) { return x < ((m_rcPosition.left + m_rcPosition.right) / 2); };
+	BOOL OnRight(int x) { return x > ((m_rcPosition.left + m_rcPosition.right) / 2); };
 };
 	inline void Sprite::CalcCollisionRect()
 	{
-		int iXShrink = (m_rcPosition.left - m_rcPosition.right) / 12;
-		int iYShrink = (m_rcPosition.top - m_rcPosition.bottom) / 12;
+		int iXShrink = (m_rcPosition.left - m_rcPosition.right) / 5;
+		int iYShrink = (m_rcPosition.top - m_rcPosition.bottom) / 6;
 		CopyRect(&m_rcCollision, &m_rcPosition);
-		InflateRect(&m_rcCollision, iXShrink, iYShrink);
+
+
+
+		InflateRect(&m_rcCollision, iXShrink, iYShrink); ////sadasdasd
 	}
 
 	//-----------------------------------------------------------------
 	// Sprite Inline General Methods
 	//-----------------------------------------------------------------
-	inline BOOL Sprite::TestCollision(Sprite* pTestSprite)
+	inline BOOL Sprite::TestCollision(Sprite* pTestSprite) // bozuk!!!
 	{
 		RECT& rcTest = pTestSprite->GetCollision();
 		return m_rcCollision.left <= rcTest.right &&

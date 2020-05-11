@@ -54,6 +54,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 						HandleKeys();
 
 						GameCycle();
+
+						
 					}
 				}
 			}
@@ -80,12 +82,13 @@ BOOL GameEngine::CheckSpriteCollision(Sprite* pTestSprite)
 	for (siSprite = m_vSprites.begin(); siSprite != m_vSprites.end(); siSprite++)
 	{
 		// Make sure not to check for collision with itself
-		if (pTestSprite == (*siSprite))
+		if (pTestSprite == (*siSprite) )
 			continue;
 
 		// Test the collision
 		if (pTestSprite->TestCollision(*siSprite))
 			// Collision detected
+			
 			return SpriteCollision((*siSprite), pTestSprite);
 	}
 
@@ -297,42 +300,58 @@ void GameEngine::UpdateSprites(bool** map, int x, int vx)
 			}
 		}
 		else {
-			if (dynamic_cast<const SimpleAI*>((*siSprite)) != nullptr) { // checking if sprite is a AI or not // SimpleAI Class >> BaseAI Class
-																	//  can't check for character, since all AIs are characters
-				(*siSprite)->SetPosition((*siSprite)->GetPosition().left - vx, (*siSprite)->GetPosition().top);
-			}
+
 			// Save the old sprite position in case we need to restore it
 			rcOldSpritePos = (*siSprite)->GetPosition();
 			//sprite lara x'in modu eklenmeli
-			bool top = map[(((rcOldSpritePos.right + rcOldSpritePos.left) / 2 - x % 40) / 40) + 2][(rcOldSpritePos.top) / 40];     // works both ai and player characters
-			bool bottom = map[(((rcOldSpritePos.right + rcOldSpritePos.left) / 2 - x % 40) / 40) + 2][(rcOldSpritePos.bottom) / 40];     // works both ai and player characters
-
-			bool right = map[((rcOldSpritePos.right - x % 40) / 40) + 2][(rcOldSpritePos.top + rcOldSpritePos.bottom) / 80];// for moving enemies
-			bool left = map[((rcOldSpritePos.left - x % 40) / 40) + 2][(rcOldSpritePos.top + rcOldSpritePos.bottom) / 80]; // does not work for player character
+			if (!instanceof<Spell>((*siSprite))) {
+				}
 
 			// Update the sprite
 			// Update the sprite
-			saSpriteAction = (*siSprite)->Update(top, bottom, right, left, x);
-
-
+			saSpriteAction = (*siSprite)->Update( map, x);
+			if (instanceof<FireBurst>(*siSprite)) {
+				(*siSprite)->SetVelocity((*siSprite)->GetVelocity().x, (*siSprite)->GetVelocity().y - 10);
+			}
 			// Handle the SA_KILL sprite action
 			if (saSpriteAction & SA_KILL)
 			{
 				delete (*siSprite);
 				m_vSprites.erase(siSprite);
-				siSprite--;
+				//siSprite--;
 				continue;
+			}
+			if (!instanceof<PlayerCharacter>((*siSprite))) { // checking if sprite is a AI or not // SimpleAI Class >> BaseAI Class
+																	//  can't check for character, since all AIs are characters
+				
+					(*siSprite)->SetPosition((*siSprite)->GetPosition().left - vx, (*siSprite)->GetPosition().top);
+				
 			}
 
 			// See if the sprite collided with any others
-			if (CheckSpriteCollision(*siSprite))
-				// Restore the old sprite position
-				(*siSprite)->SetPosition(rcOldSpritePos);
+			if (CheckSpriteCollision(*siSprite)) {
+				if (instanceof<Spell>((*siSprite)) || instanceof<FireBurst>((*siSprite))) {
+					siSprite--;
+				}
+				else {
+					(*siSprite)->SetPosition(rcOldSpritePos);
+
+				}
+
+				
+
+
+
+
+			}
+			// Restore the old sprite position
 
 		}
+		}
 		
-	}
+		
 }
+
 
 void GameEngine::CleanupSprites()
 {
