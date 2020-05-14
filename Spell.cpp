@@ -20,10 +20,16 @@ Spell::Spell(Bitmap* _bitmap, POINT target, int x, int y)
 	InflateRect(&m_rcCollision, iXShrink, iYShrink);
 }
 
-void Spell::calcNextPos()
+void Spell::calcNextPos(int y)
 {
 	// vector operations to target
-	
-	POINT p = { ((this->target.x - this->GetPosition().left) / 20), (this->target.y+ ((200 * (double)rand() / RAND_MAX)-100) -this->GetPosition().top ) / 20 };
+	//unit vector will be multiplied with constant factor
+	int factor = 10;
+	this->target.y = y;
+	double magnitude = sqrt(pow(double(this->target.x) - this->GetPosition().left, 2) + pow(double(this->target.y)  - this->GetPosition().top + sin(lifeTime)*5, 2 ));
+	double xVector = ((double(this->target.x) - this->GetPosition().left) / magnitude) * log(magnitude);
+	double yVector =  ((this->target.y + ((200 * (double)rand() / RAND_MAX) - 100) - this->GetPosition().top) / magnitude) ;
+
+	POINT p = { int(xVector),int(yVector) };
 	this->SetVelocity(p.x, p.y);
 }

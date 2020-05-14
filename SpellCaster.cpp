@@ -2,10 +2,10 @@
 
 void SpellCaster::act(int a) {
 	int rng = rand() % 5;
-	if (rng == 0) {
+	if (rng == 6) {
 		this->changeState(S_RUNL);
 	}
-	else if (rng == 1) {
+	else if (rng == 7) {
 		this->changeState(S_RUNR);
 	}
 }

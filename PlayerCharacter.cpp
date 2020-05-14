@@ -23,14 +23,14 @@ PlayerCharacter::PlayerCharacter(HDC hDC) : Character(hDC) // default frame numb
 	this->SetNumFrames(4);
 	this->SetFrameDelay(5);
 
-	int iXShrink = (m_rcPosition.left - m_rcPosition.right) / 3;
-	int iYShrink = (m_rcPosition.top - m_rcPosition.bottom) / 3;
+	int iXShrink = (m_rcPosition.left - m_rcPosition.right) / 5;
+	int iYShrink = (m_rcPosition.top - m_rcPosition.bottom) / 5;
 	CopyRect(&m_rcCollision, &m_rcPosition);
 
-
+	
 
 	InflateRect(&m_rcCollision, iXShrink, iYShrink);
-	
+	this->fireCounter = 10;
 
 	
 }
@@ -109,7 +109,7 @@ FireBurst* PlayerCharacter::fire()
 		fb->SetBitmap(_bCharFireBurstL);
 		fb->SetPosition(this->GetPosition().left,this->GetPosition().top +10);
 		
-		fb->SetVelocity(-50,0);
+		fb->SetVelocity(-20,0);
 		
 	}
 	else {
@@ -117,13 +117,13 @@ FireBurst* PlayerCharacter::fire()
 		fb->SetBitmap(_bCharFireBurstR);
 		fb->SetPosition(this->GetPosition().right, this->GetPosition().top + 10);
 		
-		fb->SetVelocity(50, 0);
+		fb->SetVelocity(20, 0);
 		
 		
 	}
 	fb->SetNumFrames(6);
 	fb->SetFrameDelay(1);
-	fb->SetBounds(RECT{ 0, 0, 1920, 1020 });
+	fb->SetBounds(RECT{ 50, 50, 1870, 1030 });
 	fb->SetBoundsAction(BA_DIE);
 	return fb;
 }

@@ -27,7 +27,6 @@ BOOL GameInitialize(HINSTANCE hInstance)
 
 	// Store the instance handle
 	_hInstance = hInstance;
-
 	return TRUE;
 }
 
@@ -113,12 +112,14 @@ void GamePaint(HDC hDC)
 
 void GameCycle()
 {
-
+	if (_sCharacter->fireCounter != 0) {
+		_sCharacter->fireCounter--;
+	}
 	randomCastSpells();
 	updateSpells();
-
-	_pGame->UpdateSprites(_Scene->getMap(x), x, vx);
 	x += vx;
+	_pGame->UpdateSprites(_Scene->getMap(x), x, vx);
+	
 	//for (int i = 0; i < 2; i++) // will be removed
 	//{
 	//    if (i == 0) {
@@ -132,6 +133,12 @@ void GameCycle()
 	//}
 	HWND  hWindow = _pGame->GetWindow();
 	HDC   hDC = GetDC(hWindow);
+	if (rand() % 100 < 1) {
+		SpellCaster* temp_spellC = new SpellCaster(hDC);
+		temp_spellC->SetPosition((rand() % 700) + 1000, 900);
+		_Scene->addSpellCaster(temp_spellC);
+		_pGame->AddSprite(temp_spellC);
+	}
 
 	GamePaint(_hOffscreenDC);
 
@@ -213,14 +220,13 @@ void HandleKeys()
 
 		}
 
-
 	}
 
 	else if (GetAsyncKeyState(VK_DOWN) < 0) {
 
 	}
 
-	else if (GetAsyncKeyState(VK_SPACE) < 0) {
+	else if (GetAsyncKeyState(VK_SPACE) < 0 && _sCharacter->fireCounter == 0) {
 		if (GetAsyncKeyState(VK_LEFT) < 0) {
 			_sCharacter->changeState(S_LFIRE);
 			_pGame->AddSprite(_sCharacter->fire());
@@ -230,7 +236,7 @@ void HandleKeys()
 			_pGame->AddSprite(_sCharacter->fire());
 
 		}
-
+		_sCharacter->fireCounter = 10;
 
 	}
 	else if (GetAsyncKeyState(VK_TAB) < 0) { // tab ile edit mod a giriliyor
@@ -322,25 +328,44 @@ void MouseMove(int x, int y)
 {
 }
 
-BOOL SpriteCollision(Sprite* pSpriteHitter, Sprite* pSpriteHittee)
+BOOL SpriteCollision(Sprite* pSpriteHitter, Sprite* pSpriteHittee) // All collision actions handled here
 {
 	//if one of is PlayerCharacter check positions and decide the faith of vx
 	if (instanceof<Spell>(pSpriteHitter) || instanceof<FireBurst>(pSpriteHitter)) {
 		if (instanceof<Spell>(pSpriteHitter) && instanceof<PlayerCharacter>(pSpriteHittee)) {
 
 			_Scene->spells.erase(std::remove(_Scene->spells.begin(), _Scene->spells.end(), pSpriteHitter), _Scene->spells.end());
-			_pGame->m_vSprites.erase(std::remove(_pGame->m_vSprites.begin(), _pGame->m_vSprites.end(), pSpriteHitter), _pGame->m_vSprites.end());
+			pSpriteHitter->SetHidden(TRUE);
+			pSpriteHittee->SetHidden(TRUE);
+			
 			//vurulan playerın canını düşür
-			return FALSE;
+			
 		}
-		else if(instanceof<FireBurst>(pSpriteHitter) && !instanceof<Spell>(pSpriteHittee)) {
-			_Scene->spells.erase(std::remove(_Scene->spells.begin(), _Scene->spells.end(), pSpriteHitter), _Scene->spells.end());
-			_pGame->m_vSprites.erase(std::remove(_pGame->m_vSprites.begin(), _pGame->m_vSprites.end(), pSpriteHitter), _pGame->m_vSprites.end());
-			return FALSE;
+		else if ((instanceof<SpellCaster>(pSpriteHitter) && instanceof<FireBurst>(pSpriteHittee))) {
+			pSpriteHittee->SetHidden(TRUE);//initiate death animation of spellcaster
+			pSpriteHitter->SetHidden(TRUE); 
+
+			_Scene->spCasters.erase(std::remove(_Scene->spCasters.begin(), _Scene->spCasters.end(), pSpriteHitter), _Scene->spCasters.end());
+
+
+		}
+		else if ((instanceof<SpellCaster>(pSpriteHittee) && instanceof<FireBurst>(pSpriteHitter))) {
+			pSpriteHittee->SetHidden(TRUE); //initiate death animation of spellcaster
+			pSpriteHitter->SetHidden(TRUE);
+
+			_Scene->spCasters.erase(std::remove(_Scene->spCasters.begin(), _Scene->spCasters.end(), pSpriteHittee), _Scene->spCasters.end());
+			
+
+		}
+		else if (instanceof<FireBurst>(pSpriteHitter)) {
+			pSpriteHitter->SetHidden(TRUE);
+
 		}
 
+		return FALSE;
 	}
-	
+
+
 	else {
 		if (pSpriteHittee->GetPosition().bottom == pSpriteHitter->GetPosition().bottom) {
 			if (instanceof<PlayerCharacter>(pSpriteHittee)) {
@@ -382,8 +407,8 @@ BOOL SpriteCollision(Sprite* pSpriteHitter, Sprite* pSpriteHittee)
 void randomCastSpells() {
 	for (SpellCaster* spellCaster : _Scene->spCasters) {
 		if (!spellCaster->IsStateHalt()) {
-			if (rand() % 20 == 0) {
-				Spell* sp = spellCaster->fire(POINT{ 340, _sCharacter->GetPosition().top+rand()%20-10+(_sCharacter->GetHeight()/2) });
+			if (rand() % 100 < 5) {
+				Spell* sp = spellCaster->fire(POINT{ 340, _sCharacter->GetPosition().top + rand() % 10 - 5 + (_sCharacter->GetHeight() / 2) });
 				sp->SetVelocity(2, 3);
 				_Scene->addSpell(sp);
 				_pGame->AddSprite(sp);
@@ -394,7 +419,8 @@ void randomCastSpells() {
 }
 void updateSpells() {
 	for (Spell* spell : _Scene->spells) {
-		spell->calcNextPos();
+		int y = (spell->GetPosition().left - 340 == 10 || spell->GetPosition().left - 340 == -10) ? _sCharacter->GetPosition().top : _sCharacter->GetPosition().top + rand() % 10 - 5 + (_sCharacter->GetHeight() / 2);
+		spell->calcNextPos(y);
 		spell->lifeTime--;
 		if (spell->lifeTime < 0) {
 			_Scene->spells.erase(std::remove(_Scene->spells.begin(), _Scene->spells.end(), spell), _Scene->spells.end());

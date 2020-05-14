@@ -8,5 +8,6 @@ public:
 	PlayerCharacter(HDC hDC);
 	void changeState(STATE state);
 	FireBurst* fire();
+	int fireCounter;
 };
 
