@@ -23,7 +23,7 @@ BOOL GameInitialize(HINSTANCE hInstance)
 	if (_pGame == NULL)
 		return FALSE;
 	// Set the frame rate
-	_pGame->SetFrameRate(60);
+	_pGame->SetFrameRate(30);
 
 	// Store the instance handle
 	_hInstance = hInstance;
@@ -41,7 +41,7 @@ void GameStart(HWND hWindow)
 	HDC hDC = GetDC(hWindow);
 	// Arkaplan resimleri sceneye ekleme iþlemleri
 	//-------------------------------------------------------------------------------------------------
-	_pBackground = new Bitmap(hDC, TEXT("resources/bg/1.bmp")); // will be changed
+	_pBackground = new Bitmap(hDC, TEXT("resources/bg/1.bmp") ); // will be changed
 	_Scene = new Scene(hDC);
 	_Scene->addBackground(_pBackground);
 	_pBackground = new Bitmap(hDC, TEXT("resources/bg/2.bmp"));  // scenein içine gömülebilir
@@ -134,17 +134,20 @@ void GameCycle()
 	HWND  hWindow = _pGame->GetWindow();
 	HDC   hDC = GetDC(hWindow);
 	if (rand() % 100 < 1) {
-		/*if (rand() % 2 == 0) {
+		if (rand() % 2 == 0) {
+			
 			SpellCaster* temp_spellC = new SpellCaster(hDC);
 			temp_spellC->SetPosition((rand() % 700) + 1000, 900);
 			_Scene->addSpellCaster(temp_spellC);
 			_pGame->AddSprite(temp_spellC);
 		}
-		else {*/
+		else {
 			Demon* temp_demon = new Demon(hDC);
 			temp_demon->SetPosition((rand() % 700) + 1000, 900);
 			_pGame->AddSprite(temp_demon);
-		/*}*/
+			_Scene->addDemon(temp_demon);
+
+		}
 		
 	}
 
@@ -349,14 +352,15 @@ BOOL SpriteCollision(Sprite* pSpriteHitter, Sprite* pSpriteHittee) // All collis
 			//vurulan playerın canını düşür
 			
 		}
-		else if ((instanceof<SpellCaster>(pSpriteHitter) && instanceof<FireBurst>(pSpriteHittee))) {
-			SpellCaster* spellCaster = dynamic_cast<SpellCaster*>(pSpriteHittee);
-			spellCaster->die();
+		else if ((instanceof<Demon>(pSpriteHittee) && instanceof<FireBurst>(pSpriteHitter))) {
+			//initiate death animation of spellcaster
+			Demon* demon = dynamic_cast<Demon*>(pSpriteHittee);
+			demon->die();
 
-			pSpriteHitter->SetHidden(TRUE); 
+			pSpriteHitter->SetHidden(TRUE);
 
-			_Scene->spCasters.erase(std::remove(_Scene->spCasters.begin(), _Scene->spCasters.end(), pSpriteHitter), _Scene->spCasters.end());
-			
+			_Scene->demons.erase(std::remove(_Scene->demons.begin(), _Scene->demons.end(), pSpriteHittee), _Scene->demons.end());
+
 
 		}
 		else if ((instanceof<SpellCaster>(pSpriteHittee) && instanceof<FireBurst>(pSpriteHitter))) {

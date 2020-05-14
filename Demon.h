@@ -8,5 +8,6 @@ public:
 	~Demon();
 	void changeState(STATE state);
 	void act(int a);
+	void die();
 };
 

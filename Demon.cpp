@@ -6,8 +6,9 @@ Demon::Demon(HDC hDC) :  SimpleAI(hDC){
 	this->_bCharAnimRunL = new Bitmap(hDC, TEXT("resources/demon_walk_l.bmp"));
 	this->_bCharAnimAttR = new Bitmap(hDC, TEXT("resources/demon_attack.bmp"));
 	this->_bCharAnimAttL = new Bitmap(hDC, TEXT("resources/demon_attack_l.bmp"));
+	this->_bCharAnimDeathL = new Bitmap(hDC, TEXT("resources/demon_death.bmp"));
+	this->_bCharAnimDeathR = new Bitmap(hDC, TEXT("resources/demon_death_l.bmp"));
 
-	
 	this->SetBitmap(_bCharAnimRunR);
 	SetRect(&m_rcPosition, 0, 0, _bCharAnimRunR->GetWidth(), _bCharAnimRunR->GetHeight());
 	this->SetVelocity(5, 0);
@@ -49,16 +50,16 @@ void Demon::changeState(STATE state) {
 		this->SetBitmap(_bCharAnimDeathR);
 		this->SetAnimDef(FALSE);
 		//this->SetPosition(RECT{ this->GetPosition().left,this->GetPosition().top, this->GetPosition().left + _bCharAnimDeathR->GetWidth(), this->GetPosition().top + _bCharAnimJumpL->GetHeight() });
-
-		this->SetNumFrames(10);
+		this->SetVelocity(0, 0);
+		this->SetNumFrames(8);
 		this->SetFrameDelay(2);
 		break;
 	case S_LDEATH:
 		this->SetBitmap(_bCharAnimDeathL);
 		this->SetAnimDef(FALSE);
 		//this->SetPosition(RECT{ this->GetPosition().left,this->GetPosition().top, this->GetPosition().left + _bCharAnimDeathL->GetWidth(), this->GetPosition().top + _bCharAnimJumpL->GetHeight() });
-
-		this->SetNumFrames(10);
+		this->SetVelocity(0, 0);
+		this->SetNumFrames(8);
 		this->SetFrameDelay(2);
 		break;
 
@@ -78,4 +79,11 @@ void Demon::act(int a) {
 	else if (rng == 7) {
 		this->changeState(S_RUNR);
 	}
+}
+
+void Demon::die()
+{
+	deathMark = TRUE;
+	STATE state = (m_pBitmap == _bCharAnimRunR || m_pBitmap == _bCharAnimIdle) ? S_LDEATH : S_RDEATH;
+	changeState(state);
 }

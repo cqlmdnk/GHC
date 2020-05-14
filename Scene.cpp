@@ -19,6 +19,11 @@ void Scene::addSpellCaster(SpellCaster* obj) { // game objeler bir kez yüklenic
 											   
 											   // gelen obje sona ekleniyor
 }
+void Scene::addDemon(Demon* obj) { // game objeler bir kez yüklenicek çok defa kullanýcak ram kullanýmý azalsýn diye böyle yapýldý
+	this->demons.push_back(obj);
+
+	// gelen obje sona ekleniyor
+}
 void Scene::addSpell(Spell* obj) { // game objeler bir kez yüklenicek çok defa kullanýcak ram kullanýmý azalsýn diye böyle yapýldý
 	this->spells.push_back(obj);
 }

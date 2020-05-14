@@ -80,7 +80,7 @@ void SpellCaster::changeState(STATE state) {
 			this->SetBitmap(_bCharAnimDeathR);
 			this->SetAnimDef(FALSE);
 			//this->SetPosition(RECT{ this->GetPosition().left,this->GetPosition().top, this->GetPosition().left + _bCharAnimDeathR->GetWidth(), this->GetPosition().top + _bCharAnimJumpL->GetHeight() });
-
+			this->SetVelocity(0, 0);
 			this->SetNumFrames(10);
 			this->SetFrameDelay(2);
 			break;
@@ -88,7 +88,7 @@ void SpellCaster::changeState(STATE state) {
 			this->SetBitmap(_bCharAnimDeathL);
 			this->SetAnimDef(FALSE);
 			//this->SetPosition(RECT{ this->GetPosition().left,this->GetPosition().top, this->GetPosition().left + _bCharAnimDeathL->GetWidth(), this->GetPosition().top + _bCharAnimJumpL->GetHeight() });
-
+			this->SetVelocity(0, 0);
 			this->SetNumFrames(10);
 			this->SetFrameDelay(2);
 			break;

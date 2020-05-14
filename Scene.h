@@ -21,7 +21,7 @@ public:
 	void addBackground(Bitmap* img);
 	void addSpellCaster(SpellCaster* obj);
 	void addSpell(Spell* obj);
-
+	void addDemon(Demon* obj);
 	void drawScene(HDC hDc);
 	void drawBackground(HDC hDc, int x);
 	HBITMAP CreateOffscreenBmp(int wd, int hgt, int x);
@@ -37,6 +37,7 @@ public:
 	HBITMAP platform;
 	std::vector <SpellCaster*> spCasters;
 	std::vector <Spell*> spells;
+	std::vector <Demon*> demons;
 
 private:
 	std::vector<Bitmap*> background; // resimlerin tutulduðu array
