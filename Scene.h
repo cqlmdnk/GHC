@@ -7,6 +7,7 @@
 #include "GameObject.h"
 #include "PlayerCharacter.h"
 #include "SpellCaster.h"
+#include "Demon.h"
 
 
 // Bu class daha yarým içine scenede olmasý gereken herþey olucak

@@ -7,4 +7,5 @@ FireBurst::FireBurst() {
 
 
 	InflateRect(&m_rcCollision, iXShrink, iYShrink);
+	deathMark = FALSE;
 }

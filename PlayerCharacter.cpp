@@ -27,7 +27,7 @@ PlayerCharacter::PlayerCharacter(HDC hDC) : Character(hDC) // default frame numb
 	int iYShrink = (m_rcPosition.top - m_rcPosition.bottom) / 5;
 	CopyRect(&m_rcCollision, &m_rcPosition);
 
-	
+	deathMark = FALSE;
 
 	InflateRect(&m_rcCollision, iXShrink, iYShrink);
 	this->fireCounter = 10;

@@ -40,6 +40,7 @@ public:
 		m_bAnimDef = TRUE;
 		m_bStateHalt = FALSE;
 	}
+	BOOL deathMark = FALSE;
 	Sprite(Bitmap* pBitmap);
 	Sprite(Bitmap* pBitmap, RECT& rcBounds,
 		BOUNDSACTION baBoundsAction = BA_STOP);

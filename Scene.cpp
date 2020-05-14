@@ -177,7 +177,7 @@ int Scene::testCollisionRight(int x,int y) {
 
 
 
-		switch (p_iPlatform[1 + x / tiles[0]->GetHeight()][y/ tiles[0]->GetHeight()])
+ 		switch (p_iPlatform[1 + x / tiles[0]->GetHeight()][y/ tiles[0]->GetHeight()])
 		{
 		case 1:
 			return 1;

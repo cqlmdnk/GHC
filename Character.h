@@ -2,12 +2,15 @@
 #include "Sprite.h"
 typedef WORD STATE;
 const STATE S_IDLE = 0,
-S_RUNR = 1,
-S_RUNL = 2,
-S_LJUMP = 3,
-S_RJUMP = 4,
-S_RFIRE = 5,
-S_LFIRE = 6;
+S_IDLEL = 1,
+S_RUNR = 2,
+S_RUNL = 3,
+S_LJUMP = 4,
+S_RJUMP = 5,
+S_RFIRE = 6,
+S_LFIRE = 7,
+S_RDEATH = 8,
+S_LDEATH = 9;
 //diğer durumlar buraya eklenecek
 
 class Character :
@@ -15,7 +18,7 @@ class Character :
 {
 	using Sprite::Sprite;
 protected:
-	Bitmap *_bCharAnimIdle, *_bCharAnimRunR, * _bCharAnimRunL, *_bCharAnimJumpR, * _bCharAnimJumpL, *_bCharFireBurstR, *_bCharFireBurstL, *_bCharFire, * _bCharFireL;;
+	Bitmap* _bCharAnimIdle,* _bCharAnimIdleL, * _bCharAnimRunR, * _bCharAnimRunL, * _bCharAnimJumpR, * _bCharAnimJumpL, * _bCharFireBurstR, * _bCharFireBurstL, * _bCharFire, * _bCharFireL, * _bCharAnimDeathR, * _bCharAnimDeathL, * _bCharAnimAttR, * _bCharAnimAttL;
 	STATE _bCharState;
 public:
 	Character(HDC hDC);

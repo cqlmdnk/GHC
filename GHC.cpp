@@ -62,7 +62,7 @@ void GameStart(HWND hWindow)
 
 	SpellCaster* temp_ai = new SpellCaster(hDC);
 	_Scene->addSpellCaster(temp_ai);
-	temp_ai->SetBoundsAction(BA_HALT);
+	
 
 	temp_ai->SetPosition(900, 700);
 
@@ -134,10 +134,18 @@ void GameCycle()
 	HWND  hWindow = _pGame->GetWindow();
 	HDC   hDC = GetDC(hWindow);
 	if (rand() % 100 < 1) {
-		SpellCaster* temp_spellC = new SpellCaster(hDC);
-		temp_spellC->SetPosition((rand() % 700) + 1000, 900);
-		_Scene->addSpellCaster(temp_spellC);
-		_pGame->AddSprite(temp_spellC);
+		/*if (rand() % 2 == 0) {
+			SpellCaster* temp_spellC = new SpellCaster(hDC);
+			temp_spellC->SetPosition((rand() % 700) + 1000, 900);
+			_Scene->addSpellCaster(temp_spellC);
+			_pGame->AddSprite(temp_spellC);
+		}
+		else {*/
+			Demon* temp_demon = new Demon(hDC);
+			temp_demon->SetPosition((rand() % 700) + 1000, 900);
+			_pGame->AddSprite(temp_demon);
+		/*}*/
+		
 	}
 
 	GamePaint(_hOffscreenDC);
@@ -342,15 +350,20 @@ BOOL SpriteCollision(Sprite* pSpriteHitter, Sprite* pSpriteHittee) // All collis
 			
 		}
 		else if ((instanceof<SpellCaster>(pSpriteHitter) && instanceof<FireBurst>(pSpriteHittee))) {
-			pSpriteHittee->SetHidden(TRUE);//initiate death animation of spellcaster
+			SpellCaster* spellCaster = dynamic_cast<SpellCaster*>(pSpriteHittee);
+			spellCaster->die();
+
 			pSpriteHitter->SetHidden(TRUE); 
 
 			_Scene->spCasters.erase(std::remove(_Scene->spCasters.begin(), _Scene->spCasters.end(), pSpriteHitter), _Scene->spCasters.end());
-
+			
 
 		}
 		else if ((instanceof<SpellCaster>(pSpriteHittee) && instanceof<FireBurst>(pSpriteHitter))) {
-			pSpriteHittee->SetHidden(TRUE); //initiate death animation of spellcaster
+			//initiate death animation of spellcaster
+			SpellCaster* spellCaster = dynamic_cast<SpellCaster*>(pSpriteHittee);
+			spellCaster->die();
+			
 			pSpriteHitter->SetHidden(TRUE);
 
 			_Scene->spCasters.erase(std::remove(_Scene->spCasters.begin(), _Scene->spCasters.end(), pSpriteHittee), _Scene->spCasters.end());
@@ -406,8 +419,8 @@ BOOL SpriteCollision(Sprite* pSpriteHitter, Sprite* pSpriteHittee) // All collis
 
 void randomCastSpells() {
 	for (SpellCaster* spellCaster : _Scene->spCasters) {
-		if (!spellCaster->IsStateHalt()) {
-			if (rand() % 100 < 5) {
+		if (!spellCaster->IsStateHalt() && spellCaster->deathMark != TRUE) {
+			if (rand() % 100 < 0) {
 				Spell* sp = spellCaster->fire(POINT{ 340, _sCharacter->GetPosition().top + rand() % 10 - 5 + (_sCharacter->GetHeight() / 2) });
 				sp->SetVelocity(2, 3);
 				_Scene->addSpell(sp);

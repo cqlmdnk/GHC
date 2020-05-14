@@ -6,9 +6,12 @@ class SpellCaster :
 {
 public:
 	SpellCaster(HDC hDC);
+	~SpellCaster();
 	void act(int a);
 	Spell* fire(POINT target);
 	void changeState(STATE state);
 	Bitmap* _bSpell;
+	
+	void die();
 };
 

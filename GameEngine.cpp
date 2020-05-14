@@ -357,9 +357,11 @@ void GameEngine::UpdateSprites(bool** map, int x, int vx)
 	}
 	for (auto sprite : m_vSprites)
 	{
-		if(sprite->IsHidden())
+
+		if ((sprite->deathMark && sprite->IsAnimDef()) || sprite->IsHidden()) {
 			m_vSprites.erase(std::remove(m_vSprites.begin(), m_vSprites.end(), sprite), m_vSprites.end());
-			
+			delete sprite;
+		}
 	}
 
 

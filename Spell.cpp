@@ -18,6 +18,8 @@ Spell::Spell(Bitmap* _bitmap, POINT target, int x, int y)
 
 	this->m_iZOrder = 11;
 	InflateRect(&m_rcCollision, iXShrink, iYShrink);
+	deathMark = FALSE;
+
 }
 
 void Spell::calcNextPos(int y)

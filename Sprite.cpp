@@ -10,7 +10,7 @@ Sprite::Sprite(Bitmap* pBitmap)
 	SetRect(&m_rcBounds, 0, 0, 640, 480);
 	m_baBoundsAction = BA_STOP;
 	m_bHidden = FALSE;
-
+	deathMark = FALSE;
 
 }
 
@@ -113,7 +113,7 @@ SPRITEACTION Sprite::Update(bool** map, int x)
 			ptNewPosition.x = max(m_rcBounds.left, min(ptNewPosition.x,
 				m_rcBounds.right - ptSpriteSize.x));
 
-			SetVelocity(0, 0);
+			SetVelocity(0, m_ptVelocity.y);
 		}
 
 
@@ -122,7 +122,7 @@ SPRITEACTION Sprite::Update(bool** map, int x)
 		{
 			ptNewPosition.y = max(m_rcBounds.top, min(ptNewPosition.y,
 				m_rcBounds.bottom - ptSpriteSize.y));
-			SetVelocity(0, 0);
+			SetVelocity(m_ptVelocity.x, 0);
 		}
 	}
 	else if(m_baBoundsAction == BA_HALT){
@@ -135,14 +135,14 @@ SPRITEACTION Sprite::Update(bool** map, int x)
 			m_bStateHalt = TRUE; //sleep and wake functions can be written for this
 			m_bHidden = TRUE;
 			SetAbsX(x); //in case of halt save x position;
-			SetVelocity(0, 0);
+			SetVelocity(0, m_ptVelocity.y);
 		}
 		if (ptNewPosition.y < m_rcBounds.top ||
 			ptNewPosition.y >(m_rcBounds.bottom - ptSpriteSize.y))
 		{
 			ptNewPosition.y = max(m_rcBounds.top, min(ptNewPosition.y,
 				m_rcBounds.bottom - ptSpriteSize.y));
-			SetVelocity(0, 0);
+			SetVelocity(m_ptVelocity.x, 0);
 		}
 	
 		else if (m_baBoundsAction == BA_DIE)

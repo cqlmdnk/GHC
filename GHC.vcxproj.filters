@@ -51,6 +51,9 @@
     <ClCompile Include="FireBurst.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Demon.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bitmap.h">
@@ -90,6 +93,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="FireBurst.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Demon.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
