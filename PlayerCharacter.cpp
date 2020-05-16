@@ -10,6 +10,8 @@ PlayerCharacter::PlayerCharacter(HDC hDC) : Character(hDC) // default frame numb
 	_bCharAnimJumpL = new Bitmap(hDC, TEXT("resources/character_jump_l.bmp"));
 	_bCharFire = new Bitmap(hDC, TEXT("resources/character_fire_burst.bmp"));
 	_bCharFireL = new Bitmap(hDC, TEXT("resources/character_fire_burst_l.bmp"));
+	_bCharAnimAttR = new Bitmap(hDC,TEXT("resources/character_attack.bmp"));
+	_bCharAnimAttL = new Bitmap(hDC, TEXT("resources/character_attack_l.bmp"));
 
 
 	_bCharFireBurstR = new Bitmap(hDC, TEXT("resources/fire_burst.bmp"));
@@ -93,6 +95,22 @@ void PlayerCharacter::changeState(STATE state) {
 		this->SetPosition(RECT{ this->GetPosition().left,this->GetPosition().top, this->GetPosition().left + _bCharFireL->GetWidth(), this->GetPosition().top + _bCharFireL->GetHeight() });
 
 		this->SetNumFrames(2);
+		this->SetFrameDelay(1);
+		this->SetAnimDef(FALSE);
+		break;
+	case S_RATT:
+		this->SetBitmap(_bCharAnimAttR); // bir kere bastıktan sonra 7 kareyi de basması ve animasyonu bitirmesi lazım
+		this->SetPosition(RECT{ this->GetPosition().left,this->GetPosition().top, this->GetPosition().left + _bCharFireL->GetWidth(), this->GetPosition().top + _bCharFireL->GetHeight() });
+
+		this->SetNumFrames(6);
+		this->SetFrameDelay(1);
+		this->SetAnimDef(FALSE);
+		break;
+	case S_LATT:
+		this->SetBitmap(_bCharAnimAttL); // bir kere bastıktan sonra 7 kareyi de basması ve animasyonu bitirmesi lazım
+		this->SetPosition(RECT{ this->GetPosition().left,this->GetPosition().top, this->GetPosition().left + _bCharFireL->GetWidth(), this->GetPosition().top + _bCharFireL->GetHeight() });
+
+		this->SetNumFrames(6);
 		this->SetFrameDelay(1);
 		this->SetAnimDef(FALSE);
 		break;

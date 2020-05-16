@@ -10,7 +10,9 @@ S_RJUMP = 5,
 S_RFIRE = 6,
 S_LFIRE = 7,
 S_RDEATH = 8,
-S_LDEATH = 9;
+S_LDEATH = 9,
+S_RATT = 10,
+S_LATT = 11;
 //diğer durumlar buraya eklenecek
 
 class Character :

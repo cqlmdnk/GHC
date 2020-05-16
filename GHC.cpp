@@ -102,10 +102,43 @@ void GamePaint(HDC hDC)
 {
 	_Scene->drawBackground(hDC, x);
 	//  
+	RECT rect = { 0,0,0,0 };
+
+	if (editMod) {
 
 
 
-	   //_pBackground->Draw(hDC, 0, 0);
+
+		POINT p = { 0,0 };
+		LPCSTR message = TEXT("Dev Mod Activated");
+		DrawTextA(hDC, message, -1, &rect, DT_SINGLELINE | DT_NOCLIP);
+
+		char buffer[30];
+		snprintf(buffer, sizeof(buffer), "Character's X coordinate : %d", x);
+		LPCSTR message1 = (buffer);
+		rect.top = 25;
+		DrawTextA(hDC, message1, -1, &rect, DT_SINGLELINE | DT_NOCLIP);
+
+		
+		GetCursorPos(&p);
+		snprintf(buffer, sizeof(buffer), "Mouse X coordinate : %ld ", p.x);
+		message1 = (buffer);
+		rect.top = 50;
+		DrawTextA(hDC, message1, -1, &rect, DT_SINGLELINE | DT_NOCLIP);
+		
+		
+		snprintf(buffer, sizeof(buffer), "Mouse Y coordinate : %ld ", p.y);
+		message1 = (buffer);
+		rect.top = 75;
+		DrawTextA(hDC, message1, -1, &rect, DT_SINGLELINE | DT_NOCLIP);
+
+		
+		snprintf(buffer, sizeof(buffer), "Platform on mouse X  : %d  ", x / 40 + p.x / 40);
+		message1 = (buffer);
+		rect.top = 100;
+		DrawTextA(hDC, message1, -1, &rect, DT_SINGLELINE | DT_NOCLIP);
+	}
+	//_pBackground->Draw(hDC, 0, 0);
 	_pGame->DrawSprites(hDC);
 
 }
@@ -120,17 +153,8 @@ void GameCycle()
 	x += vx;
 	_pGame->UpdateSprites(_Scene->getMap(x), x, vx);
 
-	//for (int i = 0; i < 2; i++) // will be removed
-	//{
-	//    if (i == 0) {
-	//        ais.at(i)->SetVelocity(10, 0);
-	//    }
-	//    else {
-	//       
-	//        ais.at(i)->SetVelocity(-10, 0);
-	//    }
+	
 
-	//}
 	HWND  hWindow = _pGame->GetWindow();
 	HDC   hDC = GetDC(hWindow);
 	if (rand() % 100 < 1) {
@@ -162,7 +186,6 @@ void GameCycle()
 
 void HandleKeys()
 {
-	//yatay collision burada hesaplanacak ona göre x te değişim yapılacak
 
 	if (GetAsyncKeyState(VK_LEFT) < 0 && (!_sCharacter->checkState(S_RJUMP) || _sCharacter->checkState(S_RJUMP))) {
 		if (vx + x > 0) {
@@ -190,9 +213,6 @@ void HandleKeys()
 
 	else if (GetAsyncKeyState(VK_RIGHT) < 0 && (!_sCharacter->checkState(S_RJUMP) || _sCharacter->checkState(S_RJUMP))) {
 
-		// x eklemeyi buradan çıkar
-		// sadece hızı artırıp azaltmayı burada bırak
-		//zıplamıyor iken sağa ve sola gidişler hızı artırsın (max a kadar)
 		if (_Scene->testCollisionRight(x + 340, (_sCharacter->GetPosition().top + _sCharacter->GetPosition().bottom) / 2) == 1) {
 
 
@@ -221,7 +241,7 @@ void HandleKeys()
 
 
 	if (GetAsyncKeyState(VK_UP) < 0) {
-		if (!_sCharacter->checkState(S_LJUMP) && !_sCharacter->checkState(S_RJUMP)) { // düşüyorsa yürüme ve koşma çalışmamalı
+		if (!_sCharacter->checkState(S_LJUMP) && !_sCharacter->checkState(S_RJUMP)) { // düşüyorsa yürüme ve koşma çalışmamalı mı ? :? //
 			if (GetAsyncKeyState(VK_LEFT) < 0) {
 				_sCharacter->changeState(S_LJUMP);
 			}
@@ -250,6 +270,15 @@ void HandleKeys()
 		}
 		_sCharacter->fireCounter = 10;
 
+	}
+	else if(GetAsyncKeyState(VK_CONTROL)){
+		if (GetAsyncKeyState(VK_LEFT) < 0) {
+			_sCharacter->changeState(S_LATT);
+		}
+		else {
+			_sCharacter->changeState(S_RATT);
+
+		}
 	}
 	else if (GetAsyncKeyState(VK_TAB) < 0) { // tab ile edit mod a giriliyor
 		editMod = !editMod;
