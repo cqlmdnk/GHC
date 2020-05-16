@@ -119,6 +119,10 @@ void PlayerCharacter::changeState(STATE state) {
 	}
 }
 
+void PlayerCharacter::die()
+{
+}
+
 FireBurst* PlayerCharacter::fire()
 {
 	FireBurst* fb = new FireBurst();

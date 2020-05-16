@@ -7,6 +7,7 @@ class PlayerCharacter :
 public:
 	PlayerCharacter(HDC hDC);
 	void changeState(STATE state);
+	void die();
 	FireBurst* fire();
 	int fireCounter;
 };

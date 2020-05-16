@@ -304,7 +304,9 @@ void GameEngine::UpdateSprites(bool** map, int x, int vx)
 																	//  can't check for character, since all AIs are characters
 
 				(*siSprite)->SetPosition((*siSprite)->GetPosition().left - vx, (*siSprite)->GetPosition().top);
+				
 			}
+			
 			
 			// Save the old sprite position in case we need to restore it
 			rcOldSpritePos = (*siSprite)->GetPosition();
@@ -315,7 +317,7 @@ void GameEngine::UpdateSprites(bool** map, int x, int vx)
 			// Update the sprite
 			// Update the sprite
 			saSpriteAction = (*siSprite)->Update(map, x);
-			if (instanceof<FireBurst>(*siSprite)) {
+			if (instanceof<FireBurst>(*siSprite) || instanceof<Tile>(*siSprite)) {
 				(*siSprite)->SetVelocity((*siSprite)->GetVelocity().x, (*siSprite)->GetVelocity().y - 10);
 			}
 			// Handle the SA_KILL sprite action
@@ -332,11 +334,8 @@ void GameEngine::UpdateSprites(bool** map, int x, int vx)
 
 			// See if the sprite collided with any others
 			if (CheckSpriteCollision(*siSprite)) {
-				if (instanceof<Spell>((*siSprite))) {
+				if (instanceof<Spell>((*siSprite)) || instanceof<FireBurst>((*siSprite)) || instanceof<Tile>((*siSprite))) {
 
-				}
-				else if (instanceof<FireBurst>((*siSprite))) {
-					
 				}
 				else {
 					(*siSprite)->SetPosition(rcOldSpritePos);

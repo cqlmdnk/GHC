@@ -8,6 +8,7 @@
 #include "PlayerCharacter.h"
 #include "SpellCaster.h"
 #include "Demon.h"
+#include "Tile.h"
 
 
 // Bu class daha yarým içine scenede olmasý gereken herþey olucak
@@ -38,7 +39,7 @@ public:
 	std::vector <SpellCaster*> spCasters;
 	std::vector <Spell*> spells;
 	std::vector <Demon*> demons;
-	std::vector<Sprite*> updateScene();
+	std::vector<Sprite*> updateScene(int x, int charYPos, HDC hDC);
 private:
 	std::vector<Bitmap*> background; // resimlerin tutulduðu array
 };

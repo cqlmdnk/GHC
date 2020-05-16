@@ -16,6 +16,7 @@
 #include "SimpleAI.h"
 #include "PlayerCharacter.h"
 #include "Spell.h"
+#include "Tile.h"
 
 using namespace std;
 template<typename Base, typename T>

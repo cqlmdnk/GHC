@@ -108,6 +108,7 @@
     <ClCompile Include="SpellCaster.cpp" />
     <ClCompile Include="Sprite.cpp" />
     <ClCompile Include="GHC.cpp" />
+    <ClCompile Include="Tile.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bitmap.h" />
@@ -124,6 +125,7 @@
     <ClInclude Include="SpellCaster.h" />
     <ClInclude Include="Sprite.h" />
     <ClInclude Include="GHC.h" />
+    <ClInclude Include="Tile.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -24,7 +24,12 @@ protected:
 	STATE _bCharState;
 public:
 	Character(HDC hDC);
+	virtual void die() = 0;
 	virtual void changeState(STATE state) = 0;
 	bool checkState(STATE state);
+	int life = 50;
+	inline bool lastFrame() {
+		return m_iCurFrame == m_iNumFrames-2;
+	}
 };
 

@@ -20,7 +20,7 @@ SpellCaster::SpellCaster(HDC hDC) : SimpleAI(hDC) {
 	_bCharAnimDeathL = new Bitmap(hDC, TEXT("resources/wizard_death_l.bmp"));
 
 	_bSpell = new Bitmap(hDC, TEXT("resources/spell.bmp"));
-	SetRect(&m_rcBounds, 0, 0, 1920, 1020);
+	SetRect(&m_rcBounds, 0, 0, 1920, 1030);
 	this->SetBitmap(_bCharAnimIdleL);
 	SetRect(&m_rcPosition, 0, 0, _bCharAnimIdle->GetWidth(), _bCharAnimIdle->GetHeight());
 	SetBoundsAction(BA_HALT);
