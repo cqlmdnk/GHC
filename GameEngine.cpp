@@ -82,14 +82,14 @@ BOOL GameEngine::CheckSpriteCollision(Sprite* pTestSprite)
 	for (siSprite = m_vSprites.begin(); siSprite != m_vSprites.end(); siSprite++)
 	{
 		// Make sure not to check for collision with itself
-		if (pTestSprite == (*siSprite))
+		if (pTestSprite == (*siSprite) || pTestSprite->deathMark || (*siSprite)->deathMark)
 			continue;
 
 		// Test the collision
 		if (pTestSprite->TestCollision(*siSprite))
 			// Collision detected
 
-			return SpriteCollision((*siSprite), pTestSprite);
+ 			return SpriteCollision((*siSprite), pTestSprite);
 	}
 
 	// No collision
@@ -280,7 +280,8 @@ void GameEngine::DrawSprites(HDC hDC)
 	// Draw the sprites in the sprite vector
 	vector<Sprite*>::iterator siSprite;
 	for (siSprite = m_vSprites.begin(); siSprite != m_vSprites.end(); siSprite++)
-		(*siSprite)->Draw(hDC);
+		if (!(*siSprite)->IsStateHalt())
+			(*siSprite)->Draw(hDC);
 }
 
 void GameEngine::UpdateSprites(bool** map, int x, int vx)
@@ -295,7 +296,6 @@ void GameEngine::UpdateSprites(bool** map, int x, int vx)
 			// change stateHalt if it is supposed to be in screen
 			if ((*siSprite)->GetAbsX() >= x || (*siSprite)->GetAbsX() >= x + 1080/*Ekran genişiliği makrosu*/) {
 				(*siSprite)->SetStateHalt(FALSE);
-				(*siSprite)->SetHidden(FALSE); //sleep and wake functions can be written for this
 
 			}
 		}

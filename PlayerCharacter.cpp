@@ -15,7 +15,7 @@ PlayerCharacter::PlayerCharacter(HDC hDC) : Character(hDC) // default frame numb
 	_bCharFireBurstR = new Bitmap(hDC, TEXT("resources/fire_burst.bmp"));
 	_bCharFireBurstL = new Bitmap(hDC, TEXT("resources/fire_burst_l.bmp"));
 
-	SetRect(&m_rcBounds, 0, 0, 1920, 1020);
+	SetRect(&m_rcBounds, 0, 0, 1920, 1030);
 	
 	this->SetBitmap(_bCharAnimIdle);
 	SetRect(&m_rcPosition, 0, 0, _bCharAnimIdle->GetWidth(), _bCharAnimIdle->GetHeight());
@@ -109,7 +109,7 @@ FireBurst* PlayerCharacter::fire()
 		fb->SetBitmap(_bCharFireBurstL);
 		fb->SetPosition(this->GetPosition().left,this->GetPosition().top +10);
 		
-		fb->SetVelocity(-20,0);
+		fb->SetVelocity(-30,0);
 		
 	}
 	else {
@@ -117,7 +117,7 @@ FireBurst* PlayerCharacter::fire()
 		fb->SetBitmap(_bCharFireBurstR);
 		fb->SetPosition(this->GetPosition().right, this->GetPosition().top + 10);
 		
-		fb->SetVelocity(20, 0);
+		fb->SetVelocity(30, 0);
 		
 		
 	}

@@ -100,20 +100,21 @@ public:
 };
 	inline void Sprite::CalcCollisionRect()
 	{
-		int iXShrink = (m_rcPosition.left - m_rcPosition.right) / 5;
-		int iYShrink = (m_rcPosition.top - m_rcPosition.bottom) / 6;
+		int iXShrink = (m_rcPosition.left - m_rcPosition.right) / 12;
+		int iYShrink = (m_rcPosition.top - m_rcPosition.bottom) / 12;
 		CopyRect(&m_rcCollision, &m_rcPosition);
 
 
 
-		InflateRect(&m_rcCollision, iXShrink, iYShrink); ////sadasdasd
+		InflateRect(&m_rcCollision, iXShrink, iYShrink); 
 	}
 
 	//-----------------------------------------------------------------
 	// Sprite Inline General Methods
 	//-----------------------------------------------------------------
-	inline BOOL Sprite::TestCollision(Sprite* pTestSprite) // bozuk!!!
+	inline BOOL Sprite::TestCollision(Sprite* pTestSprite) 
 	{
+		
 		RECT& rcTest = pTestSprite->GetCollision();
 		return m_rcCollision.left <= rcTest.right &&
 			rcTest.left <= m_rcCollision.right &&

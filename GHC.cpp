@@ -41,7 +41,7 @@ void GameStart(HWND hWindow)
 	HDC hDC = GetDC(hWindow);
 	// Arkaplan resimleri sceneye ekleme iþlemleri
 	//-------------------------------------------------------------------------------------------------
-	_pBackground = new Bitmap(hDC, TEXT("resources/bg/1.bmp") ); // will be changed
+	_pBackground = new Bitmap(hDC, TEXT("resources/bg/1.bmp")); // will be changed
 	_Scene = new Scene(hDC);
 	_Scene->addBackground(_pBackground);
 	_pBackground = new Bitmap(hDC, TEXT("resources/bg/2.bmp"));  // scenein içine gömülebilir
@@ -62,7 +62,7 @@ void GameStart(HWND hWindow)
 
 	SpellCaster* temp_ai = new SpellCaster(hDC);
 	_Scene->addSpellCaster(temp_ai);
-	
+
 
 	temp_ai->SetPosition(900, 700);
 
@@ -119,7 +119,7 @@ void GameCycle()
 	updateSpells();
 	x += vx;
 	_pGame->UpdateSprites(_Scene->getMap(x), x, vx);
-	
+
 	//for (int i = 0; i < 2; i++) // will be removed
 	//{
 	//    if (i == 0) {
@@ -135,7 +135,7 @@ void GameCycle()
 	HDC   hDC = GetDC(hWindow);
 	if (rand() % 100 < 1) {
 		if (rand() % 2 == 0) {
-			
+
 			SpellCaster* temp_spellC = new SpellCaster(hDC);
 			temp_spellC->SetPosition((rand() % 700) + 1000, 900);
 			_Scene->addSpellCaster(temp_spellC);
@@ -144,11 +144,12 @@ void GameCycle()
 		else {
 			Demon* temp_demon = new Demon(hDC);
 			temp_demon->SetPosition((rand() % 700) + 1000, 900);
+			temp_demon->changeState(S_RUNL);
 			_pGame->AddSprite(temp_demon);
 			_Scene->addDemon(temp_demon);
 
 		}
-		
+
 	}
 
 	GamePaint(_hOffscreenDC);
@@ -171,7 +172,7 @@ void HandleKeys()
 
 			}
 			else {
-				vx-=2;
+				vx -= 2;
 			}
 
 			vx = max(vx, -10);
@@ -199,7 +200,7 @@ void HandleKeys()
 
 		}
 		else {
-			vx+=2;
+			vx += 2;
 		}
 
 		vx = min(vx, 10);
@@ -211,7 +212,7 @@ void HandleKeys()
 		if (_sCharacter->IsAnimDef()) {
 			_sCharacter->changeState(S_IDLE);
 			int sign = (vx > 0) - (vx < 0);
-			vx = sign/*getting sign(- or +)*/ * (abs(vx) - 3); //
+			vx = sign/*getting sign(- or +)*/ * (abs(vx) - 3); // 3 yavaşlaması için verilen ters yönlü ivme
 			if (sign != ((vx > 0) - (vx < 0)))
 				vx = 0;
 		}
@@ -285,7 +286,7 @@ void HandleKeys()
 		if (editMod) {
 			POINT p = { 0,0 };
 			GetCursorPos(&p);
-			_Scene->addTile((x + p.x ) / PLATFORM_S , p.y / PLATFORM_S, 0, x);
+			_Scene->addTile((x + p.x) / PLATFORM_S, p.y / PLATFORM_S, 0, x);
 
 		}
 
@@ -343,14 +344,15 @@ BOOL SpriteCollision(Sprite* pSpriteHitter, Sprite* pSpriteHittee) // All collis
 {
 	//if one of is PlayerCharacter check positions and decide the faith of vx
 	if (instanceof<Spell>(pSpriteHitter) || instanceof<FireBurst>(pSpriteHitter)) {
+
 		if (instanceof<Spell>(pSpriteHitter) && instanceof<PlayerCharacter>(pSpriteHittee)) {
 
 			_Scene->spells.erase(std::remove(_Scene->spells.begin(), _Scene->spells.end(), pSpriteHitter), _Scene->spells.end());
 			pSpriteHitter->SetHidden(TRUE);
 			pSpriteHittee->SetHidden(TRUE);
-			
+
 			//vurulan playerın canını düşür
-			
+
 		}
 		else if ((instanceof<Demon>(pSpriteHittee) && instanceof<FireBurst>(pSpriteHitter))) {
 			//initiate death animation of spellcaster
@@ -367,11 +369,11 @@ BOOL SpriteCollision(Sprite* pSpriteHitter, Sprite* pSpriteHittee) // All collis
 			//initiate death animation of spellcaster
 			SpellCaster* spellCaster = dynamic_cast<SpellCaster*>(pSpriteHittee);
 			spellCaster->die();
-			
+
 			pSpriteHitter->SetHidden(TRUE);
 
 			_Scene->spCasters.erase(std::remove(_Scene->spCasters.begin(), _Scene->spCasters.end(), pSpriteHittee), _Scene->spCasters.end());
-			
+
 
 		}
 		else if (instanceof<FireBurst>(pSpriteHitter)) {

@@ -215,3 +215,9 @@ int Scene::testCollisionLeft(int x,int y) {
 
 	return 0;
 }
+
+std::vector<Sprite*> Scene::updateScene()
+{
+	std::vector<Sprite*> newSprites;
+	return newSprites;
+}

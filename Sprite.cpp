@@ -60,24 +60,25 @@ SPRITEACTION Sprite::Update(bool** map, int x)
 
 
 	//blok değişimi kontrolü
-	
-	if (!(m_rcPosition.bottom > 1080) && !(m_rcPosition.left >1920) && !(m_rcPosition.left < 0)) {
-    		if (((m_rcPosition.left + m_ptVelocity.x) / PLATFORM_S != m_rcPosition.left / PLATFORM_S) &&
+
+	if (!(m_rcPosition.bottom > 1080) && !(m_rcPosition.left > 1920) && !(m_rcPosition.left < 0)) {
+		if (((m_rcPosition.left + m_ptVelocity.x) / PLATFORM_S != m_rcPosition.left / PLATFORM_S) &&
 			map[(m_rcPosition.left + m_ptVelocity.x) / PLATFORM_S][(m_rcPosition.bottom + m_rcPosition.top) / (2 * PLATFORM_S)])
 			left = true;
 		if (((m_rcPosition.right + m_ptVelocity.x) / PLATFORM_S != m_rcPosition.right / PLATFORM_S) &&
 			map[(m_rcPosition.right + m_ptVelocity.x) / PLATFORM_S][(m_rcPosition.bottom + m_rcPosition.top) / (2 * PLATFORM_S)])
 			right = true;
-		if (((m_rcPosition.bottom + m_ptVelocity.y) / PLATFORM_S != m_rcPosition.bottom / PLATFORM_S) &&
-			map[(m_rcPosition.left + m_rcPosition.right) / (2 * PLATFORM_S)][(m_rcPosition.bottom + m_ptVelocity.y) / PLATFORM_S])
+		bool leftWBias = map[((m_rcPosition.left + m_rcPosition.right) - 40 + (x % PLATFORM_S)) / (2 * PLATFORM_S)][(m_rcPosition.bottom + m_ptVelocity.y) / PLATFORM_S];
+		bool rightWBias = map[((m_rcPosition.left + m_rcPosition.right) + 40 + (x % PLATFORM_S)) / (2 * PLATFORM_S)][(m_rcPosition.bottom + m_ptVelocity.y) / PLATFORM_S];
+		if ((leftWBias||	rightWBias))
 			bottom = true;
 		if (((m_rcPosition.top + m_ptVelocity.y) / PLATFORM_S != m_rcPosition.top / PLATFORM_S) &&
-			map[(m_rcPosition.left + m_rcPosition.right) / (2 * PLATFORM_S)][(m_rcPosition.top + m_ptVelocity.y) / PLATFORM_S])
+			map[((m_rcPosition.left + m_rcPosition.right) - (x % PLATFORM_S)) / (2 * PLATFORM_S)][(m_rcPosition.top + m_ptVelocity.y) / PLATFORM_S])
 			top = true;
 	}
-		
-	
-	
+
+
+
 
 
 	// Update the position
@@ -92,20 +93,20 @@ SPRITEACTION Sprite::Update(bool** map, int x)
 	ptBoundsSize.y = m_rcBounds.bottom - m_rcBounds.top;
 
 
-	
-	
+
+
 	// en yakın blok bottom a set edilecek
-		
-
-	
 
 
 
 
 
 
-	
-	if (m_baBoundsAction == BA_STOP) { //kontrol blokları bool dönen fonksiyona konulabilir
+
+
+
+
+	if (m_baBoundsAction == BA_STOP) {
 
 		if (ptNewPosition.x < m_rcBounds.left ||
 			ptNewPosition.x >(m_rcBounds.right - ptSpriteSize.x))
@@ -125,7 +126,7 @@ SPRITEACTION Sprite::Update(bool** map, int x)
 			SetVelocity(m_ptVelocity.x, 0);
 		}
 	}
-	else if(m_baBoundsAction == BA_HALT){
+	else if (m_baBoundsAction == BA_HALT) {
 
 		if (ptNewPosition.x < m_rcBounds.left ||
 			ptNewPosition.x >(m_rcBounds.right - ptSpriteSize.x))
@@ -133,7 +134,7 @@ SPRITEACTION Sprite::Update(bool** map, int x)
 			ptNewPosition.x = max(m_rcBounds.left, min(ptNewPosition.x,
 				m_rcBounds.right - ptSpriteSize.x));
 			m_bStateHalt = TRUE; //sleep and wake functions can be written for this
-			m_bHidden = TRUE;
+
 			SetAbsX(x); //in case of halt save x position;
 			SetVelocity(0, m_ptVelocity.y);
 		}
@@ -144,7 +145,7 @@ SPRITEACTION Sprite::Update(bool** map, int x)
 				m_rcBounds.bottom - ptSpriteSize.y));
 			SetVelocity(m_ptVelocity.x, 0);
 		}
-	
+
 		else if (m_baBoundsAction == BA_DIE)
 		{
 			if ((ptNewPosition.x + ptSpriteSize.x) < m_rcBounds.left ||
@@ -154,43 +155,43 @@ SPRITEACTION Sprite::Update(bool** map, int x)
 				return SA_KILL;
 		}
 
-		
+
 	}
 
 
+	this->SetVelocity(this->GetVelocity().x, this->GetVelocity().y + 10);
 
-	
 
 	if (top) {
 		if (GetVelocity().y < 0) {
-			ptNewPosition.y = (ptNewPosition.y / PLATFORM_S) * PLATFORM_S+1;
+			ptNewPosition.y = (ptNewPosition.y / PLATFORM_S) * PLATFORM_S + 1;
 			SetVelocity(this->GetVelocity().x, 0);
 		}
 	}
-	 if (bottom) {
+	if (bottom) {
 		if (GetVelocity().y > 0) {
-			ptNewPosition.y = (((ptNewPosition.y +GetHeight()) / PLATFORM_S) * PLATFORM_S)- this->GetHeight()-1;
+			ptNewPosition.y = (((ptNewPosition.y + GetHeight()) / PLATFORM_S) * PLATFORM_S) - this->GetHeight() - 1;
 			SetVelocity(this->GetVelocity().x, 0);
 		}
 	}
-	 else {
-		 this->SetVelocity(this->GetVelocity().x, this->GetVelocity().y + 10);
-	 }
-	 if (right) {
+
+
+
+	if (right) {
 		if (GetVelocity().x > 0) {
-			ptNewPosition.x = ((ptNewPosition.x +GetWidth() / PLATFORM_S) * PLATFORM_S)-this->GetWidth()-1;
+			ptNewPosition.x = ((ptNewPosition.x + GetWidth() / PLATFORM_S) * PLATFORM_S) - this->GetWidth() - 1;
 			SetVelocity(0, this->GetVelocity().y);
 		}
 	}
-	 if (left) {
+	if (left) {
 		if (GetVelocity().x < 0) {
-			ptNewPosition.x = (ptNewPosition.x / PLATFORM_S)*PLATFORM_S+1;
+			ptNewPosition.x = (ptNewPosition.x / PLATFORM_S) * PLATFORM_S + 1;
 			SetVelocity(0, this->GetVelocity().y);
 		}
 	}
-	 
-	 SetPosition(ptNewPosition);
-	 
+
+	SetPosition(ptNewPosition);
+
 	return SA_NONE;
 
 }

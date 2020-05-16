@@ -38,7 +38,7 @@ public:
 	std::vector <SpellCaster*> spCasters;
 	std::vector <Spell*> spells;
 	std::vector <Demon*> demons;
-
+	std::vector<Sprite*> updateScene();
 private:
 	std::vector<Bitmap*> background; // resimlerin tutulduðu array
 };

@@ -58,28 +58,36 @@ void SpellCaster::changeState(STATE state) {
 		{
 		case S_IDLE:
 			this->SetBitmap(_bCharAnimIdleL);
+			this->SetPosition(RECT{ this->GetPosition().left,this->GetPosition().top, this->GetPosition().left + m_pBitmap->GetWidth(), this->GetPosition().top + m_pBitmap->GetHeight() });
+
 			this->SetNumFrames(10);
 			this->SetFrameDelay(2);
 			break;
 		case S_IDLEL:
 			this->SetBitmap(_bCharAnimIdle);
+			this->SetPosition(RECT{ this->GetPosition().left,this->GetPosition().top, this->GetPosition().left + m_pBitmap->GetWidth(), this->GetPosition().top + m_pBitmap->GetHeight() });
+
 			this->SetNumFrames(10);
 			this->SetFrameDelay(2);
 			break;
 		case S_RUNL:
 			this->SetBitmap(_bCharAnimRunL);
+			this->SetPosition(RECT{ this->GetPosition().left,this->GetPosition().top, this->GetPosition().left + m_pBitmap->GetWidth(), this->GetPosition().top + m_pBitmap->GetHeight() });
+
 			this->SetVelocity(-5,0);
 			this->SetNumFrames(10);
 			this->SetFrameDelay(2);
 			break;
 		case S_RUNR:
 			this->SetBitmap(_bCharAnimRunR);
+			this->SetPosition(RECT{ this->GetPosition().left,this->GetPosition().top, this->GetPosition().left + m_pBitmap->GetWidth(), this->GetPosition().top + m_pBitmap->GetHeight() });
+
 			this->SetVelocity(5, 0);
 			break;
 		case S_RDEATH:
 			this->SetBitmap(_bCharAnimDeathR);
 			this->SetAnimDef(FALSE);
-			//this->SetPosition(RECT{ this->GetPosition().left,this->GetPosition().top, this->GetPosition().left + _bCharAnimDeathR->GetWidth(), this->GetPosition().top + _bCharAnimJumpL->GetHeight() });
+			this->SetPosition(RECT{ this->GetPosition().left,this->GetPosition().top, this->GetPosition().left + m_pBitmap->GetWidth(), this->GetPosition().top + m_pBitmap->GetHeight() });
 			this->SetVelocity(0, 0);
 			this->SetNumFrames(10);
 			this->SetFrameDelay(2);
@@ -87,7 +95,7 @@ void SpellCaster::changeState(STATE state) {
 		case S_LDEATH:
 			this->SetBitmap(_bCharAnimDeathL);
 			this->SetAnimDef(FALSE);
-			//this->SetPosition(RECT{ this->GetPosition().left,this->GetPosition().top, this->GetPosition().left + _bCharAnimDeathL->GetWidth(), this->GetPosition().top + _bCharAnimJumpL->GetHeight() });
+			this->SetPosition(RECT{ this->GetPosition().left,this->GetPosition().top, this->GetPosition().left + m_pBitmap->GetWidth(), this->GetPosition().top + m_pBitmap->GetHeight() });
 			this->SetVelocity(0, 0);
 			this->SetNumFrames(10);
 			this->SetFrameDelay(2);
@@ -101,7 +109,9 @@ void SpellCaster::changeState(STATE state) {
 
 }
 void SpellCaster::die() {
-	deathMark = TRUE;
-	STATE state = (m_pBitmap == _bCharAnimRunR || m_pBitmap == _bCharAnimIdle) ? S_LDEATH : S_RDEATH;
-	changeState(state);
+	if (!deathMark) {
+		deathMark = TRUE;
+		STATE state = (m_pBitmap == _bCharAnimRunR || m_pBitmap == _bCharAnimIdle ) ? S_LDEATH : S_RDEATH;
+		changeState(state);
+	}
 }
