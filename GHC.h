@@ -9,7 +9,7 @@
 // Include Files
 //-----------------------------------------------------------------
 #include <windows.h>
-#include "Resource.h"
+#include "Resources.h"
 #include "GameEngine.h"
 #include "Bitmap.h"
 #include "Scene.h"

@@ -118,7 +118,7 @@
     <ClInclude Include="GameEngine.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="PlayerCharacter.h" />
-    <ClInclude Include="Resource.h" />
+    <ClInclude Include="Resources.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="SimpleAI.h" />
     <ClInclude Include="Spell.h" />
@@ -126,6 +126,42 @@
     <ClInclude Include="Sprite.h" />
     <ClInclude Include="GHC.h" />
     <ClInclude Include="Tile.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="GHC.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="resources\bg\1.bmp" />
+    <Image Include="resources\bg\2.bmp" />
+    <Image Include="resources\bg\3.bmp" />
+    <Image Include="resources\bg\4.bmp" />
+    <Image Include="resources\bg\5.bmp" />
+    <Image Include="resources\character_attack.bmp" />
+    <Image Include="resources\character_attack_l.bmp" />
+    <Image Include="resources\character_fire_burst.bmp" />
+    <Image Include="resources\character_fire_burst_l.bmp" />
+    <Image Include="resources\character_idle.bmp" />
+    <Image Include="resources\character_jump.bmp" />
+    <Image Include="resources\character_jump_l.bmp" />
+    <Image Include="resources\character_run.bmp" />
+    <Image Include="resources\character_run_l.bmp" />
+    <Image Include="resources\demon_attack.bmp" />
+    <Image Include="resources\demon_attack_l.bmp" />
+    <Image Include="resources\demon_attack_s.bmp" />
+    <Image Include="resources\demon_death.bmp" />
+    <Image Include="resources\demon_death_l.bmp" />
+    <Image Include="resources\demon_walk.bmp" />
+    <Image Include="resources\demon_walk_l.bmp" />
+    <Image Include="resources\fire_burst.bmp" />
+    <Image Include="resources\fire_burst_l.bmp" />
+    <Image Include="resources\ground.bmp" />
+    <Image Include="resources\spell.bmp" />
+    <Image Include="resources\tile1.bmp" />
+    <Image Include="resources\tile2.bmp" />
+    <Image Include="resources\wizard_death.bmp" />
+    <Image Include="resources\wizard_death_l.bmp" />
+    <Image Include="resources\wizard_idle.bmp" />
+    <Image Include="resources\wizard_idle_l.bmp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

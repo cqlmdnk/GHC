@@ -3,10 +3,10 @@
 
 // Bu class daha yarým içine scenede olmasý gereken herþey olucak
 // Düþmanlarda dahil.
-Scene::Scene(HDC hDC) {
-	tiles[0] = new Bitmap(hDC, TEXT("resources/tile1.bmp"));
-	tiles[1] = new Bitmap(hDC, TEXT("resources/tile2.bmp"));
-	tiles[2] = new Bitmap(hDC, TEXT("resources/tile2.bmp")); // tile tipleri buradan yüklenecek
+Scene::Scene(HDC hDC, HINSTANCE  _hInstance) {
+	tiles[0] = new Bitmap(hDC, IDB_TILE1, _hInstance);
+	tiles[1] = new Bitmap(hDC, IDB_TILE2, _hInstance);
+	tiles[2] = new Bitmap(hDC, IDB_TILE2, _hInstance); // tile tipleri buradan yüklenecek
 	memset(p_iPlatform, 0, sizeof(p_iPlatform));
 }
 
@@ -32,27 +32,26 @@ void Scene::drawScene(HDC hDc)
 {
 }
 
-void Scene::drawBackground(HDC hDc, int x) {
+void Scene::drawBackground(HDC hDC, int x) {
 	int sp = 1;// Burasý için class oluþturulabilir ama ben gerek duymadým. Background þeklinde attributeeleri bitmap ve speed olabilirdi ama onun yerine hýzý yavaþ olana göre ekleyip burda hýz 
 				//oluþturup çarptým.
 	for (Bitmap* i : background) {
-		i->Draw(hDc, (sp * (-x) / 5 % 1920 + 960 + 1920) % 1920, 0, TRUE);
-		i->Draw(hDc, (sp * (-x) / 5 % 1920 - 960) % 1920, 0, TRUE); // en öndeki katman ile platformun hızı eşit olmalı
+		i->Draw(hDC, (sp * (-x) / 5 % 1920 + 960 + 1920) % 1920, 0, TRUE);
+		i->Draw(hDC, (sp * (-x) / 5 % 1920 - 960) % 1920, 0, TRUE); // en öndeki katman ile platformun hızı eşit olmalı
 		sp++;
 	}
-	if (x / tiles[0]->GetHeight() != p && x != 0) { // hız a bağlı olarak girmeye biliyor // hızdan bağısmız başka bir x e ihtiyaç var // p eklendi durum düzeldi
 
-		platform = CreateOffscreenBmp(2000, 1080, x);
-		p = x / tiles[0]->GetHeight();
-	}
+	platform = CreateOffscreenBmp(2000, 1080, x);
+	p = x / tiles[0]->GetHeight();
+	
 
-	BlitToHdc(hDc, platform, -(x % tiles[0]->GetHeight()), 0, 2000, 1080);
+	BlitToHdc(hDC, platform, -(x % tiles[0]->GetHeight()), 0, 2000, 1080);
+	DeleteObject(platform);
 
 }
 HBITMAP Scene::CreateOffscreenBmp(int wd, int hgt, int x) {
 	// Get a device context to the screen.
 	HDC hdcScreen = GetDC(NULL);
-
 	// Create a device context
 	HDC hdcBmp = CreateCompatibleDC(hdcScreen);
 
@@ -95,6 +94,12 @@ HBITMAP Scene::CreateOffscreenBmp(int wd, int hgt, int x) {
 	SelectObject(hdcBmp, hbmOld);
 	DeleteDC(hdcBmp);
 	ReleaseDC(NULL, hdcScreen);
+	DeleteObject(solidPurple);
+	DeleteObject(tile_0);
+	DeleteObject(tile_1);
+	DeleteObject(hdcScreen);
+	DeleteObject(solidPurple);
+	DeleteObject(hbmOld);
 
 	return bmp;
 }
@@ -109,6 +114,8 @@ void Scene::BlitToHdc(HDC hdcDst, HBITMAP hbmSrc, int x, int y, int wd, int hgt)
 	SelectObject(hdcSrc, hbmOld);
 	DeleteDC(hdcSrc);
 	ReleaseDC(NULL, hdcScreen);
+	DeleteObject(hbmOld);
+
 }
 
 
@@ -216,7 +223,7 @@ int Scene::testCollisionLeft(int x, int y) {
 	return 0;
 }
 
-std::vector<Sprite*> Scene::updateScene(int x, int charYPos, HDC hDC)
+std::vector<Sprite*> Scene::updateScene(int x, int charYPos, HDC hDC, HINSTANCE _hInstance)
 {
 	std::vector<Sprite*> newSprites;
 
@@ -236,12 +243,12 @@ std::vector<Sprite*> Scene::updateScene(int x, int charYPos, HDC hDC)
 			if (!spcaster->IsStateHalt())
 				tileMagic = TRUE;
 		}
-		for (int i = 0; i < 18; i++) {
+		for (int i = 0; i < 18; i++) { // creating foe tiles in presence of spellcaster randomly
 			if (p_iPlatform[(x / PLATFORM_S) + 6][i] == 1) {
 				if (i < charYPos / PLATFORM_S) {
 					//üstten düşen tile
 					p_iPlatform[(x / PLATFORM_S) + 6][i] = 0;
-					Tile* tile = new Tile(hDC);
+					Tile* tile = new Tile(hDC, _hInstance);
 					tile->SetPosition(6 * PLATFORM_S- (x% PLATFORM_S), i * PLATFORM_S);
 					tile->SetVelocity(0, 10);
 					newSprites.push_back(tile);
@@ -250,7 +257,7 @@ std::vector<Sprite*> Scene::updateScene(int x, int charYPos, HDC hDC)
 				else if (i > charYPos / PLATFORM_S) {
 					//yukarı giden tile
 					p_iPlatform[(x / PLATFORM_S) + 6][i] = 0;
-					Tile* tile = new Tile(hDC);
+					Tile* tile = new Tile(hDC, _hInstance);
 					tile->SetPosition(6 * PLATFORM_S - (x % PLATFORM_S), i  * PLATFORM_S);
 					tile->SetVelocity(0, -20);
 					newSprites.push_back(tile);
@@ -260,7 +267,7 @@ std::vector<Sprite*> Scene::updateScene(int x, int charYPos, HDC hDC)
 			}
 		}
 	}
-	platform = CreateOffscreenBmp(2000, 1080, x);
+	
 	for (Demon* demon : demons) {
 		demon->act(0);
 	}

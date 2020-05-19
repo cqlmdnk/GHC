@@ -18,7 +18,7 @@ class Scene
 {
 public:
 	int p_iPlatform[40000][18]; 
-	Scene(HDC hDC);
+	Scene(HDC hDC, HINSTANCE  _hInstance);
 	void addBackground(Bitmap* img);
 	void addSpellCaster(SpellCaster* obj);
 	void addSpell(Spell* obj);
@@ -39,7 +39,7 @@ public:
 	std::vector <SpellCaster*> spCasters;
 	std::vector <Spell*> spells;
 	std::vector <Demon*> demons;
-	std::vector<Sprite*> updateScene(int x, int charYPos, HDC hDC);
+	std::vector<Sprite*> updateScene(int x, int charYPos, HDC hDC, HINSTANCE _hInstance);
 private:
 	std::vector<Bitmap*> background; // resimlerin tutulduðu array
 };

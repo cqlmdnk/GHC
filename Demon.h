@@ -4,10 +4,14 @@ class Demon :
 	public SimpleAI
 {
 public:
-	Demon(HDC hDC);
+	Demon(HDC hDC, HINSTANCE _hInstance);
 	~Demon();
 	void changeState(STATE state);
 	void act(int a);
 	void die() ;
+	bool lastFrame()
+	{
+		return m_iCurFrame == 7;
+	};
 };
 

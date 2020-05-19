@@ -10,14 +10,15 @@ void SpellCaster::act(int a) {
 		this->changeState(S_RUNR);
 	}
 }
-SpellCaster::SpellCaster(HDC hDC) : SimpleAI(hDC) {
+SpellCaster::SpellCaster(HDC hDC, HINSTANCE _hInstance) : SimpleAI(hDC) {
 	// bitmap load
-	_bCharAnimIdle = new Bitmap(hDC, TEXT("resources/wizard_idle.bmp"));
-	_bCharAnimIdleL = new Bitmap(hDC, TEXT("resources/wizard_idle_l.bmp"));
-	_bCharAnimRunR = new Bitmap(hDC, TEXT("resources/wizard_idle.bmp"));
-	_bCharAnimRunL = new Bitmap(hDC, TEXT("resources/wizard_idle_l.bmp"));
-	_bCharAnimDeathR = new Bitmap(hDC, TEXT("resources/wizard_death.bmp"));
-	_bCharAnimDeathL = new Bitmap(hDC, TEXT("resources/wizard_death_l.bmp"));
+
+	_bCharAnimIdle = new Bitmap(hDC, IDB_SPELLCASTER_R, _hInstance);
+	_bCharAnimIdleL = new Bitmap(hDC, IDB_SPELLCASTER_IDLE_L, _hInstance);
+	_bCharAnimRunR = new Bitmap(hDC, IDB_SPELLCASTER_R, _hInstance);
+	_bCharAnimRunL = new Bitmap(hDC, IDB_SPELLCASTER_IDLE_L, _hInstance);
+	_bCharAnimDeathR = new Bitmap(hDC, IDB_SPELLCASTER_DEATH_R, _hInstance);
+	_bCharAnimDeathL = new Bitmap(hDC, IDB_SPELLCASTER_DEATH_L, _hInstance);
 
 	_bSpell = new Bitmap(hDC, TEXT("resources/spell.bmp"));
 	SetRect(&m_rcBounds, 0, 0, 1920, 1030);

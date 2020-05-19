@@ -4,7 +4,7 @@ class Tile :
 	public Sprite
 {
 public:
-	Tile(HDC hDC);
+	Tile(HDC hDC, HINSTANCE _hInstance);
 	~Tile();
 
 };

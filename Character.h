@@ -28,8 +28,6 @@ public:
 	virtual void changeState(STATE state) = 0;
 	bool checkState(STATE state);
 	int life = 50;
-	inline bool lastFrame() {
-		return m_iCurFrame == m_iNumFrames-2;
-	}
+	virtual bool lastFrame() = 0;
 };
 

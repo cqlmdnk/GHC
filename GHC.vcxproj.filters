@@ -10,8 +10,7 @@
       <Extensions>h;hpp;hxx;hm;inl;inc</Extensions>
     </Filter>
     <Filter Include="Resource Files">
-      <UniqueIdentifier>{ff23ac3e-466a-4464-a2e8-ee07905d3cac}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe</Extensions>
+      <UniqueIdentifier>{f0600afd-6e08-48b7-9c2e-2b2f9b58b6f6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -77,9 +76,6 @@
     <ClInclude Include="GameObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Resource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Character.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -104,5 +100,108 @@
     <ClInclude Include="Tile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Resources.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="resources\character_attack.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\character_attack_l.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\character_fire_burst.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\character_fire_burst_l.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\character_idle.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\character_jump.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\character_jump_l.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\character_run.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\character_run_l.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\demon_attack.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\demon_attack_l.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\demon_attack_s.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\demon_death.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\demon_death_l.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\demon_walk.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\demon_walk_l.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\fire_burst.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\fire_burst_l.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\ground.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\spell.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\tile1.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\tile2.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\wizard_death.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\wizard_death_l.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\wizard_idle.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\wizard_idle_l.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\bg\1.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\bg\2.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\bg\3.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\bg\4.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\bg\5.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="GHC.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

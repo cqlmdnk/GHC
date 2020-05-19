@@ -5,13 +5,16 @@ class SpellCaster :
 	public SimpleAI
 {
 public:
-	SpellCaster(HDC hDC);
+	SpellCaster(HDC hDC, HINSTANCE _hInstance);
 	~SpellCaster();
 	void act(int a);
 	Spell* fire(POINT target);
 	void changeState(STATE state);
 	Bitmap* _bSpell;
-	
+	bool lastFrame()
+	{
+		return m_iCurFrame == 7;
+	};
 	void die();
 };
 

@@ -19,7 +19,7 @@ BOOL GameInitialize(HINSTANCE hInstance)
 {
 	// Create the game engine
 	_pGame = new GameEngine(hInstance, TEXT("GHC"),
-		TEXT("GHC"), IDI_UFO, IDI_UFO_SM, 1920, 1080); // Bununla oynarsan scenede de deðiþiklik yapman lazým!!!!
+		TEXT("GHC"), NULL, NULL, 1920, 1080); // Bununla oynarsan scenede de deðiþiklik yapman lazým!!!!
 	if (_pGame == NULL)
 		return FALSE;
 	// Set the frame rate
@@ -39,28 +39,25 @@ void GameStart(HWND hWindow)
 
 	// Create and load the background and saucer bitmaps
 	HDC hDC = GetDC(hWindow);
-	// Arkaplan resimleri sceneye ekleme iþlemleri
-	//-------------------------------------------------------------------------------------------------
-	_pBackground = new Bitmap(hDC, TEXT("resources/bg/1.bmp")); // will be changed
-	_Scene = new Scene(hDC);
-	_Scene->addBackground(_pBackground);
-	_pBackground = new Bitmap(hDC, TEXT("resources/bg/2.bmp"));  // scenein içine gömülebilir
-	_Scene->addBackground(_pBackground);
-	_pBackground = new Bitmap(hDC, TEXT("resources/bg/3.bmp"));
-	_Scene->addBackground(_pBackground);
-	_pBackground = new Bitmap(hDC, TEXT("resources/bg/4.bmp"));
-	_Scene->addBackground(_pBackground);
-	_pBackground = new Bitmap(hDC, TEXT("resources/bg/5.bmp"));
-	_Scene->addBackground(_pBackground);
-	//--------------------------------------------------------------------------------------------------
-																												  //ÖNERÝ
-																			  //Actor diye class oluþturalým. Player extend etsin enemyde extend etsin  +1
-																			  // inharetance yapý iþimizi kolaylaþtýrýr.
 
 
-	_sCharacter = new PlayerCharacter(hDC);
+	_Scene = new Scene(hDC, _hInstance);
 
-	SpellCaster* temp_ai = new SpellCaster(hDC);
+	_pBackground = new Bitmap(hDC, IDB_BG_LAYER1, _hInstance); // will be changed
+	_Scene->addBackground(_pBackground);
+	_pBackground = new Bitmap(hDC, IDB_BG_LAYER2, _hInstance);  // scenein içine gömülebilir
+	_Scene->addBackground(_pBackground);
+	_pBackground = new Bitmap(hDC, IDB_BG_LAYER3, _hInstance);
+	_Scene->addBackground(_pBackground);
+	_pBackground = new Bitmap(hDC, IDB_BG_LAYER4, _hInstance);
+	_Scene->addBackground(_pBackground);
+	_pBackground = new Bitmap(hDC, IDB_BG_LAYER5, _hInstance);
+	_Scene->addBackground(_pBackground);
+	
+
+	_sCharacter = new PlayerCharacter(hDC, _hInstance);
+
+	SpellCaster* temp_ai = new SpellCaster(hDC, _hInstance);
 	_Scene->addSpellCaster(temp_ai);
 
 
@@ -101,17 +98,17 @@ void GameDeactivate(HWND hWindow)
 void GamePaint(HDC hDC)
 {
 	_Scene->drawBackground(hDC, x);
-	//  
+	  
 
 
 
 
-	RECT rect = { 0,0,0,0 };
+	
 
 	if (editMod) {
 
 
-
+		RECT rect = { 0,0,0,0 };
 
 		POINT p = { 0,0 };
 		LPCSTR message = TEXT("Dev Mod Activated");
@@ -144,13 +141,18 @@ void GamePaint(HDC hDC)
 	}
 	//_pBackground->Draw(hDC, 0, 0);
 	_pGame->DrawSprites(hDC);
-	RECT lifeBar = {349,_sCharacter->GetPosition().top-11,401, _sCharacter->GetPosition().top-4 };
-	RECT lifeChar = { 350,_sCharacter->GetPosition().top - 10,350+_sCharacter->life, _sCharacter->GetPosition().top - 5 };
-	HBRUSH hRed = CreateSolidBrush(RGB(255, 0, 0));
-	HBRUSH hGreen = CreateSolidBrush(RGB(0, 255, 0));
+	if (_sCharacter->life > 0)
+	{
+		RECT lifeBar = { 349,_sCharacter->GetPosition().top - 11,401, _sCharacter->GetPosition().top - 4 };
+		RECT lifeChar = { 350,_sCharacter->GetPosition().top - 10,350 + _sCharacter->life, _sCharacter->GetPosition().top - 5 };
+		HBRUSH hRed = CreateSolidBrush(RGB(255, 0, 0));
+		HBRUSH hGreen = CreateSolidBrush(RGB(0, 255, 0));
 
-	FillRect(hDC, &lifeBar, hRed);
-	FillRect(hDC, &lifeChar, hGreen);
+		FillRect(hDC, &lifeBar, hRed);
+		FillRect(hDC, &lifeChar, hGreen);
+		DeleteObject(hRed);
+		DeleteObject(hGreen);
+	}
 
 }
 
@@ -161,27 +163,28 @@ void GameCycle()
 	}
 	updateSpells();
 	x += vx;
+	
 	_pGame->UpdateSprites(_Scene->getMap(x), x, vx);
-
+	
 	HWND  hWindow = _pGame->GetWindow();
 	HDC   hDC = GetDC(hWindow);
 
-
-	std::vector<Sprite*> addedSprites = _Scene->updateScene(x, _sCharacter->GetPosition().top, hDC);
+	
+	std::vector<Sprite*> addedSprites = _Scene->updateScene(x, _sCharacter->GetPosition().top, hDC, _hInstance); // GDI Leak
 	for (auto nSprite : addedSprites) {
 		_pGame->AddSprite(nSprite);
 	}
-
+	
 	if (rand() % 100 < 1) {
 		if (rand() % 2 == 0) {
 
-			SpellCaster* temp_spellC = new SpellCaster(hDC);
+			SpellCaster* temp_spellC = new SpellCaster(hDC, _hInstance);
 			temp_spellC->SetPosition((rand() % 700) + 1000, 900);
 			_Scene->addSpellCaster(temp_spellC);
 			_pGame->AddSprite(temp_spellC);
 		}
 		else {
-			Demon* temp_demon = new Demon(hDC);
+			Demon* temp_demon = new Demon(hDC, _hInstance);
 			temp_demon->SetPosition((rand() % 700) + 1000, 900);
 			temp_demon->changeState(S_RUNL);
 			_pGame->AddSprite(temp_demon);
@@ -439,6 +442,19 @@ BOOL SpriteCollision(Sprite* pSpriteHitter, Sprite* pSpriteHittee) // All collis
 					_Scene->demons.erase(std::remove(_Scene->demons.begin(), _Scene->demons.end(), pSpriteHitter), _Scene->demons.end());
 
 			}
+			if (instanceof<Demon>(pSpriteHitter)) {// ölü olup olmadığını kontrol et
+				Demon* demon = dynamic_cast<Demon*>(pSpriteHitter);
+				STATE att_state = pChar->GetPosition().left > demon->GetPosition().left ? S_RATT : S_LATT;
+				if (demon->IsAnimDef()) {
+					demon->changeState(att_state);
+				}
+				else {
+					if (demon->lastFrame()) {
+						pChar->life -= 2;
+					}
+				}
+				
+			}
 
 		}
 		else if (instanceof<Tile>(pSpriteHitter)) {
@@ -466,6 +482,19 @@ BOOL SpriteCollision(Sprite* pSpriteHitter, Sprite* pSpriteHittee) // All collis
 					_Scene->spCasters.erase(std::remove(_Scene->spCasters.begin(), _Scene->spCasters.end(), pSpriteHittee), _Scene->spCasters.end());
 				else
 					_Scene->demons.erase(std::remove(_Scene->demons.begin(), _Scene->demons.end(), pSpriteHittee), _Scene->demons.end());
+
+			}
+			if (instanceof<Demon>(pSpriteHittee)) { // ölü olup olmadığını kontrol et
+				Demon* demon = dynamic_cast<Demon*>(pSpriteHittee);
+				STATE att_state = pChar->GetPosition().left > demon->GetPosition().left ? S_RATT : S_LATT;
+				if (demon->IsAnimDef()) {
+					demon->changeState(att_state);
+				}
+				else {
+					if (demon->lastFrame()) {
+						pChar->life -= 2;
+					}
+				}
 
 			}
 		}
