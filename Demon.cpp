@@ -1,13 +1,13 @@
 #include "Demon.h"
 
-Demon::Demon(HDC hDC) :  SimpleAI(hDC){
+Demon::Demon(HDC hDC, HINSTANCE _hInstance) :  SimpleAI(hDC){
 
-	this->_bCharAnimRunR = new Bitmap(hDC, TEXT("resources/demon_walk.bmp"));
-	this->_bCharAnimRunL = new Bitmap(hDC, TEXT("resources/demon_walk_l.bmp"));
-	this->_bCharAnimAttR = new Bitmap(hDC, TEXT("resources/demon_attack.bmp"));
-	this->_bCharAnimAttL = new Bitmap(hDC, TEXT("resources/demon_attack_l.bmp"));
-	this->_bCharAnimDeathL = new Bitmap(hDC, TEXT("resources/demon_death.bmp"));
-	this->_bCharAnimDeathR = new Bitmap(hDC, TEXT("resources/demon_death_l.bmp"));
+	this->_bCharAnimRunR = new Bitmap(hDC, IDB_DEMON_RUN_R, _hInstance);
+	this->_bCharAnimRunL = new Bitmap(hDC, IDB_DEMON_RUN_L, _hInstance);
+	this->_bCharAnimAttR = new Bitmap(hDC, IDB_DEMON_ATT_R, _hInstance);
+	this->_bCharAnimAttL = new Bitmap(hDC, IDB_DEMON_ATT_L, _hInstance);
+	this->_bCharAnimDeathR = new Bitmap(hDC, IDB_DEMON_DEATH_L, _hInstance);
+	this->_bCharAnimDeathL = new Bitmap(hDC, IDB_DEMON_DEATH_R, _hInstance);
 
 	SetRect(&m_rcBounds, 0, 0, 1920, 1030);
 	this->SetBitmap(_bCharAnimRunR);
@@ -71,6 +71,26 @@ void Demon::changeState(STATE state) {
 		this->SetFrameDelay(2);
 
 		break;
+	case S_RATT:
+		this->SetBitmap(_bCharAnimAttR);
+		this->SetPosition(RECT{ this->GetPosition().left,this->GetPosition().top, this->GetPosition().left + m_pBitmap->GetWidth(), this->GetPosition().top + m_pBitmap->GetHeight() });
+
+		this->SetAnimDef(FALSE);
+		this->SetVelocity(0, 0);
+		this->SetNumFrames(18);
+		this->SetFrameDelay(1);
+
+		break;
+	case S_LATT:
+		this->SetBitmap(_bCharAnimAttL);
+		this->SetPosition(RECT{ this->GetPosition().left,this->GetPosition().top, this->GetPosition().left + m_pBitmap->GetWidth(), this->GetPosition().top + m_pBitmap->GetHeight() });
+
+		this->SetAnimDef(FALSE);
+		this->SetVelocity(0, 0);
+		this->SetNumFrames(18);
+		this->SetFrameDelay(1);
+
+		break;
 
 
 
@@ -82,9 +102,12 @@ void Demon::changeState(STATE state) {
 void Demon::act(int a) {
 	int rng = rand() % 50;
 
-	if (rng == 0 ) {
+	if (rng == 0 && IsAnimDef()) {
 		STATE state = (m_pBitmap == _bCharAnimRunR ) ? S_RUNL : S_RUNR;
-		this->changeState(state);
+		changeState(state);
+	}
+	if (IsAnimDef() &&  !checkState(S_RUNL) && !checkState(S_RUNR)) {
+		changeState(S_RUNL);
 	}
 	
 }

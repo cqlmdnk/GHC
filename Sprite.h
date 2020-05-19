@@ -1,5 +1,6 @@
 #pragma once
 #include "Bitmap.h"
+#include "Resources.h"
 #define PLATFORM_S 60
 typedef WORD        SPRITEACTION;
 const SPRITEACTION  SA_NONE = 0x0000L,

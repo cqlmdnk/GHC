@@ -1,21 +1,21 @@
 ﻿#include "PlayerCharacter.h"
 
 
-PlayerCharacter::PlayerCharacter(HDC hDC) : Character(hDC) // default frame number and delay canbe parameters
+PlayerCharacter::PlayerCharacter(HDC hDC, HINSTANCE _hInstance) : Character(hDC) // default frame number and delay canbe parameters
 {
-	_bCharAnimIdle = new Bitmap(hDC, TEXT("resources/character_idle.bmp"));
-	_bCharAnimRunR = new Bitmap(hDC, TEXT("resources/character_run.bmp"));
-	_bCharAnimRunL = new Bitmap(hDC, TEXT("resources/character_run_l.bmp"));
-	_bCharAnimJumpR = new Bitmap(hDC, TEXT("resources/character_jump.bmp"));
-	_bCharAnimJumpL = new Bitmap(hDC, TEXT("resources/character_jump_l.bmp"));
-	_bCharFire = new Bitmap(hDC, TEXT("resources/character_fire_burst.bmp"));
-	_bCharFireL = new Bitmap(hDC, TEXT("resources/character_fire_burst_l.bmp"));
-	_bCharAnimAttR = new Bitmap(hDC,TEXT("resources/character_attack.bmp"));
-	_bCharAnimAttL = new Bitmap(hDC, TEXT("resources/character_attack_l.bmp"));
+	_bCharAnimIdle = new Bitmap(hDC, IDB_CHAR_IDLE_R, _hInstance);
+	_bCharAnimRunR = new Bitmap(hDC, IDB_CHAR_RUN_R, _hInstance);
+	_bCharAnimRunL = new Bitmap(hDC, IDB_CHAR_RUN_L, _hInstance);
+	_bCharAnimJumpR = new Bitmap(hDC, IDB_CHAR_JUMP_R, _hInstance);
+	_bCharAnimJumpL = new Bitmap(hDC, IDB_CHAR_JUMP_L, _hInstance);
+	_bCharFire = new Bitmap(hDC, IDB_CHAR_FIREBURST_R, _hInstance);
+	_bCharFireL = new Bitmap(hDC, IDB_CHAR_FIREBURST_L, _hInstance);
+	_bCharAnimAttR = new Bitmap(hDC, IDB_CHAR_ATT_R, _hInstance);
+	_bCharAnimAttL = new Bitmap(hDC, IDB_CHAR_ATT_L, _hInstance);
 
 
-	_bCharFireBurstR = new Bitmap(hDC, TEXT("resources/fire_burst.bmp"));
-	_bCharFireBurstL = new Bitmap(hDC, TEXT("resources/fire_burst_l.bmp"));
+	_bCharFireBurstR = new Bitmap(hDC, IDB_FIREBURST_R, _hInstance);
+	_bCharFireBurstL = new Bitmap(hDC, IDB_FIREBURST_L, _hInstance);
 
 	SetRect(&m_rcBounds, 0, 0, 1920, 1030);
 	

@@ -7,6 +7,7 @@ Spell::Spell(Bitmap* _bitmap, POINT target, int x, int y)
 	this->m_pBitmap = _bitmap;
 	SetRect(&m_rcBounds, 20, 20, 1880, 1060);
 	this->SetPosition(RECT{ x,y , x + this->m_pBitmap->GetWidth() , y + this->m_pBitmap->GetHeight() });
+	this->startPos = { x,y };
 	this->target = target;
 	this->SetNumFrames(5);
 	this->SetFrameDelay(2);
@@ -30,8 +31,9 @@ void Spell::calcNextPos(int y)
 	this->target.y = y;
 	double magnitude = sqrt(pow(double(this->target.x) - this->GetPosition().left, 2) + pow(double(this->target.y)  - this->GetPosition().top + sin(lifeTime)*5, 2 ));
 	double xVector = ((double(this->target.x) - this->GetPosition().left) / magnitude) * log(magnitude);
-	double yVector =  ((this->target.y + ((200 * (double)rand() / RAND_MAX) - 100) - this->GetPosition().top) / magnitude) ;
-
+	double yVector =  ((this->target.y + ((200 * (double)rand() / RAND_MAX) - 100) - this->GetPosition().top) / magnitude);
+	
+	
 	POINT p = { int(xVector),int(yVector) };
 	this->SetVelocity(p.x, p.y);
 }
