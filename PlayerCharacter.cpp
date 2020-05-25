@@ -20,12 +20,14 @@ PlayerCharacter::PlayerCharacter(HDC hDC, HINSTANCE _hInstance) : Character(hDC)
 	SetRect(&m_rcBounds, 0, 0, 1920, 1030);
 	
 	this->SetBitmap(_bCharAnimIdle);
-	SetRect(&m_rcPosition, 0, 0, _bCharAnimIdle->GetWidth(), _bCharAnimIdle->GetHeight());
-	this->SetPosition(320, 1020);
+	
+	this->SetPosition(320, 960);
+	this->SetPosition(RECT{ this->GetPosition().left,this->GetPosition().bottom - this->m_pBitmap->GetHeight() , this->GetPosition().left + this->m_pBitmap->GetWidth(), this->GetPosition().bottom });
+
 	this->SetNumFrames(4);
 	this->SetFrameDelay(5);
 
-	int iXShrink = (m_rcPosition.left - m_rcPosition.right) / 5;
+	int iXShrink = (m_rcPosition.left - m_rcPosition.right) / 3;
 	int iYShrink = (m_rcPosition.top - m_rcPosition.bottom) / 5;
 	CopyRect(&m_rcCollision, &m_rcPosition);
 
@@ -38,19 +40,19 @@ PlayerCharacter::PlayerCharacter(HDC hDC, HINSTANCE _hInstance) : Character(hDC)
 }
 void PlayerCharacter::changeState(STATE state) {
 	_bCharState = state;
-	this->m_iCurFrame = 0;
+	this->m_iCurFrame = 0; // tüm positionları bottom referans alarak ayarla !!!!!!!!!
 
 	switch (state)
 	{
 	case S_IDLE:
 		this->SetBitmap(_bCharAnimIdle); // iki animasyon arası koordinat farkı var 
-		this->SetPosition(RECT{ this->GetPosition().left,this->GetPosition().top, this->GetPosition().left + _bCharAnimIdle->GetWidth(), this->GetPosition().top + _bCharAnimIdle->GetHeight() });
+		this->SetPosition(RECT{ this->GetPosition().left,this->GetPosition().bottom- this->m_pBitmap->GetHeight() , this->GetPosition().left + this->m_pBitmap->GetWidth(), this->GetPosition().bottom });
 		this->SetFrameDelay(5);          // geçiş sırasında kopukluk hissediliyor
 		this->SetNumFrames(4);
 		break;
 	case S_RUNL:
 		this->SetBitmap(_bCharAnimRunL);
-		this->SetPosition(RECT{ this->GetPosition().left,this->GetPosition().top, this->GetPosition().left + _bCharAnimRunL->GetWidth(), this->GetPosition().top + _bCharAnimRunL->GetHeight() });
+		this->SetPosition(RECT{ this->GetPosition().left,this->GetPosition().bottom - this->m_pBitmap->GetHeight() , this->GetPosition().left + this->m_pBitmap->GetWidth(), this->GetPosition().bottom });
 
 		this->SetNumFrames(6);
 		this->SetFrameDelay(1);
@@ -58,7 +60,7 @@ void PlayerCharacter::changeState(STATE state) {
 		break;
 	case S_RUNR:
 		this->SetBitmap(_bCharAnimRunR);
-		this->SetPosition(RECT{ this->GetPosition().left,this->GetPosition().top, this->GetPosition().left + _bCharAnimRunR->GetWidth(), this->GetPosition().top + _bCharAnimRunR->GetHeight() });
+		this->SetPosition(RECT{ this->GetPosition().left,this->GetPosition().bottom - this->m_pBitmap->GetHeight() , this->GetPosition().left + this->m_pBitmap->GetWidth(), this->GetPosition().bottom });
 
 		this->SetNumFrames(6);
 		this->SetFrameDelay(1);
@@ -67,7 +69,7 @@ void PlayerCharacter::changeState(STATE state) {
 	case S_LJUMP:
 		this->SetVelocity(0, -50);
 		this->SetBitmap(_bCharAnimJumpL); // bir kere bastıktan sonra 7 kareyi de basması ve animasyonu bitirmesi lazım
-		this->SetPosition(RECT{ this->GetPosition().left,this->GetPosition().top, this->GetPosition().left + _bCharAnimJumpL->GetWidth(), this->GetPosition().top + _bCharAnimJumpL->GetHeight() });
+		this->SetPosition(RECT{ this->GetPosition().left,this->GetPosition().bottom - this->m_pBitmap->GetHeight() , this->GetPosition().left + this->m_pBitmap->GetWidth(), this->GetPosition().bottom });
 
 		this->SetNumFrames(7);
 		this->SetFrameDelay(2);
@@ -76,7 +78,7 @@ void PlayerCharacter::changeState(STATE state) {
 	case S_RJUMP:
 		this->SetVelocity(0, -50);
 		this->SetBitmap(_bCharAnimJumpR); // bir kere bastıktan sonra 7 kareyi de basması ve animasyonu bitirmesi lazım
-		this->SetPosition(RECT{ this->GetPosition().left,this->GetPosition().top, this->GetPosition().left + _bCharAnimJumpR->GetWidth(), this->GetPosition().top + _bCharAnimJumpR->GetHeight() });
+		this->SetPosition(RECT{ this->GetPosition().left,this->GetPosition().bottom - this->m_pBitmap->GetHeight() , this->GetPosition().left + this->m_pBitmap->GetWidth(), this->GetPosition().bottom });
 
 		this->SetNumFrames(7);
 		this->SetFrameDelay(2);
@@ -84,7 +86,7 @@ void PlayerCharacter::changeState(STATE state) {
 		break;
 	case S_RFIRE:
 		this->SetBitmap(_bCharFire); // bir kere bastıktan sonra 7 kareyi de basması ve animasyonu bitirmesi lazım
-		this->SetPosition(RECT{ this->GetPosition().left,this->GetPosition().top, this->GetPosition().left + _bCharFireL->GetWidth(), this->GetPosition().top + _bCharFireL->GetHeight() });
+		this->SetPosition(RECT{ this->GetPosition().left,this->GetPosition().bottom - this->m_pBitmap->GetHeight() , this->GetPosition().left + this->m_pBitmap->GetWidth(), this->GetPosition().bottom });
 
 		this->SetNumFrames(2);
 		this->SetFrameDelay(1);
@@ -92,7 +94,7 @@ void PlayerCharacter::changeState(STATE state) {
 		break;
 	case S_LFIRE:
 		this->SetBitmap(_bCharFireL); // bir kere bastıktan sonra 7 kareyi de basması ve animasyonu bitirmesi lazım
-		this->SetPosition(RECT{ this->GetPosition().left,this->GetPosition().top, this->GetPosition().left + _bCharFireL->GetWidth(), this->GetPosition().top + _bCharFireL->GetHeight() });
+		this->SetPosition(RECT{ this->GetPosition().left,this->GetPosition().bottom - this->m_pBitmap->GetHeight() , this->GetPosition().left + this->m_pBitmap->GetWidth(), this->GetPosition().bottom });
 
 		this->SetNumFrames(2);
 		this->SetFrameDelay(1);
@@ -100,7 +102,7 @@ void PlayerCharacter::changeState(STATE state) {
 		break;
 	case S_RATT:
 		this->SetBitmap(_bCharAnimAttR); // bir kere bastıktan sonra 7 kareyi de basması ve animasyonu bitirmesi lazım
-		this->SetPosition(RECT{ this->GetPosition().left,this->GetPosition().top, this->GetPosition().left + _bCharFireL->GetWidth(), this->GetPosition().top + _bCharFireL->GetHeight() });
+		this->SetPosition(RECT{ this->GetPosition().left,this->GetPosition().bottom - this->m_pBitmap->GetHeight() , this->GetPosition().left + this->m_pBitmap->GetWidth(), this->GetPosition().bottom });
 
 		this->SetNumFrames(6);
 		this->SetFrameDelay(1);
@@ -108,7 +110,7 @@ void PlayerCharacter::changeState(STATE state) {
 		break;
 	case S_LATT:
 		this->SetBitmap(_bCharAnimAttL); // bir kere bastıktan sonra 7 kareyi de basması ve animasyonu bitirmesi lazım
-		this->SetPosition(RECT{ this->GetPosition().left,this->GetPosition().top, this->GetPosition().left + _bCharFireL->GetWidth(), this->GetPosition().top + _bCharFireL->GetHeight() });
+		this->SetPosition(RECT{ this->GetPosition().left,this->GetPosition().bottom - this->m_pBitmap->GetHeight() , this->GetPosition().left + this->m_pBitmap->GetWidth(), this->GetPosition().bottom });
 
 		this->SetNumFrames(6);
 		this->SetFrameDelay(1);

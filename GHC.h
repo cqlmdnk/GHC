@@ -31,3 +31,4 @@ bool editMod = false; // mod kontrol için tutuluyor
 int x = 0;
 int vx = 0;
 int sceneBlock = 2;
+int xThreshold = 32;

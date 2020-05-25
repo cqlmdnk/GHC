@@ -89,7 +89,7 @@ BOOL GameEngine::CheckSpriteCollision(Sprite* pTestSprite)
 		if (pTestSprite->TestCollision(*siSprite))
 			// Collision detected
 
- 			return SpriteCollision((*siSprite), pTestSprite);
+			return SpriteCollision((*siSprite), pTestSprite);
 	}
 
 	// No collision
@@ -284,7 +284,7 @@ void GameEngine::DrawSprites(HDC hDC)
 			(*siSprite)->Draw(hDC);
 }
 
-void GameEngine::UpdateSprites(bool** map, int x, int vx)
+void GameEngine::UpdateSprites(int** map, int x, int vx)
 {
 	// Update the sprites in the sprite vector
 	RECT          rcOldSpritePos;
@@ -292,77 +292,91 @@ void GameEngine::UpdateSprites(bool** map, int x, int vx)
 	vector<Sprite*>::iterator siSprite;
 	for (siSprite = m_vSprites.begin(); siSprite != m_vSprites.end(); siSprite++)
 	{
+
+
 		if ((*siSprite)->IsStateHalt()) {
 			// change stateHalt if it is supposed to be in screen
-			if ((*siSprite)->GetAbsX() >= x || (*siSprite)->GetAbsX() >= x + 1080/*Ekran genişiliği makrosu*/) {
+			if ((*siSprite)->GetAbsX() >= x  && (*siSprite)->GetAbsX() < x + 1920/*Ekran genişiliği makrosu*/) {
 				(*siSprite)->SetStateHalt(FALSE);
-
-			}
-		}
-		else {
-			if (!instanceof<PlayerCharacter>((*siSprite))) { // checking if sprite is a AI or not // SimpleAI Class >> BaseAI Class
-																	//  can't check for character, since all AIs are characters
-
-				(*siSprite)->SetPosition((*siSprite)->GetPosition().left - vx, (*siSprite)->GetPosition().top);
-				
-			}
-			
-			
-			// Save the old sprite position in case we need to restore it
-			rcOldSpritePos = (*siSprite)->GetPosition();
-			//sprite lara x'in modu eklenmeli
-			if (!instanceof<Spell>((*siSprite))) {
-			}
-
-			// Update the sprite
-			// Update the sprite
-			saSpriteAction = (*siSprite)->Update(map, x);
-			if (instanceof<FireBurst>(*siSprite) || instanceof<Tile>(*siSprite)) {
-				(*siSprite)->SetVelocity((*siSprite)->GetVelocity().x, (*siSprite)->GetVelocity().y - 10);
-			}
-			// Handle the SA_KILL sprite action
-			if (saSpriteAction & SA_KILL)
-			{
-				//m_vSprites.erase(std::remove(m_vSprites.begin(), m_vSprites.end(), (*siSprite)), m_vSprites.end());
-				(*siSprite)->SetHidden(TRUE);
-				//siSprite--;
-
-				
-				continue;
-			}
-
-
-			// See if the sprite collided with any others
-			if (CheckSpriteCollision(*siSprite)) {
-				if (instanceof<Spell>((*siSprite)) || instanceof<FireBurst>((*siSprite)) || instanceof<Tile>((*siSprite))) {
-
+				/*if ((*siSprite)->GetAbsX() >= x) {
+					(*siSprite)->SetPosition(0, (*siSprite)->GetPosition().top);
 				}
 				else {
-					(*siSprite)->SetPosition(rcOldSpritePos);
+					(*siSprite)->SetPosition(1920 , (*siSprite)->GetPosition().top);
 
-				}
-
-
-
-
-
-
+				}*/
 			}
-			// Restore the old sprite position
+			else {
+				continue;
+			}
+		}
+		if (!instanceof<PlayerCharacter>((*siSprite))) { // checking if sprite is a AI or not // SimpleAI Class >> BaseAI Class
+															//  can't check for character, since all AIs are characters
+
+			((*siSprite))->SetPosition(((*siSprite))->GetPosition().left - vx, ((*siSprite))->GetPosition().top);
 
 		}
-		
-	
+
+
+
+		// Save the old sprite position in case we need to restore it
+		rcOldSpritePos = (*siSprite)->GetPosition();
+		//sprite lara x'in modu eklenmeli
+		if (!instanceof<Spell>((*siSprite))) {
+		}
+
+		// Update the sprite
+		// Update the sprite
+		saSpriteAction = (*siSprite)->Update(map, x);
+		if (instanceof<FireBurst>(*siSprite) || instanceof<Tile>(*siSprite)) {
+			(*siSprite)->SetVelocity((*siSprite)->GetVelocity().x, (*siSprite)->GetVelocity().y - 10);
+		}
+		// Handle the SA_KILL sprite action
+		if (saSpriteAction & SA_KILL)
+		{
+			//m_vSprites.erase(std::remove(m_vSprites.begin(), m_vSprites.end(), (*siSprite)), m_vSprites.end());
+			(*siSprite)->SetHidden(TRUE);
+			//siSprite--;
+
+
+			continue;
+		}
+
+
+		// See if the sprite collided with any others
+		if (CheckSpriteCollision(*siSprite)) {
+			if (instanceof<Spell>((*siSprite)) || instanceof<FireBurst>((*siSprite)) || instanceof<Tile>((*siSprite))) {
+
+			}
+			else {
+				(*siSprite)->SetPosition(rcOldSpritePos);
+
+			}
+
+
+
+
+
+
+		}
+		// Restore the old sprite position
+
+
+
+
 	}
 	for (auto sprite : m_vSprites)
 	{
 
 		if ((sprite->deathMark && sprite->IsAnimDef()) || sprite->IsHidden()) {
 			m_vSprites.erase(std::remove(m_vSprites.begin(), m_vSprites.end(), sprite), m_vSprites.end());
-			
+
 			delete sprite;
 		}
+
+
 	}
+
 
 
 }

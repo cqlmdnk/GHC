@@ -6,6 +6,7 @@ class Tile :
 public:
 	Tile(HDC hDC, HINSTANCE _hInstance);
 	~Tile();
+	int type;
 
 };
 

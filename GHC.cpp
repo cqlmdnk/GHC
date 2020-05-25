@@ -10,7 +10,6 @@
 
 
 //-----GAME SPECIFIC FUNCTIONS-----//
-void randomCastSpells();
 void updateSpells();
 //-----------------------------------------------------------------
 // Game Engine Functions
@@ -43,9 +42,9 @@ void GameStart(HWND hWindow)
 
 	_Scene = new Scene(hDC, _hInstance);
 
-	_pBackground = new Bitmap(hDC, IDB_BG_LAYER1, _hInstance); // will be changed
+	_pBackground = new Bitmap(hDC, IDB_BG_LAYER1, _hInstance);
 	_Scene->addBackground(_pBackground);
-	_pBackground = new Bitmap(hDC, IDB_BG_LAYER2, _hInstance);  // scenein içine gömülebilir
+	_pBackground = new Bitmap(hDC, IDB_BG_LAYER2, _hInstance); 
 	_Scene->addBackground(_pBackground);
 	_pBackground = new Bitmap(hDC, IDB_BG_LAYER3, _hInstance);
 	_Scene->addBackground(_pBackground);
@@ -68,10 +67,60 @@ void GameStart(HWND hWindow)
 	ais.push_back(temp_ai);
 	_pGame->AddSprite(temp_ai);
 
-
+	_Scene->loadLevel("leveld.dat");
 	_sCharacter->SetBoundsAction(BA_STOP);
 
 	_pGame->AddSprite(_sCharacter);
+	int** map = _Scene->getMap(x);
+	for (size_t i = 0; i < 36; i++)
+	{
+		for (size_t j = 0; j < 18; j++)
+		{
+			if (map[i][j] == 3)
+			{
+				Tile* tile = new Tile(hDC, _hInstance);
+				tile->type = 0;
+				tile->SetVelocity(0, -10);
+				tile->SetBoundsAction(BA_BOUNCE);
+				tile->SetPosition(i * PLATFORM_S, j * PLATFORM_S);
+				_pGame->AddSprite(tile);
+				_Scene->addSpriteTile(tile); // may not be necessary
+
+			} // moving tile(vertical)   // moving tiles bounces back in case of collision with platform ( case 1 and 2 )
+			else if (map[i][j] == 4) {
+				Tile* tile = new Tile(hDC, _hInstance);
+				tile->type = 1;
+				tile->SetVelocity(-10, 0);
+				tile->SetBoundsAction(BA_BOUNCE);
+				tile->SetPosition(i * PLATFORM_S, j * PLATFORM_S);
+				_pGame->AddSprite(tile);
+				_Scene->addSpriteTile(tile); // may not be necessary
+
+				 // moving tile(horizontal) // moving tiles bounces back in case of collision with platform ( case 1 and 2 )
+			}
+			else if (map[i][j] == 4) {
+				
+			}
+			else if (map[i][j] == 5) {
+				SpellCaster* sp = new SpellCaster(hDC, _hInstance);
+
+				sp->SetBoundsAction(BA_HALT);
+				sp->SetPosition(i * PLATFORM_S, j * PLATFORM_S);
+				_pGame->AddSprite(sp);
+				_Scene->addSpellCaster(sp); // may not be necessary
+				
+			}
+			else if (map[i][j] == 6) {
+				Demon* demon = new Demon(hDC, _hInstance);
+
+				demon->SetBoundsAction(BA_STOP);
+				demon->SetPosition(i*PLATFORM_S, j * PLATFORM_S);
+				_pGame->AddSprite(demon);
+				_Scene->addDemon(demon); // may not be necessary
+				
+			}
+		}
+	}
 
 
 }
@@ -114,7 +163,7 @@ void GamePaint(HDC hDC)
 		LPCSTR message = TEXT("Dev Mod Activated");
 		DrawTextA(hDC, message, -1, &rect, DT_SINGLELINE | DT_NOCLIP);
 
-		char buffer[30];
+		char buffer[50];
 		snprintf(buffer, sizeof(buffer), "Character's X coordinate : %d", x);
 		LPCSTR message1 = (buffer);
 		rect.top = 25;
@@ -168,14 +217,14 @@ void GameCycle()
 	
 	HWND  hWindow = _pGame->GetWindow();
 	HDC   hDC = GetDC(hWindow);
-
+	
 	
 	std::vector<Sprite*> addedSprites = _Scene->updateScene(x, _sCharacter->GetPosition().top, hDC, _hInstance); // GDI Leak
 	for (auto nSprite : addedSprites) {
 		_pGame->AddSprite(nSprite);
 	}
 	
-	if (rand() % 100 < 1) {
+	/*if (rand() % 200 < 1) {
 		if (rand() % 2 == 0) {
 
 			SpellCaster* temp_spellC = new SpellCaster(hDC, _hInstance);
@@ -192,7 +241,7 @@ void GameCycle()
 
 		}
 
-	}
+	}*/
 
 	GamePaint(_hOffscreenDC);
 
@@ -305,20 +354,69 @@ void HandleKeys()
 
 
 	}
-	else if (GetAsyncKeyState('S') < 0) {
+	else if (GetAsyncKeyState('S') < 0) { // spellcaster (s)
 		if (editMod) {
 			POINT p = { 0,0 };
 			GetCursorPos(&p);
-			_Scene->addTile((x + p.x) / PLATFORM_S, p.y / PLATFORM_S, 1, x);
+			_Scene->addTile((x + p.x) / PLATFORM_S, p.y / PLATFORM_S, 5, x);
+			HWND  hWindow = _pGame->GetWindow();
+			HDC   hDC = GetDC(hWindow);
+			SpellCaster* sp = new SpellCaster(hDC, _hInstance);
+			
+			sp->SetBoundsAction(BA_HALT);
+			sp->SetPosition(p.x, p.y);
+			_pGame->AddSprite(sp);
+			_Scene->addSpellCaster(sp); // may not be necessary
+			DeleteObject(hWindow);
+			DeleteObject(hDC);
+		}
+
+
+	}
+
+	else if (GetAsyncKeyState('D') < 0) { // demon (d)
+		if (editMod) {
+			POINT p = { 0,0 };
+			GetCursorPos(&p);
+			_Scene->addTile((x + p.x) / PLATFORM_S, p.y / PLATFORM_S, 6, x);
+			HWND  hWindow = _pGame->GetWindow();
+			HDC   hDC = GetDC(hWindow);
+			Demon* demon = new Demon(hDC, _hInstance);
+
+			demon->SetBoundsAction(BA_BOUNCE);
+			demon->SetPosition(p.x, p.y);
+			_pGame->AddSprite(demon);
+			_Scene->addDemon(demon); // may not be necessary
+			DeleteObject(hWindow);
+			DeleteObject(hDC);
+
+		}
+
+
+	}
+	else if (GetAsyncKeyState(VK_DELETE) < 0) { // delete 
+		if (editMod) {
+			POINT p = { 0,0 };
+			GetCursorPos(&p);
+			_Scene->addTile((x + p.x) / PLATFORM_S, p.y / PLATFORM_S, 0, x);
+
 		}
 
 
 
+	}
+	else if (GetAsyncKeyState('1') < 0) { // tile1
+		if (editMod) {
+			POINT p = { 0,0 };
+			GetCursorPos(&p);
+			_Scene->addTile((x + p.x) / PLATFORM_S, p.y / PLATFORM_S, 1, x);
+
+		}
 
 
 
 	}
-	else if (GetAsyncKeyState('A') < 0) {
+	else if (GetAsyncKeyState('2') < 0) { // tile2 (if its needed)
 		if (editMod) {
 			POINT p = { 0,0 };
 			GetCursorPos(&p);
@@ -329,16 +427,50 @@ void HandleKeys()
 
 
 	}
-	else if (GetAsyncKeyState('D') < 0) { //delete
+	else if (GetAsyncKeyState('V') < 0) { // vertical dynamic tile
 		if (editMod) {
 			POINT p = { 0,0 };
 			GetCursorPos(&p);
-			_Scene->addTile((x + p.x) / PLATFORM_S, p.y / PLATFORM_S, 0, x);
+			_Scene->addTile((x + p.x) / PLATFORM_S, p.y / PLATFORM_S, 3, x);
+			HWND  hWindow = _pGame->GetWindow();
+			HDC   hDC = GetDC(hWindow);
+			Tile* tile = new Tile(hDC, _hInstance);
+			tile->type = 0;
+			tile->SetVelocity(0, -10);
+			tile->SetBoundsAction(BA_BOUNCE); 
+			tile->SetPosition(p.x, p.y);
+			_pGame->AddSprite(tile);
+			_Scene->addSpriteTile(tile); // may not be necessary
+			DeleteObject(hWindow);
+			DeleteObject(hDC);
+		}
 
+	}
+	else if (GetAsyncKeyState('H') < 0) { // horizontal dynamic tile
+		if (editMod) {
+			POINT p = { 0,0 };
+			GetCursorPos(&p);
+			_Scene->addTile((x + p.x) / PLATFORM_S, p.y / PLATFORM_S, 4, x);
+			HWND  hWindow = _pGame->GetWindow();
+			HDC   hDC = GetDC(hWindow);
+			Tile* tile = new Tile(hDC, _hInstance);
+			tile->type = 1;
+			tile->SetVelocity(-10, 0); // bouncing will be handled through sprite update platform collision
+			tile->SetBoundsAction(BA_BOUNCE);
+			tile->SetPosition(p.x, p.y);
+			_pGame->AddSprite(tile);
+			_Scene->addSpriteTile(tile); // may not be necessary
+			DeleteObject(hWindow);
+			DeleteObject(hDC);
 		}
 
 
+
 	}
+	
+
+
+	
 	else if (GetAsyncKeyState('L') < 0) {
 		if (editMod) {
 			_Scene->loadLevel("leveld.dat");
@@ -363,7 +495,6 @@ void HandleKeys()
 
 	}
 
-	// sınır kontrolleri eklenmeli ( p_iPlatform[x][])
 }
 
 void MouseButtonDown(int x, int y, BOOL bLeft)
@@ -371,7 +502,7 @@ void MouseButtonDown(int x, int y, BOOL bLeft)
 
 	if (bLeft)
 	{
-
+		_sCharacter->SetPosition(x, y);
 	}
 	else
 	{
@@ -458,17 +589,24 @@ BOOL SpriteCollision(Sprite* pSpriteHitter, Sprite* pSpriteHittee) // All collis
 
 		}
 		else if (instanceof<Tile>(pSpriteHitter)) {
-			if (pSpriteHitter->GetPosition().top < pSpriteHittee->GetPosition().top) {// blok üstten mi alttan mı geliyor
-				PlayerCharacter* pChar = dynamic_cast<PlayerCharacter*>(pSpriteHittee);
-				pChar->life -= 2;
-				pSpriteHitter->SetHidden(TRUE);
-			}
-			else {
+			
 				//blok ile beraber üste gitme kodu
+			if (pSpriteHitter->GetPosition().top > pSpriteHittee->GetPosition().top) {
 				pSpriteHittee->SetVelocity(pSpriteHittee->GetVelocity().x, pSpriteHittee->GetVelocity().y - 10);
 				pSpriteHittee->SetPosition(pSpriteHittee->GetPosition().left, pSpriteHittee->GetPosition().top + pSpriteHitter->GetVelocity().y);
+				Tile* tile = dynamic_cast<Tile*>(pSpriteHitter);
+				if (tile->type == 1) {
+					int sign = (pSpriteHitter->GetVelocity().x > 0) - (pSpriteHitter->GetVelocity().x < 0);
+					if (sign < 0) {
+						vx = min(pSpriteHitter->GetVelocity().x - 3, vx);
+					}
+					else {
+						vx = max(pSpriteHitter->GetVelocity().x + 3, vx);
+					}
+				}
 
 			}
+			
 			
 		}
 	}
@@ -499,18 +637,26 @@ BOOL SpriteCollision(Sprite* pSpriteHitter, Sprite* pSpriteHittee) // All collis
 			}
 		}
 		else if (instanceof<Tile>(pSpriteHittee)) {
-			if (pSpriteHitter->GetPosition().top > pSpriteHittee->GetPosition().top) { // blok üstten mi alttan mı geliyor
-
-				PlayerCharacter* pChar = dynamic_cast<PlayerCharacter*>(pSpriteHitter);
-				pChar->life -= 2;
-				pSpriteHittee->SetHidden(TRUE);
-			}
-			else {
+			
 				//blok ile beraber üste gitme kodu
-				pSpriteHitter->SetVelocity(pSpriteHitter->GetVelocity().x, pSpriteHitter->GetVelocity().y-10);
-				pSpriteHitter->SetPosition(pSpriteHitter->GetPosition().left, pSpriteHitter->GetPosition().top+ pSpriteHittee->GetVelocity().y);
-
-			}
+				
+				if (pSpriteHittee->GetPosition().top > pSpriteHitter->GetPosition().top) {
+					pSpriteHitter->SetVelocity(pSpriteHitter->GetVelocity().x, pSpriteHitter->GetVelocity().y - 10);
+					pSpriteHitter->SetPosition(pSpriteHitter->GetPosition().left, pSpriteHitter->GetPosition().top + pSpriteHittee->GetVelocity().y);
+					Tile* tile = dynamic_cast<Tile*>(pSpriteHittee);
+					if (tile->type == 1) {
+						int sign = (pSpriteHittee->GetVelocity().x > 0) - (pSpriteHittee->GetVelocity().x < 0);
+						if (sign < 0) {
+							vx = min(pSpriteHitter->GetVelocity().x - 3, vx);
+						}
+						else {
+							vx = max(pSpriteHitter->GetVelocity().x + 3, vx);
+						}
+					}
+					
+				}
+				
+			
 		}
 	}
 	else {

@@ -12,20 +12,22 @@ Scene::Scene(HDC hDC, HINSTANCE  _hInstance) {
 
 
 void Scene::addBackground(Bitmap* img) {
-	background.push_back(img); // gelen obje sona ekleniyor
+	background.push_back(img);
 }
-void Scene::addSpellCaster(SpellCaster* obj) { // game objeler bir kez yüklenicek çok defa kullanýcak ram kullanýmý azalsýn diye böyle yapýldý
+void Scene::addSpellCaster(SpellCaster* obj) { 
 	this->spCasters.push_back(obj);
 
-	// gelen obje sona ekleniyor
 }
-void Scene::addDemon(Demon* obj) { // game objeler bir kez yüklenicek çok defa kullanýcak ram kullanýmý azalsýn diye böyle yapýldý
+void Scene::addDemon(Demon* obj) { 
 	this->demons.push_back(obj);
 
-	// gelen obje sona ekleniyor
 }
-void Scene::addSpell(Spell* obj) { // game objeler bir kez yüklenicek çok defa kullanýcak ram kullanýmý azalsýn diye böyle yapýldý
+void Scene::addSpell(Spell* obj) { 
 	this->spells.push_back(obj);
+}
+
+void Scene::addSpriteTile(Tile* obj) { // game objeler bir kez yüklenicek çok defa kullanýcak ram kullanýmý azalsýn diye böyle yapýldý
+	this->tilesSprites.push_back(obj);
 }
 
 void Scene::drawScene(HDC hDc)
@@ -42,7 +44,7 @@ void Scene::drawBackground(HDC hDC, int x) {
 	}
 
 	platform = CreateOffscreenBmp(2000, 1080, x);
-	p = x / tiles[0]->GetHeight();
+	
 	
 
 	BlitToHdc(hDC, platform, -(x % tiles[0]->GetHeight()), 0, 2000, 1080);
@@ -69,7 +71,7 @@ HBITMAP Scene::CreateOffscreenBmp(int wd, int hgt, int x) {
 	{
 		for (int j = 0; j < 18; j++)
 		{
-			RECT rect = { i * PLATFORM_S, j * PLATFORM_S,(i * PLATFORM_S) + PLATFORM_S, (j * PLATFORM_S) + PLATFORM_S };
+			RECT rect = { i * PLATFORM_S, j * PLATFORM_S,(i * PLATFORM_S) + PLATFORM_S, (j * PLATFORM_S) + 40 };
 
 			switch (p_iPlatform[i + x / PLATFORM_S][j])
 			{
@@ -121,17 +123,17 @@ void Scene::BlitToHdc(HDC hdcDst, HBITMAP hbmSrc, int x, int y, int wd, int hgt)
 
 
 
-bool** Scene::getMap(int x)
+int** Scene::getMap(int x)
 {
-	bool** map = 0;
-	map = new bool* [36];
+	int** map = 0;
+	map = new int* [36];
 
 	for (size_t i = 0; i < 36; i++)
 	{
-		map[i] = new bool[18];
+		map[i] = new int[18];
 		for (size_t j = 0; j < 18; j++)
 		{
-			map[i][j] = p_iPlatform[i + x / tiles[0]->GetHeight()][j] != 0;
+			map[i][j] = p_iPlatform[i + x / tiles[0]->GetHeight()][j];
 
 
 		}
@@ -207,7 +209,7 @@ int Scene::testCollisionRight(int x, int y) {
 int Scene::testCollisionLeft(int x, int y) {
 
 
-	switch (p_iPlatform[(x / tiles[0]->GetHeight()) - 1][y / tiles[0]->GetHeight()])
+	switch (p_iPlatform[(x / tiles[0]->GetHeight()) ][y / tiles[0]->GetHeight()])
 	{
 	case 1:
 		return 2;
@@ -243,31 +245,47 @@ std::vector<Sprite*> Scene::updateScene(int x, int charYPos, HDC hDC, HINSTANCE 
 			if (!spcaster->IsStateHalt())
 				tileMagic = TRUE;
 		}
-		for (int i = 0; i < 18; i++) { // creating foe tiles in presence of spellcaster randomly
-			if (p_iPlatform[(x / PLATFORM_S) + 6][i] == 1) {
-				if (i < charYPos / PLATFORM_S) {
-					//üstten düşen tile
-					p_iPlatform[(x / PLATFORM_S) + 6][i] = 0;
-					Tile* tile = new Tile(hDC, _hInstance);
-					tile->SetPosition(6 * PLATFORM_S- (x% PLATFORM_S), i * PLATFORM_S);
-					tile->SetVelocity(0, 10);
-					newSprites.push_back(tile);
-					break;
-				}
-				else if (i > charYPos / PLATFORM_S) {
-					//yukarı giden tile
-					p_iPlatform[(x / PLATFORM_S) + 6][i] = 0;
-					Tile* tile = new Tile(hDC, _hInstance);
-					tile->SetPosition(6 * PLATFORM_S - (x % PLATFORM_S), i  * PLATFORM_S);
-					tile->SetVelocity(0, -20);
-					newSprites.push_back(tile);
-					break;
-				}
-				
+
+	}
+	if (x/60 > p ) {
+		p = x / 60;
+		for (size_t i = 0; i < 18; i++)
+		{
+			
+			if (p_iPlatform[ x / tiles[0]->GetHeight()+31][i] == 3)
+			{
+				Tile* tile = new Tile(hDC, _hInstance);
+				tile->type = 0;
+				tile->SetVelocity(0, -10);
+				tile->SetBoundsAction(BA_BOUNCE);
+				tile->SetPosition(31 * PLATFORM_S, i * PLATFORM_S);
+				newSprites.push_back(tile);
+				addSpriteTile(tile); // may not be necessary
+
+			} // moving tile(vertical)   // moving tiles bounces back in case of collision with platform ( case 1 and 2 )
+			else if (p_iPlatform[x / tiles[0]->GetHeight()+31][i] == 4) {
+				Tile* tile = new Tile(hDC, _hInstance);
+				tile->type = 1;
+				tile->SetVelocity(-10, 0);
+				tile->SetBoundsAction(BA_BOUNCE);
+				tile->SetPosition(31 * PLATFORM_S, i * PLATFORM_S);
+				newSprites.push_back(tile);
+				addSpriteTile(tile); // may not be necessary
+
+				 // moving tile(horizontal) // moving tiles bounces back in case of collision with platform ( case 1 and 2 )
 			}
 		}
+		
 	}
-	
+	for (auto tile : tilesSprites) {
+		if (tile->type == 0) {
+			tile->SetVelocity(0, tile->GetVelocity().y);
+		}
+		else {
+			tile->SetVelocity(tile->GetVelocity().x, 0);
+		}
+	}
+
 	for (Demon* demon : demons) {
 		demon->act(0);
 	}

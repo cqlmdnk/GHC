@@ -22,12 +22,13 @@ public:
 	void addBackground(Bitmap* img);
 	void addSpellCaster(SpellCaster* obj);
 	void addSpell(Spell* obj);
+	void addSpriteTile(Tile* obj);
 	void addDemon(Demon* obj);
 	void drawScene(HDC hDc);
 	void drawBackground(HDC hDc, int x);
 	HBITMAP CreateOffscreenBmp(int wd, int hgt, int x);
 	void BlitToHdc(HDC hdcDst, HBITMAP hbmSrc, int x, int y, int wd, int hgt);
-	bool** getMap(int x);
+	int** getMap(int x);
 	void addTile(int xCur, int yCur, int type, int x);
 	void saveLevel(char* levelName);
 	void loadLevel(char* levelName);
@@ -39,6 +40,8 @@ public:
 	std::vector <SpellCaster*> spCasters;
 	std::vector <Spell*> spells;
 	std::vector <Demon*> demons;
+	std::vector <Tile*> tilesSprites;
+
 	std::vector<Sprite*> updateScene(int x, int charYPos, HDC hDC, HINSTANCE _hInstance);
 private:
 	std::vector<Bitmap*> background; // resimlerin tutulduðu array

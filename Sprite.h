@@ -51,7 +51,7 @@ public:
 	virtual void  CalcCollisionRect();
 	
 	// General Methods
-	virtual SPRITEACTION Update(bool** map, int x);
+	virtual SPRITEACTION Update(int** map, int x);
 	void Draw(HDC hDC);
 	BOOL                  IsPointInside(int x, int y);
 	BOOL                  TestCollision(Sprite* pTestSprite);
