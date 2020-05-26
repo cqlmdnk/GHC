@@ -27,13 +27,13 @@ PlayerCharacter::PlayerCharacter(HDC hDC, HINSTANCE _hInstance) : Character(hDC)
 	this->SetNumFrames(4);
 	this->SetFrameDelay(5);
 
-	int iXShrink = (m_rcPosition.left - m_rcPosition.right) / 3;
-	int iYShrink = (m_rcPosition.top - m_rcPosition.bottom) / 5;
+	//int iXShrink = (m_rcPosition.left - m_rcPosition.right) / 12;
+	//int iYShrink = (m_rcPosition.top - m_rcPosition.bottom) / 12;
 	CopyRect(&m_rcCollision, &m_rcPosition);
 
 	deathMark = FALSE;
 
-	InflateRect(&m_rcCollision, iXShrink, iYShrink);
+	//InflateRect(&m_rcCollision, iXShrink, iYShrink);
 	this->fireCounter = 10;
 
 	

@@ -296,7 +296,7 @@ void GameEngine::UpdateSprites(int** map, int x, int vx)
 
 		if ((*siSprite)->IsStateHalt()) {
 			// change stateHalt if it is supposed to be in screen
-			if ((*siSprite)->GetAbsX() >= x  && (*siSprite)->GetAbsX() < x + 1920/*Ekran genişiliği makrosu*/) {
+			if ((*siSprite)->GetAbsX() > x  && (*siSprite)->GetAbsX() < x + 1920/*Ekran genişiliği makrosu*/) {
 				(*siSprite)->SetStateHalt(FALSE);
 				/*if ((*siSprite)->GetAbsX() >= x) {
 					(*siSprite)->SetPosition(0, (*siSprite)->GetPosition().top);

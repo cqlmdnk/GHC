@@ -81,7 +81,6 @@ void GameStart(HWND hWindow)
 				Tile* tile = new Tile(hDC, _hInstance);
 				tile->type = 0;
 				tile->SetVelocity(0, -10);
-				tile->SetBoundsAction(BA_BOUNCE);
 				tile->SetPosition(i * PLATFORM_S, j * PLATFORM_S);
 				_pGame->AddSprite(tile);
 				_Scene->addSpriteTile(tile); // may not be necessary
@@ -91,7 +90,6 @@ void GameStart(HWND hWindow)
 				Tile* tile = new Tile(hDC, _hInstance);
 				tile->type = 1;
 				tile->SetVelocity(-10, 0);
-				tile->SetBoundsAction(BA_BOUNCE);
 				tile->SetPosition(i * PLATFORM_S, j * PLATFORM_S);
 				_pGame->AddSprite(tile);
 				_Scene->addSpriteTile(tile); // may not be necessary
@@ -104,7 +102,6 @@ void GameStart(HWND hWindow)
 			else if (map[i][j] == 5) {
 				SpellCaster* sp = new SpellCaster(hDC, _hInstance);
 
-				sp->SetBoundsAction(BA_HALT);
 				sp->SetPosition(i * PLATFORM_S, j * PLATFORM_S);
 				_pGame->AddSprite(sp);
 				_Scene->addSpellCaster(sp); // may not be necessary
@@ -113,7 +110,6 @@ void GameStart(HWND hWindow)
 			else if (map[i][j] == 6) {
 				Demon* demon = new Demon(hDC, _hInstance);
 
-				demon->SetBoundsAction(BA_STOP);
 				demon->SetPosition(i*PLATFORM_S, j * PLATFORM_S);
 				_pGame->AddSprite(demon);
 				_Scene->addDemon(demon); // may not be necessary
@@ -183,7 +179,7 @@ void GamePaint(HDC hDC)
 		DrawTextA(hDC, message1, -1, &rect, DT_SINGLELINE | DT_NOCLIP);
 
 
-		snprintf(buffer, sizeof(buffer), "Platform on mouse X  : %d  ", x / PLATFORM_S + p.x / PLATFORM_S);
+		snprintf(buffer, sizeof(buffer), "Character top   : %d  ", _sCharacter->GetPosition().top);
 		message1 = (buffer);
 		rect.top = 100;
 		DrawTextA(hDC, message1, -1, &rect, DT_SINGLELINE | DT_NOCLIP);
@@ -308,7 +304,7 @@ void HandleKeys()
 
 
 	if (GetAsyncKeyState(VK_UP) < 0) {
-		if (!_sCharacter->checkState(S_LJUMP) && !_sCharacter->checkState(S_RJUMP)) { // düşüyorsa yürüme ve koşma çalışmamalı mı ? :? //
+		if (!_sCharacter->checkState(S_LJUMP) && !_sCharacter->checkState(S_RJUMP)) { 
 			if (GetAsyncKeyState(VK_LEFT) < 0) {
 				_sCharacter->changeState(S_LJUMP);
 			}
@@ -502,7 +498,7 @@ void MouseButtonDown(int x, int y, BOOL bLeft)
 
 	if (bLeft)
 	{
-		_sCharacter->SetPosition(x, y);
+		//_sCharacter->SetPosition(x, y);
 	}
 	else
 	{
@@ -591,7 +587,7 @@ BOOL SpriteCollision(Sprite* pSpriteHitter, Sprite* pSpriteHittee) // All collis
 		else if (instanceof<Tile>(pSpriteHitter)) {
 			
 				//blok ile beraber üste gitme kodu
-			if (pSpriteHitter->GetPosition().top > pSpriteHittee->GetPosition().top) {
+			if (pSpriteHitter->GetPosition().top-40 > pSpriteHittee->GetPosition().top) {
 				pSpriteHittee->SetVelocity(pSpriteHittee->GetVelocity().x, pSpriteHittee->GetVelocity().y - 10);
 				pSpriteHittee->SetPosition(pSpriteHittee->GetPosition().left, pSpriteHittee->GetPosition().top + pSpriteHitter->GetVelocity().y);
 				Tile* tile = dynamic_cast<Tile*>(pSpriteHitter);
@@ -640,17 +636,17 @@ BOOL SpriteCollision(Sprite* pSpriteHitter, Sprite* pSpriteHittee) // All collis
 			
 				//blok ile beraber üste gitme kodu
 				
-				if (pSpriteHittee->GetPosition().top > pSpriteHitter->GetPosition().top) {
+				if (pSpriteHittee->GetPosition().top-40 > pSpriteHitter->GetPosition().top) {
 					pSpriteHitter->SetVelocity(pSpriteHitter->GetVelocity().x, pSpriteHitter->GetVelocity().y - 10);
 					pSpriteHitter->SetPosition(pSpriteHitter->GetPosition().left, pSpriteHitter->GetPosition().top + pSpriteHittee->GetVelocity().y);
 					Tile* tile = dynamic_cast<Tile*>(pSpriteHittee);
 					if (tile->type == 1) {
 						int sign = (pSpriteHittee->GetVelocity().x > 0) - (pSpriteHittee->GetVelocity().x < 0);
 						if (sign < 0) {
-							vx = min(pSpriteHitter->GetVelocity().x - 3, vx);
+							vx = pSpriteHittee->GetVelocity().x - 3;
 						}
 						else {
-							vx = max(pSpriteHitter->GetVelocity().x + 3, vx);
+							vx = pSpriteHittee->GetVelocity().x + 3;
 						}
 					}
 					

@@ -101,7 +101,7 @@ public:
 };
 	inline void Sprite::CalcCollisionRect()
 	{
-		int iXShrink = (m_rcPosition.left - m_rcPosition.right) / 12;
+		int iXShrink = (m_rcPosition.left - m_rcPosition.right) / 5;
 		int iYShrink = (m_rcPosition.top - m_rcPosition.bottom) / 12;
 		CopyRect(&m_rcCollision, &m_rcPosition);
 

@@ -68,14 +68,33 @@ SPRITEACTION Sprite::Update(int** map, int x)
 		if (((m_rcPosition.right + m_ptVelocity.x + (x % PLATFORM_S)) / PLATFORM_S != m_rcPosition.right / PLATFORM_S) + (x % PLATFORM_S) &&
 			map[(m_rcPosition.right + m_ptVelocity.x + (x % PLATFORM_S)) / PLATFORM_S][(m_rcPosition.bottom + m_rcPosition.top) / (2 * PLATFORM_S)] == 1)
 			right = true;
-		bool leftWBias  = map[( m_rcPosition.left+30  + (x % PLATFORM_S)) / ( PLATFORM_S)][(m_rcPosition.bottom + m_ptVelocity.y) / PLATFORM_S] == 1;
-		bool rightWBias = map[( m_rcPosition.right-30 + (x % PLATFORM_S)) / ( PLATFORM_S)][(m_rcPosition.bottom + m_ptVelocity.y) / PLATFORM_S] == 1;
+		bool leftWBias  = map[(( m_rcPosition.left+ m_rcPosition.right)/2 + (x % PLATFORM_S)) / ( PLATFORM_S)][(m_rcPosition.bottom + m_ptVelocity.y) / PLATFORM_S] == 1;
+		//bool rightWBias = map[( m_rcPosition.right-10 + (x % PLATFORM_S)) / ( PLATFORM_S)][(m_rcPosition.bottom + m_ptVelocity.y) / PLATFORM_S] == 1;
+		int tempVelY = m_ptVelocity.y;
+		int sign = (tempVelY > 0) - (tempVelY < 0);
+		int memVelY = m_ptVelocity.y;
+		m_ptVelocity.y = 0;
+		while (abs(tempVelY) != 0) {
+			m_ptVelocity.y += sign * 10;
+			if (((m_rcPosition.bottom + m_ptVelocity.y) / PLATFORM_S != m_rcPosition.bottom / PLATFORM_S) && (leftWBias))//|| rightWBias))
+			{
+				bottom = true;
+				break;
+			}
+				
+			if (((m_rcPosition.top + m_ptVelocity.y) / 10 != m_rcPosition.top / 10) &&
+				map[((m_rcPosition.left + m_rcPosition.right) + (x % PLATFORM_S)) / (2 * PLATFORM_S)][(m_rcPosition.top + m_ptVelocity.y) / PLATFORM_S] == 1 &&
+				(m_rcPosition.top + m_ptVelocity.y) % 60 < 30) {
+				top = true;
+				break;
+			}
+				
+			tempVelY -= sign * 10;
+		}
+		if (!bottom && !top)
+			m_ptVelocity.y = memVelY;
 		
-		if (((m_rcPosition.bottom + m_ptVelocity.y) / PLATFORM_S != m_rcPosition.bottom / PLATFORM_S) && (leftWBias || rightWBias))
-			bottom = true;
-		if (((m_rcPosition.top + m_ptVelocity.y) / PLATFORM_S != m_rcPosition.top / PLATFORM_S) &&
-			map[((m_rcPosition.left + m_rcPosition.right) + (x % PLATFORM_S)) / (2 * PLATFORM_S)][(m_rcPosition.top + m_ptVelocity.y) / PLATFORM_S] == 1)
-			top = true;
+		
 	}
 
 
@@ -132,12 +151,10 @@ SPRITEACTION Sprite::Update(int** map, int x)
 		if (ptNewPosition.x < m_rcBounds.left ||
 			ptNewPosition.x >(m_rcBounds.right - ptSpriteSize.x))
 		{
-			ptNewPosition.x = max(m_rcBounds.left, min(ptNewPosition.x,
-				m_rcBounds.right - ptSpriteSize.x));
+			
 			m_bStateHalt = TRUE; //sleep and wake functions can be written for this
 
 			SetAbsX(x); //in case of halt save x position;
-			SetVelocity(0, m_ptVelocity.y);
 		}
 		if (ptNewPosition.y < m_rcBounds.top ||
 			ptNewPosition.y >(m_rcBounds.bottom - ptSpriteSize.y))
@@ -201,16 +218,14 @@ SPRITEACTION Sprite::Update(int** map, int x)
 			SetVelocity(ptNewVelocity);
 		if (ptNewPosition.x < m_rcBounds.left)
 		{
-			ptNewPosition.x = max(m_rcBounds.left,ptNewPosition.x);
 			m_bStateHalt = TRUE; //sleep and wake functions can be written for this
-
+			m_ptVelocity.x = 10;
 			SetAbsX(x); //in case of halt save x position;
 			
 		}
 		else if (ptNewPosition.x > (m_rcBounds.right - ptSpriteSize.x)) {
-			ptNewPosition.x = min(m_rcBounds.right- ptSpriteSize.x, ptNewPosition.x);
 			m_bStateHalt = TRUE; //sleep and wake functions can be written for this
-
+			m_ptVelocity.x = -10;
 			SetAbsX(x+1920); //in case of halt save x position;
 		}
 		
@@ -233,7 +248,8 @@ SPRITEACTION Sprite::Update(int** map, int x)
 
 	if (top) {
 		if (GetVelocity().y < 0) {
-			ptNewPosition.y = (ptNewPosition.y - m_ptVelocity.y);
+			int sign = (m_ptVelocity.y > 0) - (m_ptVelocity.y < 0);
+			ptNewPosition.y = (ptNewPosition.y + m_ptVelocity.y - 10*sign);
 			SetVelocity(this->GetVelocity().x, 0);
 		}
 	}

@@ -230,8 +230,7 @@ std::vector<Sprite*> Scene::updateScene(int x, int charYPos, HDC hDC, HINSTANCE 
 	std::vector<Sprite*> newSprites;
 
 	//random for spellcasters tile move spell
-	BOOL tileMagic = FALSE;
-	if (rand() % 10 == 0 && !spCasters.empty()) {
+	/*if (rand() % 10 == 0 && !spCasters.empty()) {
 		for (SpellCaster* spcaster : spCasters) {
 			if (!spcaster->IsStateHalt() && spcaster->deathMark != TRUE) {
 				if (rand() % 100 < 20) {
@@ -242,11 +241,10 @@ std::vector<Sprite*> Scene::updateScene(int x, int charYPos, HDC hDC, HINSTANCE 
 				}
 				spcaster->act(0);
 			}
-			if (!spcaster->IsStateHalt())
-				tileMagic = TRUE;
+			
 		}
 
-	}
+	}*/
 	if (x/60 > p ) {
 		p = x / 60;
 		for (size_t i = 0; i < 18; i++)
