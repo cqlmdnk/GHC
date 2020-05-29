@@ -191,7 +191,7 @@ int Scene::testCollisionRight(int x, int y) {
 
 
 
-	switch (p_iPlatform[1 + x / tiles[0]->GetHeight()][y / tiles[0]->GetHeight()])
+	switch (p_iPlatform[x / tiles[0]->GetHeight()][y / tiles[0]->GetHeight()])
 	{
 	case 1:
 		return 1;
@@ -207,7 +207,6 @@ int Scene::testCollisionRight(int x, int y) {
 	return 0;
 }
 int Scene::testCollisionLeft(int x, int y) {
-
 
 	switch (p_iPlatform[(x / tiles[0]->GetHeight()) ][y / tiles[0]->GetHeight()])
 	{
@@ -254,7 +253,7 @@ std::vector<Sprite*> Scene::updateScene(int x, int charYPos, HDC hDC, HINSTANCE 
 			{
 				Tile* tile = new Tile(hDC, _hInstance);
 				tile->type = 0;
-				tile->SetVelocity(0, -10);
+				tile->SetVelocity(0, -9);
 				tile->SetBoundsAction(BA_BOUNCE);
 				tile->SetPosition(31 * PLATFORM_S, i * PLATFORM_S);
 				newSprites.push_back(tile);
@@ -264,13 +263,29 @@ std::vector<Sprite*> Scene::updateScene(int x, int charYPos, HDC hDC, HINSTANCE 
 			else if (p_iPlatform[x / tiles[0]->GetHeight()+31][i] == 4) {
 				Tile* tile = new Tile(hDC, _hInstance);
 				tile->type = 1;
-				tile->SetVelocity(-10, 0);
+				tile->SetVelocity(-9, 0);
 				tile->SetBoundsAction(BA_BOUNCE);
 				tile->SetPosition(31 * PLATFORM_S, i * PLATFORM_S);
 				newSprites.push_back(tile);
 				addSpriteTile(tile); // may not be necessary
 
 				 // moving tile(horizontal) // moving tiles bounces back in case of collision with platform ( case 1 and 2 )
+			}
+			else if (p_iPlatform[x / tiles[0]->GetHeight() + 31][i] == 5) {
+				SpellCaster* sp = new SpellCaster(hDC, _hInstance);
+
+				sp->SetPosition(31 * PLATFORM_S, i * PLATFORM_S);
+				newSprites.push_back(sp);
+				addSpellCaster(sp); // may not be necessary
+
+			}
+			else if (p_iPlatform[x / tiles[0]->GetHeight() + 31][i] == 6) {
+				Demon* demon = new Demon(hDC, _hInstance);
+
+				demon->SetPosition(31 * PLATFORM_S, i * PLATFORM_S);
+				newSprites.push_back(demon);
+				addDemon(demon); // may not be necessary
+
 			}
 		}
 		

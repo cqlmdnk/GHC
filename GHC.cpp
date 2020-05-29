@@ -80,7 +80,7 @@ void GameStart(HWND hWindow)
 			{
 				Tile* tile = new Tile(hDC, _hInstance);
 				tile->type = 0;
-				tile->SetVelocity(0, -10);
+				tile->SetVelocity(0, -9);
 				tile->SetPosition(i * PLATFORM_S, j * PLATFORM_S);
 				_pGame->AddSprite(tile);
 				_Scene->addSpriteTile(tile); // may not be necessary
@@ -89,8 +89,8 @@ void GameStart(HWND hWindow)
 			else if (map[i][j] == 4) {
 				Tile* tile = new Tile(hDC, _hInstance);
 				tile->type = 1;
-				tile->SetVelocity(-10, 0);
-				tile->SetPosition(i * PLATFORM_S, j * PLATFORM_S);
+				tile->SetVelocity(-9, 0);
+				tile->SetPosition(i * PLATFORM_S, j * PLATFORM_S-5);
 				_pGame->AddSprite(tile);
 				_Scene->addSpriteTile(tile); // may not be necessary
 
@@ -188,8 +188,8 @@ void GamePaint(HDC hDC)
 	_pGame->DrawSprites(hDC);
 	if (_sCharacter->life > 0)
 	{
-		RECT lifeBar = { 349,_sCharacter->GetPosition().top - 11,401, _sCharacter->GetPosition().top - 4 };
-		RECT lifeChar = { 350,_sCharacter->GetPosition().top - 10,350 + _sCharacter->life, _sCharacter->GetPosition().top - 5 };
+		RECT lifeBar = { _sCharacter->GetPosition().left-1,_sCharacter->GetPosition().top - 11,_sCharacter->GetPosition().left +79, _sCharacter->GetPosition().top - 4 };
+		RECT lifeChar = { _sCharacter->GetPosition().left,_sCharacter->GetPosition().top - 10,_sCharacter->GetPosition().left + _sCharacter->life, _sCharacter->GetPosition().top - 5 };
 		HBRUSH hRed = CreateSolidBrush(RGB(255, 0, 0));
 		HBRUSH hGreen = CreateSolidBrush(RGB(0, 255, 0));
 
@@ -207,13 +207,22 @@ void GameCycle()
 		_sCharacter->fireCounter--;
 	}
 	updateSpells();
-	x += vx;
 	
-	_pGame->UpdateSprites(_Scene->getMap(x), x, vx);
 	
+	
+	if (_sCharacter->GetPosition().left+vx > 500 && _sCharacter->GetPosition().left + vx < 800) {
+		_sCharacter->SetPosition(_sCharacter->GetPosition().left + vx, _sCharacter->GetPosition().top);
+		_pGame->UpdateSprites(_Scene->getMap(x), x, 0);
+
+	}
+	else {
+		_pGame->UpdateSprites(_Scene->getMap(x), x, vx);
+		x += vx;
+
+	}
+		
 	HWND  hWindow = _pGame->GetWindow();
 	HDC   hDC = GetDC(hWindow);
-	
 	
 	std::vector<Sprite*> addedSprites = _Scene->updateScene(x, _sCharacter->GetPosition().top, hDC, _hInstance); // GDI Leak
 	for (auto nSprite : addedSprites) {
@@ -238,7 +247,6 @@ void GameCycle()
 		}
 
 	}*/
-
 	GamePaint(_hOffscreenDC);
 
 	BitBlt(hDC, 0, 0, _pGame->GetWidth(), _pGame->GetHeight(),//???
@@ -250,9 +258,10 @@ void GameCycle()
 void HandleKeys()
 {
 
-	if (GetAsyncKeyState(VK_LEFT) < 0 && (!_sCharacter->checkState(S_RJUMP) || _sCharacter->checkState(S_RJUMP))) {
+	if (GetAsyncKeyState(VK_LEFT) < 0 /*&& (!_sCharacter->checkState(S_RJUMP) || _sCharacter->checkState(S_LJUMP))*/) {
+
 		if (vx + x > 0) {
-			if (_Scene->testCollisionLeft(x + 340, (_sCharacter->GetPosition().top + _sCharacter->GetPosition().bottom) / 2) == 2) {
+			if (_Scene->testCollisionLeft(_sCharacter->GetPosition().left+20 + x, _sCharacter->GetPosition().bottom-20) == 2) {
 
 				vx = 0;
 
@@ -274,9 +283,9 @@ void HandleKeys()
 
 	}
 
-	else if (GetAsyncKeyState(VK_RIGHT) < 0 && (!_sCharacter->checkState(S_RJUMP) || _sCharacter->checkState(S_RJUMP))) {
+	else if (GetAsyncKeyState(VK_RIGHT) < 0 /*&& (!_sCharacter->checkState(S_LJUMP) || _sCharacter->checkState(S_RJUMP))*/) {
 
-		if (_Scene->testCollisionRight(x + 340, (_sCharacter->GetPosition().top + _sCharacter->GetPosition().bottom) / 2) == 1) {
+		if (_Scene->testCollisionRight(_sCharacter->GetPosition().right-20 + x,  _sCharacter->GetPosition().bottom-20) == 1) {
 
 
 			vx = 0;
@@ -516,6 +525,7 @@ void MouseMove(int x, int y)
 
 BOOL SpriteCollision(Sprite* pSpriteHitter, Sprite* pSpriteHittee) // All collision actions handled here
 {
+	
 	if (instanceof<Spell>(pSpriteHitter) || instanceof<FireBurst>(pSpriteHitter)) { // spell veya fireburst işlemleri
 
 		if (instanceof<Spell>(pSpriteHitter) && instanceof<PlayerCharacter>(pSpriteHittee)) { // spell mi vurdu
@@ -588,18 +598,9 @@ BOOL SpriteCollision(Sprite* pSpriteHitter, Sprite* pSpriteHittee) // All collis
 			
 				//blok ile beraber üste gitme kodu
 			if (pSpriteHitter->GetPosition().top-40 > pSpriteHittee->GetPosition().top) {
-				pSpriteHittee->SetVelocity(pSpriteHittee->GetVelocity().x, pSpriteHittee->GetVelocity().y - 10);
-				pSpriteHittee->SetPosition(pSpriteHittee->GetPosition().left, pSpriteHittee->GetPosition().top + pSpriteHitter->GetVelocity().y);
-				Tile* tile = dynamic_cast<Tile*>(pSpriteHitter);
-				if (tile->type == 1) {
-					int sign = (pSpriteHitter->GetVelocity().x > 0) - (pSpriteHitter->GetVelocity().x < 0);
-					if (sign < 0) {
-						vx = min(pSpriteHitter->GetVelocity().x - 3, vx);
-					}
-					else {
-						vx = max(pSpriteHitter->GetVelocity().x + 3, vx);
-					}
-				}
+				pSpriteHittee->SetVelocity(pSpriteHittee->GetVelocity().x , pSpriteHittee->GetVelocity().y - 10);
+				pSpriteHittee->SetPosition(pSpriteHittee->GetPosition().left + pSpriteHitter->GetVelocity().x, pSpriteHittee->GetPosition().top + pSpriteHitter->GetVelocity().y);
+				
 
 			}
 			
@@ -637,18 +638,9 @@ BOOL SpriteCollision(Sprite* pSpriteHitter, Sprite* pSpriteHittee) // All collis
 				//blok ile beraber üste gitme kodu
 				
 				if (pSpriteHittee->GetPosition().top-40 > pSpriteHitter->GetPosition().top) {
-					pSpriteHitter->SetVelocity(pSpriteHitter->GetVelocity().x, pSpriteHitter->GetVelocity().y - 10);
-					pSpriteHitter->SetPosition(pSpriteHitter->GetPosition().left, pSpriteHitter->GetPosition().top + pSpriteHittee->GetVelocity().y);
-					Tile* tile = dynamic_cast<Tile*>(pSpriteHittee);
-					if (tile->type == 1) {
-						int sign = (pSpriteHittee->GetVelocity().x > 0) - (pSpriteHittee->GetVelocity().x < 0);
-						if (sign < 0) {
-							vx = pSpriteHittee->GetVelocity().x - 3;
-						}
-						else {
-							vx = pSpriteHittee->GetVelocity().x + 3;
-						}
-					}
+					pSpriteHitter->SetVelocity(pSpriteHitter->GetVelocity().x , pSpriteHitter->GetVelocity().y - 10);
+					pSpriteHitter->SetPosition(pSpriteHitter->GetPosition().left+pSpriteHittee->GetVelocity().x, pSpriteHitter->GetPosition().top + pSpriteHittee->GetVelocity().y);
+					
 					
 				}
 				

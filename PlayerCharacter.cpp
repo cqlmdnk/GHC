@@ -21,7 +21,7 @@ PlayerCharacter::PlayerCharacter(HDC hDC, HINSTANCE _hInstance) : Character(hDC)
 	
 	this->SetBitmap(_bCharAnimIdle);
 	
-	this->SetPosition(320, 960);
+	this->SetPosition(500, 960);
 	this->SetPosition(RECT{ this->GetPosition().left,this->GetPosition().bottom - this->m_pBitmap->GetHeight() , this->GetPosition().left + this->m_pBitmap->GetWidth(), this->GetPosition().bottom });
 
 	this->SetNumFrames(4);

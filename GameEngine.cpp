@@ -345,8 +345,11 @@ void GameEngine::UpdateSprites(int** map, int x, int vx)
 
 		// See if the sprite collided with any others
 		if (CheckSpriteCollision(*siSprite)) {
-			if (instanceof<Spell>((*siSprite)) || instanceof<FireBurst>((*siSprite)) || instanceof<Tile>((*siSprite))) {
+			if (instanceof<Spell>((*siSprite)) || instanceof<FireBurst>((*siSprite)) || instanceof<Tile>((*siSprite)) ) {
 
+			}
+			else if (instanceof<PlayerCharacter>((*siSprite))) {
+				(*siSprite)->SetPosition((*siSprite)->GetPosition().left,rcOldSpritePos.top);
 			}
 			else {
 				(*siSprite)->SetPosition(rcOldSpritePos);
@@ -371,7 +374,14 @@ void GameEngine::UpdateSprites(int** map, int x, int vx)
 		if ((sprite->deathMark && sprite->IsAnimDef()) || sprite->IsHidden()) {
 			m_vSprites.erase(std::remove(m_vSprites.begin(), m_vSprites.end(), sprite), m_vSprites.end());
 
-			delete sprite;
+ 			delete sprite;
+		}
+		else {
+			if (instanceof<FireBurst>(sprite) && sprite->GetVelocity().x == 0) {
+				m_vSprites.erase(std::remove(m_vSprites.begin(), m_vSprites.end(), sprite), m_vSprites.end());
+
+				delete sprite;
+			}
 		}
 
 
