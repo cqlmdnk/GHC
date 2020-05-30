@@ -10,6 +10,8 @@ public:
 	void die();
 	FireBurst* fire();
 	int fireCounter;
+	int life = 5;
+	int prevSpeed = 0;
 	bool lastFrame()
 	{
 		return m_iCurFrame == m_iNumFrames - 2;

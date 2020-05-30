@@ -198,6 +198,12 @@
     <Image Include="resources\bg\5.bmp">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="resources\m_tile1.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\bitmap1.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="GHC.rc">

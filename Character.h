@@ -27,7 +27,7 @@ public:
 	virtual void die() = 0;
 	virtual void changeState(STATE state) = 0;
 	bool checkState(STATE state);
-	int life = 50;
+	
 	virtual bool lastFrame() = 0;
 };
 

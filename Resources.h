@@ -31,12 +31,13 @@
 #define IDB_BG_LAYER3                   132
 #define IDB_BG_LAYER4                   133
 #define IDB_BG_LAYER5                   134
+#define IDB_MTILE_1                     135
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        135
+#define _APS_NEXT_RESOURCE_VALUE        137
 #define _APS_NEXT_COMMAND_VALUE         40001
 #define _APS_NEXT_CONTROL_VALUE         1001
 #define _APS_NEXT_SYMED_VALUE           101
