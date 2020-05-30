@@ -53,6 +53,8 @@ void GameStart(HWND hWindow)
 	_pBackground = new Bitmap(hDC, IDB_BG_LAYER5, _hInstance);
 	_Scene->addBackground(_pBackground);
 	
+	_pLife = new Bitmap(hDC, "resources/life.bmp");
+	_pGameOver = new Bitmap(hDC, "resources/gameover.bmp");
 
 	_sCharacter = new PlayerCharacter(hDC, _hInstance);
 
@@ -81,7 +83,7 @@ void GameStart(HWND hWindow)
 				Tile* tile = new Tile(hDC, _hInstance);
 				tile->type = 0;
 				tile->SetVelocity(0, -9);
-				tile->SetPosition(i * PLATFORM_S, j * PLATFORM_S);
+				tile->SetPosition(i * PLATFORM_S+1, j * PLATFORM_S);
 				_pGame->AddSprite(tile);
 				_Scene->addSpriteTile(tile); // may not be necessary
 
@@ -177,27 +179,25 @@ void GamePaint(HDC hDC)
 		message1 = (buffer);
 		rect.top = 75;
 		DrawTextA(hDC, message1, -1, &rect, DT_SINGLELINE | DT_NOCLIP);
+		if (maxSp < _sCharacter->GetVelocity().y) {
+			maxSp = _sCharacter->GetVelocity().y;
+		}
 
-
-		snprintf(buffer, sizeof(buffer), "Character top   : %d  ", _sCharacter->GetPosition().top);
+		snprintf(buffer, sizeof(buffer), "Character velocity.y  : %d  ", maxSp);
 		message1 = (buffer);
 		rect.top = 100;
 		DrawTextA(hDC, message1, -1, &rect, DT_SINGLELINE | DT_NOCLIP);
 	}
 	//_pBackground->Draw(hDC, 0, 0);
 	_pGame->DrawSprites(hDC);
-	if (_sCharacter->life > 0)
-	{
+	for (size_t i = 0; i < _sCharacter->life; i++){
 		RECT lifeBar = { _sCharacter->GetPosition().left-1,_sCharacter->GetPosition().top - 11,_sCharacter->GetPosition().left +79, _sCharacter->GetPosition().top - 4 };
 		RECT lifeChar = { _sCharacter->GetPosition().left,_sCharacter->GetPosition().top - 10,_sCharacter->GetPosition().left + _sCharacter->life, _sCharacter->GetPosition().top - 5 };
 		HBRUSH hRed = CreateSolidBrush(RGB(255, 0, 0));
 		HBRUSH hGreen = CreateSolidBrush(RGB(0, 255, 0));
-
-		FillRect(hDC, &lifeBar, hRed);
-		FillRect(hDC, &lifeChar, hGreen);
-		DeleteObject(hRed);
-		DeleteObject(hGreen);
+		_pLife->Draw(hDC, 20 + i * 20, 20, TRUE);
 	}
+	
 
 }
 
@@ -207,8 +207,10 @@ void GameCycle()
 		_sCharacter->fireCounter--;
 	}
 	updateSpells();
-	
-	
+	if (_sCharacter->prevSpeed > 70 && (_sCharacter->GetVelocity().y == 0 || _sCharacter->GetVelocity().y == 10) ){
+		_sCharacter->life--;
+	}
+	_sCharacter->prevSpeed = _sCharacter->GetVelocity().y;
 	
 	if (_sCharacter->GetPosition().left+vx > 500 && _sCharacter->GetPosition().left + vx < 800) {
 		_sCharacter->SetPosition(_sCharacter->GetPosition().left + vx, _sCharacter->GetPosition().top);
@@ -251,7 +253,14 @@ void GameCycle()
 
 	BitBlt(hDC, 0, 0, _pGame->GetWidth(), _pGame->GetHeight(),//???
 		_hOffscreenDC, 0, 0, SRCCOPY);
-
+	if (!_sCharacter->life > 0) {
+		
+		while (GetAsyncKeyState(VK_RETURN) == 0)
+		{
+			_pGameOver->Draw(hDC, 0, 0, TRUE);
+		}
+		_sCharacter->life = 5;
+	}
 	ReleaseDC(hWindow, hDC);
 }
 
@@ -532,8 +541,8 @@ BOOL SpriteCollision(Sprite* pSpriteHitter, Sprite* pSpriteHittee) // All collis
 
 			_Scene->spells.erase(std::remove(_Scene->spells.begin(), _Scene->spells.end(), pSpriteHitter), _Scene->spells.end());
 			pSpriteHitter->SetHidden(TRUE);
-			Character* pChar = dynamic_cast<Character*>(pSpriteHittee);
-			pChar->life -= 5;
+			PlayerCharacter* pChar = dynamic_cast<PlayerCharacter*>(pSpriteHittee);
+			pChar->life--;
 
 			//vurulan playerın canını düşür
 
@@ -587,12 +596,13 @@ BOOL SpriteCollision(Sprite* pSpriteHitter, Sprite* pSpriteHittee) // All collis
 				}
 				else {
 					if (demon->lastFrame()) {
-						pChar->life -= 2;
+						pChar->life--;
+
 					}
 				}
 				
 			}
-
+			return FALSE;
 		}
 		else if (instanceof<Tile>(pSpriteHitter)) {
 			
@@ -619,19 +629,20 @@ BOOL SpriteCollision(Sprite* pSpriteHitter, Sprite* pSpriteHittee) // All collis
 					_Scene->demons.erase(std::remove(_Scene->demons.begin(), _Scene->demons.end(), pSpriteHittee), _Scene->demons.end());
 
 			}
-			if (instanceof<Demon>(pSpriteHittee)) { // ölü olup olmadığını kontrol et
-				Demon* demon = dynamic_cast<Demon*>(pSpriteHittee);
-				STATE att_state = pChar->GetPosition().left > demon->GetPosition().left ? S_RATT : S_LATT;
-				if (demon->IsAnimDef()) {
-					demon->changeState(att_state);
-				}
-				else {
-					if (demon->lastFrame()) {
-						pChar->life -= 2;
-					}
-				}
+			// ölü olup olmadığını kontrol et
+			//	Demon* demon = dynamic_cast<Demon*>(pSpriteHittee);
+			//	STATE att_state = pChar->GetPosition().left > demon->GetPosition().left ? S_RATT : S_LATT;
+			//	if (demon->IsAnimDef()) {
+			//		demon->changeState(att_state);
+			//	}
+			//	else {
+			//		if (demon->lastFrame()) {
+			//			pChar->life--;
+			//		}
+			//	}
 
-			}
+			//}
+			return FALSE;
 		}
 		else if (instanceof<Tile>(pSpriteHittee)) {
 			

@@ -11,7 +11,7 @@ public:
 	void die() ;
 	bool lastFrame()
 	{
-		return m_iCurFrame == 7;
+		return m_iCurFrame == m_iNumFrames-1;
 	};
 };
 

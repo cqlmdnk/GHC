@@ -88,7 +88,7 @@ BOOL GameEngine::CheckSpriteCollision(Sprite* pTestSprite)
 		// Test the collision
 		if (pTestSprite->TestCollision(*siSprite))
 			// Collision detected
-
+			
 			return SpriteCollision((*siSprite), pTestSprite);
 	}
 
@@ -298,29 +298,27 @@ void GameEngine::UpdateSprites(int** map, int x, int vx)
 			// change stateHalt if it is supposed to be in screen
 			if ((*siSprite)->GetAbsX() > x  && (*siSprite)->GetAbsX() < x + 1920/*Ekran genişiliği makrosu*/) {
 				(*siSprite)->SetStateHalt(FALSE);
-				/*if ((*siSprite)->GetAbsX() >= x) {
-					(*siSprite)->SetPosition(0, (*siSprite)->GetPosition().top);
-				}
-				else {
-					(*siSprite)->SetPosition(1920 , (*siSprite)->GetPosition().top);
-
-				}*/
+				
+				(*siSprite)->SetPosition((*siSprite)->GetPosition().left-((*siSprite)->GetPosition().left %PLATFORM_S), (*siSprite)->GetPosition().top);
+				
+				
 			}
 			else {
 				continue;
 			}
 		}
+		
+
+
+
+		// Save the old sprite position in case we need to restore it
+		rcOldSpritePos = (*siSprite)->GetPosition();
 		if (!instanceof<PlayerCharacter>((*siSprite))) { // checking if sprite is a AI or not // SimpleAI Class >> BaseAI Class
 															//  can't check for character, since all AIs are characters
 
 			((*siSprite))->SetPosition(((*siSprite))->GetPosition().left - vx, ((*siSprite))->GetPosition().top);
 
 		}
-
-
-
-		// Save the old sprite position in case we need to restore it
-		rcOldSpritePos = (*siSprite)->GetPosition();
 		//sprite lara x'in modu eklenmeli
 		if (!instanceof<Spell>((*siSprite))) {
 		}

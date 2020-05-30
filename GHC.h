@@ -24,6 +24,7 @@ HDC	        _hOffscreenDC;
 GameEngine* _pGame;
 const int   _iMAXSPEED = 8;
 Bitmap* _pBackground;
+Bitmap *_pLife, *_pGameOver;
 PlayerCharacter* _sCharacter;
 Scene* _Scene;   // Scene pointer her chapter bir scene den oluşur diye düþündüm ama birden fazla oluşabilir.
 std::vector<SimpleAI*> ais;
@@ -32,3 +33,4 @@ int x = 0;
 int vx = 0;
 int sceneBlock = 2;
 int xThreshold = 32;
+int maxSp = 0; 

@@ -84,7 +84,7 @@ SPRITEACTION Sprite::Update(int** map, int x)
 				
 			if (((m_rcPosition.top + m_ptVelocity.y) / 10 != m_rcPosition.top / 10) &&
 				map[((m_rcPosition.left + m_rcPosition.right) + (x % PLATFORM_S)) / (2 * PLATFORM_S)][(m_rcPosition.top + m_ptVelocity.y) / PLATFORM_S] == 1 &&
-				(m_rcPosition.top + m_ptVelocity.y) % 60 < 30) {
+				(m_rcPosition.top + m_ptVelocity.y) % 60 <= 30) {
 				top = true;
 				break;
 			}
@@ -199,7 +199,7 @@ SPRITEACTION Sprite::Update(int** map, int x)
 		}
 
 		//Bounce off top bounnd
-		else if (ptNewPosition.y < m_rcBounds.top || top)
+		if (ptNewPosition.y < m_rcBounds.top || top)
 		{
 			bBounce = TRUE;
 			ptNewPosition.y = ptNewPosition.y - ptNewVelocity.y;
@@ -220,12 +220,16 @@ SPRITEACTION Sprite::Update(int** map, int x)
 		{
 			m_bStateHalt = TRUE; //sleep and wake functions can be written for this
 			m_ptVelocity.x = 10;
+			SetPosition(GetPosition().left - GetPosition().left % PLATFORM_S, GetPosition().top);
+
 			SetAbsX(x); //in case of halt save x position;
 			
 		}
 		else if (ptNewPosition.x > (m_rcBounds.right - ptSpriteSize.x)) {
 			m_bStateHalt = TRUE; //sleep and wake functions can be written for this
 			m_ptVelocity.x = -10;
+
+			SetPosition(GetPosition().left - GetPosition().left%PLATFORM_S, GetPosition().top);
 			SetAbsX(x+1920); //in case of halt save x position;
 		}
 		

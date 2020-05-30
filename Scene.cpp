@@ -255,7 +255,7 @@ std::vector<Sprite*> Scene::updateScene(int x, int charYPos, HDC hDC, HINSTANCE 
 				tile->type = 0;
 				tile->SetVelocity(0, -9);
 				tile->SetBoundsAction(BA_BOUNCE);
-				tile->SetPosition(31 * PLATFORM_S, i * PLATFORM_S);
+				tile->SetPosition(31 * PLATFORM_S-4, i * PLATFORM_S);
 				newSprites.push_back(tile);
 				addSpriteTile(tile); // may not be necessary
 
@@ -265,7 +265,7 @@ std::vector<Sprite*> Scene::updateScene(int x, int charYPos, HDC hDC, HINSTANCE 
 				tile->type = 1;
 				tile->SetVelocity(-9, 0);
 				tile->SetBoundsAction(BA_BOUNCE);
-				tile->SetPosition(31 * PLATFORM_S, i * PLATFORM_S);
+				tile->SetPosition(31 * PLATFORM_S-4, i * PLATFORM_S);
 				newSprites.push_back(tile);
 				addSpriteTile(tile); // may not be necessary
 
