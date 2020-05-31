@@ -37,7 +37,7 @@ void Demon::changeState(STATE state) {
 	{
 	case S_RUNL:
 		this->SetBitmap(_bCharAnimRunL);
-		this->SetPosition(RECT{ this->GetPosition().left,this->GetPosition().top, this->GetPosition().left + m_pBitmap->GetWidth(), this->GetPosition().top + m_pBitmap->GetHeight() });
+		this->SetPosition(RECT{ this->GetPosition().left  ,this->GetPosition().bottom - m_pBitmap->GetHeight(), this->GetPosition().left + m_pBitmap->GetWidth(), this->GetPosition().bottom });
 		this->SetVelocity(-2, 0);
 		this->SetNumFrames(13);
 		this->SetFrameDelay(1);
@@ -45,7 +45,7 @@ void Demon::changeState(STATE state) {
 		break;
 	case S_RUNR:
 		this->SetBitmap(_bCharAnimRunR);
-		this->SetPosition(RECT{ this->GetPosition().left,this->GetPosition().top, this->GetPosition().left + m_pBitmap->GetWidth(), this->GetPosition().top + m_pBitmap->GetHeight() });
+		this->SetPosition(RECT{ this->GetPosition().left  ,this->GetPosition().bottom - m_pBitmap->GetHeight(), this->GetPosition().left + m_pBitmap->GetWidth(), this->GetPosition().bottom });
 		this->SetVelocity(2, 0);
 		this->SetNumFrames(13);
 		this->SetFrameDelay(1);
@@ -53,7 +53,7 @@ void Demon::changeState(STATE state) {
 		break;
 	case S_RDEATH:
 		this->SetBitmap(_bCharAnimDeathR);
-		this->SetPosition(RECT{ this->GetPosition().left,this->GetPosition().top, this->GetPosition().left + m_pBitmap->GetWidth(), this->GetPosition().top + m_pBitmap->GetHeight() });
+		this->SetPosition(RECT{ this->GetPosition().left  ,this->GetPosition().bottom - m_pBitmap->GetHeight(), this->GetPosition().left + m_pBitmap->GetWidth(), this->GetPosition().bottom });
 
 		this->SetAnimDef(FALSE);
 		this->SetVelocity(0, 0);
@@ -63,7 +63,7 @@ void Demon::changeState(STATE state) {
 		break;
 	case S_LDEATH:
 		this->SetBitmap(_bCharAnimDeathL);
-		this->SetPosition(RECT{ this->GetPosition().left,this->GetPosition().top, this->GetPosition().left + m_pBitmap->GetWidth(), this->GetPosition().top + m_pBitmap->GetHeight() });
+		this->SetPosition(RECT{ this->GetPosition().left  ,this->GetPosition().bottom - m_pBitmap->GetHeight(), this->GetPosition().left + m_pBitmap->GetWidth(), this->GetPosition().bottom });
 
 		this->SetAnimDef(FALSE);
 		this->SetVelocity(0, 0);
@@ -73,7 +73,7 @@ void Demon::changeState(STATE state) {
 		break;
 	case S_RATT:
 		this->SetBitmap(_bCharAnimAttR);
-		this->SetPosition(RECT{ this->GetPosition().left,this->GetPosition().top, this->GetPosition().left + m_pBitmap->GetWidth(), this->GetPosition().top + m_pBitmap->GetHeight() });
+		this->SetPosition(RECT{ this->GetPosition().left  ,this->GetPosition().bottom - m_pBitmap->GetHeight(), this->GetPosition().left + m_pBitmap->GetWidth(), this->GetPosition().bottom });
 
 		this->SetAnimDef(FALSE);
 		this->SetVelocity(0, 0);
@@ -83,7 +83,7 @@ void Demon::changeState(STATE state) {
 		break;
 	case S_LATT:
 		this->SetBitmap(_bCharAnimAttL);
-		this->SetPosition(RECT{ this->GetPosition().left,this->GetPosition().top, this->GetPosition().left + m_pBitmap->GetWidth(), this->GetPosition().top + m_pBitmap->GetHeight() });
+		this->SetPosition(RECT{ this->GetPosition().left  ,this->GetPosition().bottom - m_pBitmap->GetHeight(), this->GetPosition().left + m_pBitmap->GetWidth(), this->GetPosition().bottom });
 
 		this->SetAnimDef(FALSE);
 		this->SetVelocity(0, 0);
