@@ -55,9 +55,9 @@ void GameStart(HWND hWindow)
 	
 	_pLife = new Bitmap(hDC, "resources/life.bmp");
 	_pGameOver = new Bitmap(hDC, "resources/gameover.bmp");
-
+	_pFireIcon = new Bitmap(hDC, "resources/fire_burst_ico.bmp");
 	_sCharacter = new PlayerCharacter(hDC, _hInstance);
-
+	char_null = new Bitmap(hDC, "resources/chat_null.bmp");
 	SpellCaster* temp_ai = new SpellCaster(hDC, _hInstance);
 	_Scene->addSpellCaster(temp_ai);
 
@@ -191,11 +191,12 @@ void GamePaint(HDC hDC)
 	//_pBackground->Draw(hDC, 0, 0);
 	_pGame->DrawSprites(hDC);
 	for (size_t i = 0; i < _sCharacter->life; i++){
-		RECT lifeBar = { _sCharacter->GetPosition().left-1,_sCharacter->GetPosition().top - 11,_sCharacter->GetPosition().left +79, _sCharacter->GetPosition().top - 4 };
-		RECT lifeChar = { _sCharacter->GetPosition().left,_sCharacter->GetPosition().top - 10,_sCharacter->GetPosition().left + _sCharacter->life, _sCharacter->GetPosition().top - 5 };
-		HBRUSH hRed = CreateSolidBrush(RGB(255, 0, 0));
-		HBRUSH hGreen = CreateSolidBrush(RGB(0, 255, 0));
-		_pLife->Draw(hDC, 20 + i * 20, 20, TRUE);
+		
+		_pLife->Draw(hDC, 20 + i * 30, 20, TRUE);
+	}
+	for (size_t i = 0; i < _sCharacter->magazine; i++) {
+
+		_pFireIcon->Draw(hDC, 20 + i * 50, 51, TRUE);
 	}
 	
 
@@ -203,12 +204,32 @@ void GamePaint(HDC hDC)
 
 void GameCycle()
 {
+	Bitmap* char_bitmap = _sCharacter->GetBitmap();
 	if (_sCharacter->fireCounter != 0) {
 		_sCharacter->fireCounter--;
 	}
+	if (_sCharacter->magazine < 3) {
+		fireReloadDelay--;
+		if (fireReloadDelay == 0) {
+			fireReloadDelay = 120;
+			_sCharacter->magazine++;
+		}
+	}
+	if (_sCharacter->losingLifeTime > 0) {
+		if (_sCharacter->losingLifeTime % 10 == 0) {
+			
+			_sCharacter->SetBitmap(char_null);
+		}
+		_sCharacter->losingLifeTime--;
+
+	}
 	updateSpells();
 	if (_sCharacter->prevSpeed > 70 && (_sCharacter->GetVelocity().y == 0 || _sCharacter->GetVelocity().y == 10) ){
-		_sCharacter->life--;
+		if (_sCharacter->losingLifeTime == 0) {
+			_sCharacter->life--;
+			_sCharacter->losingLifeTime = 60;
+		}
+		
 	}
 	_sCharacter->prevSpeed = _sCharacter->GetVelocity().y;
 	
@@ -262,6 +283,7 @@ void GameCycle()
 		_sCharacter->life = 5;
 	}
 	ReleaseDC(hWindow, hDC);
+	_sCharacter->SetBitmap(char_bitmap);
 }
 
 void HandleKeys()
@@ -339,7 +361,7 @@ void HandleKeys()
 
 	}
 
-	else if (GetAsyncKeyState(VK_SPACE) < 0 && _sCharacter->fireCounter == 0) {
+	else if (GetAsyncKeyState(VK_SPACE) < 0 && _sCharacter->fireCounter == 0 && _sCharacter->magazine >0) {
 		if (GetAsyncKeyState(VK_LEFT) < 0) {
 			_sCharacter->changeState(S_LFIRE);
 			_pGame->AddSprite(_sCharacter->fire());
@@ -350,6 +372,7 @@ void HandleKeys()
 
 		}
 		_sCharacter->fireCounter = 10;
+		_sCharacter->magazine--;
 
 	}
 	else if (GetAsyncKeyState(VK_CONTROL)) {
@@ -543,7 +566,10 @@ BOOL SpriteCollision(Sprite* pSpriteHitter, Sprite* pSpriteHittee) // All collis
 			pSpriteHitter->SetHidden(TRUE);
 			PlayerCharacter* pChar = dynamic_cast<PlayerCharacter*>(pSpriteHittee);
 			pChar->life--;
-
+			if (_sCharacter->losingLifeTime == 0) {
+				_sCharacter->life--;
+				_sCharacter->losingLifeTime = 60;
+			}
 			//vurulan playerın canını düşür
 
 		}
@@ -596,8 +622,10 @@ BOOL SpriteCollision(Sprite* pSpriteHitter, Sprite* pSpriteHittee) // All collis
 				}
 				else {
 					if (demon->lastFrame()) {
-						pChar->life--;
-
+						if (_sCharacter->losingLifeTime == 0) {
+							_sCharacter->life--;
+							_sCharacter->losingLifeTime = 60;
+						}
 					}
 				}
 				
