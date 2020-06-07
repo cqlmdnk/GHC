@@ -9,7 +9,7 @@ Demon::Demon(HDC hDC, HINSTANCE _hInstance) :  SimpleAI(hDC){
 	this->_bCharAnimDeathR = new Bitmap(hDC, IDB_DEMON_DEATH_L, _hInstance);
 	this->_bCharAnimDeathL = new Bitmap(hDC, IDB_DEMON_DEATH_R, _hInstance);
 
-	SetRect(&m_rcBounds, 0, 0, 1920, 1030);
+	SetRect(&m_rcBounds, -60, 0, 1980, 1030);
 	this->SetBitmap(_bCharAnimRunR);
 	SetRect(&m_rcPosition, 0, 0, _bCharAnimRunR->GetWidth(), _bCharAnimRunR->GetHeight());
 	SetBoundsAction(BA_HALT);

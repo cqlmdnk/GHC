@@ -21,12 +21,13 @@ SpellCaster::SpellCaster(HDC hDC, HINSTANCE _hInstance) : SimpleAI(hDC) {
 	_bCharAnimDeathL = new Bitmap(hDC, IDB_SPELLCASTER_DEATH_L, _hInstance);
 
 	_bSpell = new Bitmap(hDC, TEXT("resources/spell.bmp"));
-	SetRect(&m_rcBounds, 0, 0, 1920, 1030);
+	SetRect(&m_rcBounds, -60, 0, 1980, 1030);
 	this->SetBitmap(_bCharAnimIdleL);
 	SetRect(&m_rcPosition, 0, 0, _bCharAnimIdle->GetWidth(), _bCharAnimIdle->GetHeight());
 	SetBoundsAction(BA_HALT);
 	this->SetNumFrames(10);
-	this->SetFrameDelay(2);
+	this->SetFrameDelay(3);
+	this->m_iCurFrame = rand() % 10;
 	this->m_iZOrder = 10;
 	deathMark = FALSE;
 	
@@ -47,7 +48,10 @@ SpellCaster::~SpellCaster() {
 
 Spell* SpellCaster::fire(POINT target)
 {
-	return new Spell(_bSpell, target, this->GetPosition().left+(this->GetWidth()/2), this->GetPosition().top + (this->GetHeight() / 2)); // ai karakterin önünden spawn olan bir spell döndür
+	Spell* spell = new Spell(_bSpell, target);
+	spell->SetPosition(this->GetPosition().left + 20, this->GetPosition().top);
+	return spell; // ai karakterin önünden spawn olan bir spell döndür
+
 					// döndürdüğü değeri oyundan engine a ekle
 					// üsttekilerin olması için spell classı tutan bir vektörü scene de yarat
 }

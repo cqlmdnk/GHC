@@ -32,12 +32,22 @@
 #define IDB_BG_LAYER4                   133
 #define IDB_BG_LAYER5                   134
 #define IDB_MTILE_1                     135
+#define IDB_MTILE_2                     136
+#define IDB_LIFE                        137
+#define IDB_CHAR_NULL                   138
+#define IDB_GAMEOVER                    139
+#define IDB_FIREBURST_ICO               140
+#define IDR_JUMP_SOUND                  141
+#define IDR_ATTACK_PLAYER               143
+#define IDR_FIRE_PLAYER                 144
+#define IDR_WAVE1                       145
+#define IDR_HIT_PLAYER                  145
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        137
+#define _APS_NEXT_RESOURCE_VALUE        146
 #define _APS_NEXT_COMMAND_VALUE         40001
 #define _APS_NEXT_CONTROL_VALUE         1001
 #define _APS_NEXT_SYMED_VALUE           101

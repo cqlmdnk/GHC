@@ -7,6 +7,8 @@ public:
 	Tile(HDC hDC, HINSTANCE _hInstance);
 	~Tile();
 	int type;
+	SPRITEACTION Update(int** map, int x);
+
 
 };
 

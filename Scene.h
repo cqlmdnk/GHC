@@ -9,7 +9,7 @@
 #include "SpellCaster.h"
 #include "Demon.h"
 #include "Tile.h"
-
+#include <time.h>       /* time */
 
 // Bu class daha yarým içine scenede olmasý gereken herþey olucak
 // Düþmanlarda dahil.
@@ -32,6 +32,7 @@ public:
 	void addTile(int xCur, int yCur, int type, int x);
 	void saveLevel(char* levelName);
 	void loadLevel(char* levelName);
+	void createNextScreen(int x);
 	int testCollisionRight(int x, int y);
 	int testCollisionLeft(int x, int y);
 	int p = 0;
@@ -42,7 +43,7 @@ public:
 	std::vector <Demon*> demons;
 	std::vector <Tile*> tilesSprites;
 
-	std::vector<Sprite*> updateScene(int x, int charYPos, HDC hDC, HINSTANCE _hInstance);
+	std::vector<Sprite*> updateScene(int x, int charXPos, int charYPos, HDC hDC, HINSTANCE _hInstance);
 private:
 	std::vector<Bitmap*> background; // resimlerin tutulduðu array
 };

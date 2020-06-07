@@ -60,8 +60,14 @@ SPRITEACTION Sprite::Update(int** map, int x)
 
 	this->GetAbsX();
 	//blok değişimi kontrolü
+	int xShiftPlatfrom = 120;
+	if (x < 120)
+		xShiftPlatfrom = 0;
 
-	if (!(m_rcPosition.bottom > 1080) && !(m_rcPosition.left > 1920) && !(m_rcPosition.left < 0)) {
+	SetPosition(GetPosition().left + xShiftPlatfrom, GetPosition().top);
+
+
+	if (!(m_rcPosition.bottom > 1080) && !(m_rcPosition.left > 2040) && !(m_rcPosition.left < 0)) {
 		if (((m_rcPosition.left + m_ptVelocity.x + (x % PLATFORM_S)) / PLATFORM_S != m_rcPosition.left / PLATFORM_S) + (x % PLATFORM_S) &&
 			map[(m_rcPosition.left + m_ptVelocity.x + (x % PLATFORM_S)) / PLATFORM_S][(m_rcPosition.bottom + m_rcPosition.top) / (2 * PLATFORM_S)] == 1)
 			left = true;
@@ -97,7 +103,7 @@ SPRITEACTION Sprite::Update(int** map, int x)
 		
 	}
 
-
+	SetPosition(GetPosition().left - xShiftPlatfrom, GetPosition().top);
 
 
 
@@ -236,7 +242,10 @@ SPRITEACTION Sprite::Update(int** map, int x)
 	}
 
 
-	this->SetVelocity(this->GetVelocity().x, this->GetVelocity().y + 10);
+	this->SetVelocity(this->GetVelocity().x, this->GetVelocity().y + 10); // gravity kicks in
+
+
+
 	if (right) {
 		if (GetVelocity().x > 0) {
 			ptNewPosition.x = (ptNewPosition.x - m_ptVelocity.x);

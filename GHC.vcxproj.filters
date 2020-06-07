@@ -204,10 +204,36 @@
     <Image Include="resources\bitmap1.bmp">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="resources\char_null.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\fire_burst_ico.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\gameover.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\life.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="GHC.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="resources\sounds\jump.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="resources\sounds\attack_player.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="resources\sounds\fire_player.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="resources\sounds\hit_player.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
   </ItemGroup>
 </Project>

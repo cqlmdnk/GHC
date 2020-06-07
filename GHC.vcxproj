@@ -63,7 +63,7 @@
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>msimg32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>msimg32.lib;%(AdditionalDependencies);winmm.lib</AdditionalDependencies>
       <OutputFile>$(OutDir)GHC.exe</OutputFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(OutDir)GHC.pdb</ProgramDatabaseFile>
@@ -146,6 +146,7 @@
     <Image Include="resources\character_jump_l.bmp" />
     <Image Include="resources\character_run.bmp" />
     <Image Include="resources\character_run_l.bmp" />
+    <Image Include="resources\char_null.bmp" />
     <Image Include="resources\demon_attack.bmp" />
     <Image Include="resources\demon_attack_l.bmp" />
     <Image Include="resources\demon_attack_s.bmp" />
@@ -154,8 +155,11 @@
     <Image Include="resources\demon_walk.bmp" />
     <Image Include="resources\demon_walk_l.bmp" />
     <Image Include="resources\fire_burst.bmp" />
+    <Image Include="resources\fire_burst_ico.bmp" />
     <Image Include="resources\fire_burst_l.bmp" />
+    <Image Include="resources\gameover.bmp" />
     <Image Include="resources\ground.bmp" />
+    <Image Include="resources\life.bmp" />
     <Image Include="resources\m_tile1.bmp" />
     <Image Include="resources\spell.bmp" />
     <Image Include="resources\tile1.bmp" />
@@ -164,6 +168,12 @@
     <Image Include="resources\wizard_death_l.bmp" />
     <Image Include="resources\wizard_idle.bmp" />
     <Image Include="resources\wizard_idle_l.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="resources\sounds\attack_player.wav" />
+    <Media Include="resources\sounds\fire_player.wav" />
+    <Media Include="resources\sounds\hit_player.wav" />
+    <Media Include="resources\sounds\jump.wav" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

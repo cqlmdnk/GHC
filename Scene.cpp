@@ -67,7 +67,7 @@ HBITMAP Scene::CreateOffscreenBmp(int wd, int hgt, int x) {
 
 	HBRUSH tile_0 = CreatePatternBrush(tiles[0]->GetHbitmap());
 	HBRUSH tile_1 = CreatePatternBrush(tiles[1]->GetHbitmap());
-	for (int i = 0; i < 36; i++)
+	for (int i = 0; i < 34; i++)
 	{
 		for (int j = 0; j < 18; j++)
 		{
@@ -126,14 +126,16 @@ void Scene::BlitToHdc(HDC hdcDst, HBITMAP hbmSrc, int x, int y, int wd, int hgt)
 int** Scene::getMap(int x)
 {
 	int** map = 0;
-	map = new int* [36];
-
-	for (size_t i = 0; i < 36; i++)
+	map = new int* [38];
+	int k = -2;
+	if (x < 120)
+		k = 0;
+	for (size_t i = 0; i < 38; i++)
 	{
 		map[i] = new int[18];
 		for (size_t j = 0; j < 18; j++)
 		{
-			map[i][j] = p_iPlatform[i + x / tiles[0]->GetHeight()][j];
+			map[i][j] = p_iPlatform[i+k + x / tiles[0]->GetHeight()][j];
 
 
 		}
@@ -143,7 +145,7 @@ int** Scene::getMap(int x)
 }
 void Scene::addTile(int xCur, int yCur, int type, int x)
 {
-	p_iPlatform[xCur][yCur] = type;
+	p_iPlatform[xCur/PLATFORM_S][yCur / PLATFORM_S] = type;
 }
 
 void Scene::saveLevel(char* levelName)
@@ -186,6 +188,7 @@ void Scene::loadLevel(char* levelName)
 	}
 	file.close();
 }
+
 int Scene::testCollisionRight(int x, int y) {
 
 
@@ -224,17 +227,21 @@ int Scene::testCollisionLeft(int x, int y) {
 	return 0;
 }
 
-std::vector<Sprite*> Scene::updateScene(int x, int charYPos, HDC hDC, HINSTANCE _hInstance)
+std::vector<Sprite*> Scene::updateScene(int x, int charXPos, int charYPos, HDC hDC, HINSTANCE _hInstance)
 {
-	std::vector<Sprite*> newSprites;
-
-	//random for spellcasters tile move spell
-	/*if (rand() % 10 == 0 && !spCasters.empty()) {
+	std::vector<Sprite*> newSprites; 
+	////////////////////////////////
+	// --- AI Update Functions ---//
+	////////////////////////////////
+	for (Demon* demon : demons) {
+		demon->act(0);
+	}
+	//random spell for spellcasters 
+	if (rand() % 10 == 0 && !spCasters.empty()) {
 		for (SpellCaster* spcaster : spCasters) {
 			if (!spcaster->IsStateHalt() && spcaster->deathMark != TRUE) {
 				if (rand() % 100 < 20) {
-					Spell* sp = spcaster->fire(POINT{ 340, charYPos + rand() % 10 - 5 });
-					sp->SetVelocity(2, 3);
+					Spell* sp = spcaster->fire(POINT{ charXPos, charYPos });
 					addSpell(sp);
 					newSprites.push_back(sp);
 				}
@@ -243,7 +250,17 @@ std::vector<Sprite*> Scene::updateScene(int x, int charYPos, HDC hDC, HINSTANCE 
 			
 		}
 
-	}*/
+	}
+
+	for (Spell* spell : spells) {
+		spell->calcNextPos(charXPos + 30, charYPos + 30);
+		spell->lifeTime--;
+		if (spell->lifeTime < 0) {
+			spell->SetHidden(TRUE);
+		}
+	}
+	
+
 	if (x/60 > p ) {
 		p = x / 60;
 		for (size_t i = 0; i < 18; i++)
@@ -253,28 +270,18 @@ std::vector<Sprite*> Scene::updateScene(int x, int charYPos, HDC hDC, HINSTANCE 
 			{
 				Tile* tile = new Tile(hDC, _hInstance);
 				tile->type = 0;
-				tile->SetVelocity(0, -9);
+				tile->SetVelocity(0, -10);
 				tile->SetBoundsAction(BA_BOUNCE);
-				tile->SetPosition(31 * PLATFORM_S-4, i * PLATFORM_S);
+				tile->SetPosition((32 * PLATFORM_S)+20, i * PLATFORM_S);
 				newSprites.push_back(tile);
 				addSpriteTile(tile); // may not be necessary
 
 			} // moving tile(vertical)   // moving tiles bounces back in case of collision with platform ( case 1 and 2 )
-			else if (p_iPlatform[x / tiles[0]->GetHeight()+31][i] == 4) {
-				Tile* tile = new Tile(hDC, _hInstance);
-				tile->type = 1;
-				tile->SetVelocity(-9, 0);
-				tile->SetBoundsAction(BA_BOUNCE);
-				tile->SetPosition(31 * PLATFORM_S-4, i * PLATFORM_S);
-				newSprites.push_back(tile);
-				addSpriteTile(tile); // may not be necessary
-
-				 // moving tile(horizontal) // moving tiles bounces back in case of collision with platform ( case 1 and 2 )
-			}
+			
 			else if (p_iPlatform[x / tiles[0]->GetHeight() + 31][i] == 5) {
 				SpellCaster* sp = new SpellCaster(hDC, _hInstance);
 
-				sp->SetPosition(31 * PLATFORM_S, i * PLATFORM_S);
+				sp->SetPosition(31 * PLATFORM_S, i * PLATFORM_S-40);
 				newSprites.push_back(sp);
 				addSpellCaster(sp); // may not be necessary
 
@@ -282,7 +289,7 @@ std::vector<Sprite*> Scene::updateScene(int x, int charYPos, HDC hDC, HINSTANCE 
 			else if (p_iPlatform[x / tiles[0]->GetHeight() + 31][i] == 6) {
 				Demon* demon = new Demon(hDC, _hInstance);
 
-				demon->SetPosition(31 * PLATFORM_S, i * PLATFORM_S);
+				demon->SetPosition(31 * PLATFORM_S, i * PLATFORM_S-40);
 				newSprites.push_back(demon);
 				addDemon(demon); // may not be necessary
 
@@ -291,21 +298,80 @@ std::vector<Sprite*> Scene::updateScene(int x, int charYPos, HDC hDC, HINSTANCE 
 		
 	}
 	for (auto tile : tilesSprites) {
-		if (tile->type == 0) {
-			tile->SetVelocity(0, tile->GetVelocity().y);
-		}
-		else {
-			tile->SetVelocity(tile->GetVelocity().x, 0);
-		}
+		 tile->SetVelocity(0, tile->GetVelocity().y);
 	}
 
-	for (Demon* demon : demons) {
-		demon->act(0);
-	}
+	
 
 
 	
 
 
 	return newSprites;
+}
+void Scene::createNextScreen(int x) // bir önceki batch in devamlılığı yok
+{
+	srand(time(NULL));
+	int startIndx = (x + 1920) / PLATFORM_S;
+	for (size_t i = 2; i < 18; i+=4)
+	{
+		int randRemainder = 1;
+		for (size_t j = 0; j < 34; j++)
+		{
+			if (rand() % 50 < randRemainder) {
+				randRemainder = 1;
+				int spaceCount = (rand() % 4)+1;
+				
+				for (size_t k = 0; k < spaceCount; k++)
+				{
+					p_iPlatform[j + startIndx+k][i] = 0;
+				}
+				if (spaceCount > 2 && rand()%2 ==0) {
+					p_iPlatform[j + startIndx][i] = 3;
+				}
+				j += spaceCount;
+				for (size_t k = 0; k < spaceCount*2; k++)
+				{
+					if (rand() % 30 == 0) {
+						if (rand() % 2 == 0) {
+							p_iPlatform[j + startIndx + k][i-1] = 5;
+						}
+						else {
+							p_iPlatform[j + startIndx + k][i-1] = 6;
+						}
+					}
+					p_iPlatform[j + startIndx + k][i] = 1;
+				}
+				
+			}
+			else {
+				randRemainder++;
+				bool freeForTile = true;
+				if (j < 3 && j + startIndx >3) {
+					for (size_t k = 1; k < 4; k++)
+					{
+						if (p_iPlatform[j + startIndx - k][i] == 3) {
+							freeForTile = false;
+							break;
+						}
+					}
+				}
+				if (freeForTile) {
+					if (rand() % 30 == 0) {
+						if (rand() % 2 == 0) {
+							p_iPlatform[j + startIndx][i - 1] = 5;
+						}
+						else {
+							p_iPlatform[j + startIndx][i - 1] = 6;
+						}
+					}
+					p_iPlatform[j + startIndx][i] = 1;// enemy insertion
+				}
+					
+				else
+					p_iPlatform[j + startIndx][i] = 0;
+
+			}
+		}
+	}
 }

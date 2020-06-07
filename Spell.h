@@ -5,8 +5,9 @@ class Spell :
 {
 public:
 
-	Spell(Bitmap* _bitmap, POINT target, int x, int y);
-	void calcNextPos(int y);
+	Spell(Bitmap* _bitmap, POINT target);
+	void calcNextPos(int x, int y);
+	SPRITEACTION Update(int** map, int x);
 	POINT target;
 	POINT startPos;
 	int lifeTime = 0;

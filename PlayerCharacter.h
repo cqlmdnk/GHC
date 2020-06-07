@@ -7,6 +7,7 @@ class PlayerCharacter :
 public:
 	PlayerCharacter(HDC hDC, HINSTANCE _hInstance);
 	void changeState(STATE state);
+	SPRITEACTION Update(int** map, int x);
 	void die();
 	FireBurst* fire();
 	int fireCounter;

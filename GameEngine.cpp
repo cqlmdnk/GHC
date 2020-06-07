@@ -117,6 +117,7 @@ GameEngine::GameEngine(HINSTANCE hInstance, LPTSTR szWindowClass,
 	m_iHeight = iHeight;
 	m_iFrameDelay = 50;   // 20 FPS default
 	m_bSleep = TRUE;
+	m_uiMIDIPlayerID = 0;
 }
 
 GameEngine::~GameEngine()
@@ -292,7 +293,7 @@ void GameEngine::UpdateSprites(int** map, int x, int vx)
 	vector<Sprite*>::iterator siSprite;
 	for (siSprite = m_vSprites.begin(); siSprite != m_vSprites.end(); siSprite++)
 	{
-
+		(*siSprite)->SetVelocity((*siSprite)->GetVelocity().x, min(50, (*siSprite)->GetVelocity().y));  // artificial fall speed equilibrium between gravity and air resistance 
 
 		if ((*siSprite)->IsStateHalt()) {
 			// change stateHalt if it is supposed to be in screen
@@ -327,7 +328,7 @@ void GameEngine::UpdateSprites(int** map, int x, int vx)
 		// Update the sprite
 		saSpriteAction = (*siSprite)->Update(map, x);
 		if (instanceof<FireBurst>(*siSprite) || instanceof<Tile>(*siSprite)) {
-			(*siSprite)->SetVelocity((*siSprite)->GetVelocity().x, (*siSprite)->GetVelocity().y - 10);
+			(*siSprite)->SetVelocity((*siSprite)->GetVelocity().x, (*siSprite)->GetVelocity().y - 10); // degravitation 
 		}
 		// Handle the SA_KILL sprite action
 		if (saSpriteAction & SA_KILL)
@@ -343,11 +344,11 @@ void GameEngine::UpdateSprites(int** map, int x, int vx)
 
 		// See if the sprite collided with any others
 		if (CheckSpriteCollision(*siSprite)) {
-			if (instanceof<Spell>((*siSprite)) || instanceof<FireBurst>((*siSprite)) || instanceof<Tile>((*siSprite)) ) {
+			if (instanceof<Spell>((*siSprite)) || instanceof<FireBurst>((*siSprite)) || instanceof<Tile>((*siSprite)) || instanceof<SimpleAI>((*siSprite))) {
 
 			}
 			else if (instanceof<PlayerCharacter>((*siSprite))) {
-				(*siSprite)->SetPosition((*siSprite)->GetPosition().left,rcOldSpritePos.top);
+				
 			}
 			else {
 				(*siSprite)->SetPosition(rcOldSpritePos);
@@ -370,20 +371,17 @@ void GameEngine::UpdateSprites(int** map, int x, int vx)
 	{
 
 		if ((sprite->deathMark && sprite->IsAnimDef()) || sprite->IsHidden()) {
+			
+			delete sprite;
 			m_vSprites.erase(std::remove(m_vSprites.begin(), m_vSprites.end(), sprite), m_vSprites.end());
-			try {
-				delete sprite;
-
-			}
-			catch (...) {
-
-			}
+			
 		}
 		else {
 			if (instanceof<FireBurst>(sprite) && sprite->GetVelocity().x == 0) {
+				delete sprite;
 				m_vSprites.erase(std::remove(m_vSprites.begin(), m_vSprites.end(), sprite), m_vSprites.end());
 
-				delete sprite;
+				
 			}
 		}
 
@@ -421,3 +419,60 @@ Sprite* GameEngine::IsPointInSprite(int x, int y)
 
 
 
+
+void GameEngine::PlayMIDISong(LPTSTR szMIDIFileName, BOOL bRestart)
+{
+	//See if the MIDI player needs to be opened
+	if (m_uiMIDIPlayerID == 0)
+	{
+		//Open the MIDI player by specifying the device and filename
+		MCI_OPEN_PARMS mciOpenParms;
+		mciOpenParms.lpstrDeviceType = "sequencer";
+		mciOpenParms.lpstrElementName = szMIDIFileName;
+		if (mciSendCommand(NULL, MCI_OPEN, MCI_OPEN_TYPE | MCI_OPEN_ELEMENT,
+			(DWORD_PTR)&mciOpenParms) == 0)
+
+			//Get the ID for the MIDI player
+			m_uiMIDIPlayerID = mciOpenParms.wDeviceID;
+		else
+
+			//There was a problem, so just return
+			return;
+	}
+
+	//Restart the MIDI song, if necessary
+	if (bRestart)
+	{
+		MCI_SEEK_PARMS mciSeekParms;
+		if (mciSendCommand(m_uiMIDIPlayerID, MCI_SEEK, MCI_SEEK_TO_START,
+			(DWORD_PTR)&mciSeekParms) != 0)
+
+			//There was a problem, so close the MIDI player
+			CloseMIDIPlayer();
+	}
+
+	//Play the MIDI song
+	MCI_PLAY_PARMS mciPlayParms;
+	if (mciSendCommand(m_uiMIDIPlayerID, MCI_PLAY, 0,
+		(DWORD_PTR)&mciPlayParms) != 0)
+
+		//There was a problem so close the MIDI player
+		CloseMIDIPlayer();
+}
+
+void GameEngine::PauseMIDISong()
+{
+	//Pause the currently playing song, if possible
+	if (m_uiMIDIPlayerID != 0)
+		mciSendCommand(m_uiMIDIPlayerID, MCI_PAUSE, 0, NULL);
+}
+
+void GameEngine::CloseMIDIPlayer()
+{
+	//Close the MIDI player, if possible
+	if (m_uiMIDIPlayerID != 0)
+	{
+		mciSendCommand(m_uiMIDIPlayerID, MCI_CLOSE, 0, NULL);
+		m_uiMIDIPlayerID = 0;
+	}
+}

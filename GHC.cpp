@@ -10,7 +10,10 @@
 
 
 //-----GAME SPECIFIC FUNCTIONS-----//
-void updateSpells();
+void drawHUD(HDC hDC);
+void drawEditMode(HDC hDC);
+void createScreenElements(int** map, HDC hDC);
+void addParallaxBgs(HDC hDC);
 //-----------------------------------------------------------------
 // Game Engine Functions
 //-----------------------------------------------------------------
@@ -39,87 +42,21 @@ void GameStart(HWND hWindow)
 	// Create and load the background and saucer bitmaps
 	HDC hDC = GetDC(hWindow);
 
-
 	_Scene = new Scene(hDC, _hInstance);
+	addParallaxBgs(hDC);
 
-	_pBackground = new Bitmap(hDC, IDB_BG_LAYER1, _hInstance);
-	_Scene->addBackground(_pBackground);
-	_pBackground = new Bitmap(hDC, IDB_BG_LAYER2, _hInstance); 
-	_Scene->addBackground(_pBackground);
-	_pBackground = new Bitmap(hDC, IDB_BG_LAYER3, _hInstance);
-	_Scene->addBackground(_pBackground);
-	_pBackground = new Bitmap(hDC, IDB_BG_LAYER4, _hInstance);
-	_Scene->addBackground(_pBackground);
-	_pBackground = new Bitmap(hDC, IDB_BG_LAYER5, _hInstance);
-	_Scene->addBackground(_pBackground);
-	
-	_pLife = new Bitmap(hDC, "resources/life.bmp");
-	_pGameOver = new Bitmap(hDC, "resources/gameover.bmp");
-	_pFireIcon = new Bitmap(hDC, "resources/fire_burst_ico.bmp");
 	_sCharacter = new PlayerCharacter(hDC, _hInstance);
-	char_null = new Bitmap(hDC, "resources/chat_null.bmp");
-	SpellCaster* temp_ai = new SpellCaster(hDC, _hInstance);
-	_Scene->addSpellCaster(temp_ai);
-
-
-	temp_ai->SetPosition(900, 700);
-
-
-	temp_ai->SetBoundsAction(BA_HALT);
-	ais.push_back(temp_ai);
-	_pGame->AddSprite(temp_ai);
-
-	_Scene->loadLevel("leveld.dat");
-	_sCharacter->SetBoundsAction(BA_STOP);
+	_Scene->createNextScreen(-1920);
+	_Scene->createNextScreen(0);
+	_Scene->addTile(_sCharacter->GetPosition().left + 50, _sCharacter->GetPosition().top + 200, 1, 0);
+	
 
 	_pGame->AddSprite(_sCharacter);
-	int** map = _Scene->getMap(x);
-	for (size_t i = 0; i < 36; i++)
-	{
-		for (size_t j = 0; j < 18; j++)
-		{
-			if (map[i][j] == 3)
-			{
-				Tile* tile = new Tile(hDC, _hInstance);
-				tile->type = 0;
-				tile->SetVelocity(0, -9);
-				tile->SetPosition(i * PLATFORM_S+1, j * PLATFORM_S);
-				_pGame->AddSprite(tile);
-				_Scene->addSpriteTile(tile); // may not be necessary
+	
+	
+	createScreenElements(_Scene->getMap(x), hDC);
 
-			} // moving tile(vertical)   // moving tiles bounces back in case of collision with platform ( case 1 and 2 )
-			else if (map[i][j] == 4) {
-				Tile* tile = new Tile(hDC, _hInstance);
-				tile->type = 1;
-				tile->SetVelocity(-9, 0);
-				tile->SetPosition(i * PLATFORM_S, j * PLATFORM_S-5);
-				_pGame->AddSprite(tile);
-				_Scene->addSpriteTile(tile); // may not be necessary
-
-				 // moving tile(horizontal) // moving tiles bounces back in case of collision with platform ( case 1 and 2 )
-			}
-			else if (map[i][j] == 4) {
-				
-			}
-			else if (map[i][j] == 5) {
-				SpellCaster* sp = new SpellCaster(hDC, _hInstance);
-
-				sp->SetPosition(i * PLATFORM_S, j * PLATFORM_S);
-				_pGame->AddSprite(sp);
-				_Scene->addSpellCaster(sp); // may not be necessary
-				
-			}
-			else if (map[i][j] == 6) {
-				Demon* demon = new Demon(hDC, _hInstance);
-
-				demon->SetPosition(i*PLATFORM_S, j * PLATFORM_S);
-				_pGame->AddSprite(demon);
-				_Scene->addDemon(demon); // may not be necessary
-				
-			}
-		}
-	}
-
+	_pGame->PlayMIDISong(TEXT("resources\\sounds\\background.mid"), TRUE);
 
 }
 
@@ -136,74 +73,33 @@ void GameEnd()
 
 void GameActivate(HWND hWindow)
 {
+	_pGame->PlayMIDISong(TEXT(""), FALSE);
 }
 
 void GameDeactivate(HWND hWindow)
 {
+	_pGame->PauseMIDISong();
 }
 
 void GamePaint(HDC hDC)
 {
 	_Scene->drawBackground(hDC, x);
-	  
 
 
-
-
-	
-
-	if (editMod) {
-
-
-		RECT rect = { 0,0,0,0 };
-
-		POINT p = { 0,0 };
-		LPCSTR message = TEXT("Dev Mod Activated");
-		DrawTextA(hDC, message, -1, &rect, DT_SINGLELINE | DT_NOCLIP);
-
-		char buffer[50];
-		snprintf(buffer, sizeof(buffer), "Character's X coordinate : %d", x);
-		LPCSTR message1 = (buffer);
-		rect.top = 25;
-		DrawTextA(hDC, message1, -1, &rect, DT_SINGLELINE | DT_NOCLIP);
-
-
-		GetCursorPos(&p);
-		snprintf(buffer, sizeof(buffer), "Mouse X coordinate : %ld ", p.x);
-		message1 = (buffer);
-		rect.top = 50;
-		DrawTextA(hDC, message1, -1, &rect, DT_SINGLELINE | DT_NOCLIP);
-
-
-		snprintf(buffer, sizeof(buffer), "Mouse Y coordinate : %ld ", p.y);
-		message1 = (buffer);
-		rect.top = 75;
-		DrawTextA(hDC, message1, -1, &rect, DT_SINGLELINE | DT_NOCLIP);
-		if (maxSp < _sCharacter->GetVelocity().y) {
-			maxSp = _sCharacter->GetVelocity().y;
-		}
-
-		snprintf(buffer, sizeof(buffer), "Character velocity.y  : %d  ", maxSp);
-		message1 = (buffer);
-		rect.top = 100;
-		DrawTextA(hDC, message1, -1, &rect, DT_SINGLELINE | DT_NOCLIP);
-	}
+	drawEditMode(hDC);
 	//_pBackground->Draw(hDC, 0, 0);
 	_pGame->DrawSprites(hDC);
-	for (size_t i = 0; i < _sCharacter->life; i++){
-		
-		_pLife->Draw(hDC, 20 + i * 30, 20, TRUE);
-	}
-	for (size_t i = 0; i < _sCharacter->magazine; i++) {
-
-		_pFireIcon->Draw(hDC, 20 + i * 50, 51, TRUE);
-	}
 	
+	drawHUD(hDC);
 
 }
 
 void GameCycle()
 {
+	if (sceneBlock < x / 1920) {
+		sceneBlock = x / 1920;
+		_Scene->createNextScreen(x);
+	}
 	Bitmap* char_bitmap = _sCharacter->GetBitmap();
 	if (_sCharacter->fireCounter != 0) {
 		_sCharacter->fireCounter--;
@@ -217,23 +113,23 @@ void GameCycle()
 	}
 	if (_sCharacter->losingLifeTime > 0) {
 		if (_sCharacter->losingLifeTime % 10 == 0) {
-			
+
 			_sCharacter->SetBitmap(char_null);
 		}
 		_sCharacter->losingLifeTime--;
 
 	}
-	updateSpells();
-	if (_sCharacter->prevSpeed > 70 && (_sCharacter->GetVelocity().y == 0 || _sCharacter->GetVelocity().y == 10) ){
+	if (_sCharacter->prevSpeed > 70 && (_sCharacter->GetVelocity().y == 0 || _sCharacter->GetVelocity().y == 10)) {
 		if (_sCharacter->losingLifeTime == 0) {
 			_sCharacter->life--;
 			_sCharacter->losingLifeTime = 60;
+			PlaySound((LPCSTR)IDR_HIT_PLAYER, _hInstance, SND_ASYNC | SND_RESOURCE);
 		}
-		
+
 	}
 	_sCharacter->prevSpeed = _sCharacter->GetVelocity().y;
-	
-	if (_sCharacter->GetPosition().left+vx > 500 && _sCharacter->GetPosition().left + vx < 800) {
+
+	if (_sCharacter->GetPosition().left + vx > 500 && _sCharacter->GetPosition().left + vx < 800) {
 		_sCharacter->SetPosition(_sCharacter->GetPosition().left + vx, _sCharacter->GetPosition().top);
 		_pGame->UpdateSprites(_Scene->getMap(x), x, 0);
 
@@ -243,56 +139,42 @@ void GameCycle()
 		x += vx;
 
 	}
-		
+
 	HWND  hWindow = _pGame->GetWindow();
 	HDC   hDC = GetDC(hWindow);
-	
-	std::vector<Sprite*> addedSprites = _Scene->updateScene(x, _sCharacter->GetPosition().top, hDC, _hInstance); // GDI Leak
+	SetBkMode(hDC, TRANSPARENT);
+
+	std::vector<Sprite*> addedSprites = _Scene->updateScene(x, _sCharacter->GetPosition().left, _sCharacter->GetPosition().top, hDC, _hInstance); // GDI Leak
 	for (auto nSprite : addedSprites) {
 		_pGame->AddSprite(nSprite);
 	}
-	
-	/*if (rand() % 200 < 1) {
-		if (rand() % 2 == 0) {
 
-			SpellCaster* temp_spellC = new SpellCaster(hDC, _hInstance);
-			temp_spellC->SetPosition((rand() % 700) + 1000, 900);
-			_Scene->addSpellCaster(temp_spellC);
-			_pGame->AddSprite(temp_spellC);
-		}
-		else {
-			Demon* temp_demon = new Demon(hDC, _hInstance);
-			temp_demon->SetPosition((rand() % 700) + 1000, 900);
-			temp_demon->changeState(S_RUNL);
-			_pGame->AddSprite(temp_demon);
-			_Scene->addDemon(temp_demon);
-
-		}
-
-	}*/
 	GamePaint(_hOffscreenDC);
 
 	BitBlt(hDC, 0, 0, _pGame->GetWidth(), _pGame->GetHeight(),//???
 		_hOffscreenDC, 0, 0, SRCCOPY);
 	if (!_sCharacter->life > 0) {
-		
+		_pGame->PauseMIDISong();
 		while (GetAsyncKeyState(VK_RETURN) == 0)
 		{
 			_pGameOver->Draw(hDC, 0, 0, TRUE);
 		}
 		_sCharacter->life = 5;
+		_pGame->PlayMIDISong(TEXT("resources\\sounds\\background.mid"));
+
 	}
 	ReleaseDC(hWindow, hDC);
 	_sCharacter->SetBitmap(char_bitmap);
+
 }
 
 void HandleKeys()
 {
 
-	if (GetAsyncKeyState(VK_LEFT) < 0 /*&& (!_sCharacter->checkState(S_RJUMP) || _sCharacter->checkState(S_LJUMP))*/) {
+	if (GetAsyncKeyState(VK_LEFT) < 0 ) {
 
 		if (vx + x > 0) {
-			if (_Scene->testCollisionLeft(_sCharacter->GetPosition().left+20 + x, _sCharacter->GetPosition().bottom-20) == 2) {
+			if (_Scene->testCollisionLeft(_sCharacter->GetPosition().left + 20 + x, _sCharacter->GetPosition().bottom - 20) == 2) {
 
 				vx = 0;
 
@@ -314,9 +196,9 @@ void HandleKeys()
 
 	}
 
-	else if (GetAsyncKeyState(VK_RIGHT) < 0 /*&& (!_sCharacter->checkState(S_LJUMP) || _sCharacter->checkState(S_RJUMP))*/) {
+	else if (GetAsyncKeyState(VK_RIGHT) < 0 ) {
 
-		if (_Scene->testCollisionRight(_sCharacter->GetPosition().right-20 + x,  _sCharacter->GetPosition().bottom-20) == 1) {
+		if (_Scene->testCollisionRight(_sCharacter->GetPosition().right - 20 + x, _sCharacter->GetPosition().bottom - 20) == 1) {
 
 
 			vx = 0;
@@ -344,14 +226,18 @@ void HandleKeys()
 
 
 	if (GetAsyncKeyState(VK_UP) < 0) {
-		if (!_sCharacter->checkState(S_LJUMP) && !_sCharacter->checkState(S_RJUMP)) { 
+		if (!_sCharacter->checkState(S_LJUMP) && !_sCharacter->checkState(S_RJUMP)) {
 			if (GetAsyncKeyState(VK_LEFT) < 0) {
 				_sCharacter->changeState(S_LJUMP);
+				vx = -5;
 			}
 			else {
+				if (GetAsyncKeyState(VK_RIGHT)) {
+					vx += 5;
+				}
 				_sCharacter->changeState(S_RJUMP);
 			}
-
+			PlaySound((LPCSTR)IDR_JUMP_SOUND, _hInstance, SND_ASYNC | SND_RESOURCE);
 
 		}
 
@@ -361,7 +247,7 @@ void HandleKeys()
 
 	}
 
-	else if (GetAsyncKeyState(VK_SPACE) < 0 && _sCharacter->fireCounter == 0 && _sCharacter->magazine >0) {
+	else if (GetAsyncKeyState(VK_SPACE) < 0 && _sCharacter->fireCounter == 0 && _sCharacter->magazine > 0) {
 		if (GetAsyncKeyState(VK_LEFT) < 0) {
 			_sCharacter->changeState(S_LFIRE);
 			_pGame->AddSprite(_sCharacter->fire());
@@ -373,6 +259,10 @@ void HandleKeys()
 		}
 		_sCharacter->fireCounter = 10;
 		_sCharacter->magazine--;
+		PlaySound((LPCSTR)IDR_FIRE_PLAYER, _hInstance, SND_ASYNC | SND_RESOURCE);
+
+
+
 
 	}
 	else if (GetAsyncKeyState(VK_CONTROL)) {
@@ -383,6 +273,8 @@ void HandleKeys()
 			_sCharacter->changeState(S_RATT);
 
 		}
+		PlaySound((LPCSTR)IDR_ATTACK_PLAYER, _hInstance, SND_ASYNC | SND_RESOURCE);
+
 	}
 	else if (GetAsyncKeyState(VK_TAB) < 0) { // tab ile edit mod a giriliyor
 		editMod = !editMod;
@@ -399,7 +291,7 @@ void HandleKeys()
 			HWND  hWindow = _pGame->GetWindow();
 			HDC   hDC = GetDC(hWindow);
 			SpellCaster* sp = new SpellCaster(hDC, _hInstance);
-			
+
 			sp->SetBoundsAction(BA_HALT);
 			sp->SetPosition(p.x, p.y);
 			_pGame->AddSprite(sp);
@@ -435,7 +327,7 @@ void HandleKeys()
 		if (editMod) {
 			POINT p = { 0,0 };
 			GetCursorPos(&p);
-			_Scene->addTile((x + p.x) / PLATFORM_S, p.y / PLATFORM_S, 0, x);
+			_Scene->addTile((x + p.x), p.y, 0, x);
 
 		}
 
@@ -446,7 +338,7 @@ void HandleKeys()
 		if (editMod) {
 			POINT p = { 0,0 };
 			GetCursorPos(&p);
-			_Scene->addTile((x + p.x) / PLATFORM_S, p.y / PLATFORM_S, 1, x);
+			_Scene->addTile((x + p.x), p.y, 1, x);
 
 		}
 
@@ -457,7 +349,7 @@ void HandleKeys()
 		if (editMod) {
 			POINT p = { 0,0 };
 			GetCursorPos(&p);
-			_Scene->addTile((x + p.x) / PLATFORM_S, p.y / PLATFORM_S, 2, x);
+			_Scene->addTile((x + p.x), p.y, 2, x);
 
 		}
 
@@ -474,7 +366,7 @@ void HandleKeys()
 			Tile* tile = new Tile(hDC, _hInstance);
 			tile->type = 0;
 			tile->SetVelocity(0, -10);
-			tile->SetBoundsAction(BA_BOUNCE); 
+			tile->SetBoundsAction(BA_BOUNCE);
 			tile->SetPosition(p.x, p.y);
 			_pGame->AddSprite(tile);
 			_Scene->addSpriteTile(tile); // may not be necessary
@@ -504,10 +396,10 @@ void HandleKeys()
 
 
 	}
-	
 
 
-	
+
+
 	else if (GetAsyncKeyState('L') < 0) {
 		if (editMod) {
 			_Scene->loadLevel("leveld.dat");
@@ -557,18 +449,18 @@ void MouseMove(int x, int y)
 
 BOOL SpriteCollision(Sprite* pSpriteHitter, Sprite* pSpriteHittee) // All collision actions handled here
 {
-	
+
 	if (instanceof<Spell>(pSpriteHitter) || instanceof<FireBurst>(pSpriteHitter)) { // spell veya fireburst işlemleri
 
 		if (instanceof<Spell>(pSpriteHitter) && instanceof<PlayerCharacter>(pSpriteHittee)) { // spell mi vurdu
 
-			_Scene->spells.erase(std::remove(_Scene->spells.begin(), _Scene->spells.end(), pSpriteHitter), _Scene->spells.end());
-			pSpriteHitter->SetHidden(TRUE);
-			PlayerCharacter* pChar = dynamic_cast<PlayerCharacter*>(pSpriteHittee);
-			pChar->life--;
+
+
 			if (_sCharacter->losingLifeTime == 0) {
+				pSpriteHitter->SetHidden(TRUE);
 				_sCharacter->life--;
 				_sCharacter->losingLifeTime = 60;
+				PlaySound((LPCSTR)IDR_HIT_PLAYER, _hInstance, SND_ASYNC | SND_RESOURCE);
 			}
 			//vurulan playerın canını düşür
 
@@ -577,6 +469,7 @@ BOOL SpriteCollision(Sprite* pSpriteHitter, Sprite* pSpriteHittee) // All collis
 			//initiate death animation of spellcaster
 			Demon* demon = dynamic_cast<Demon*>(pSpriteHittee);
 			demon->die();
+			score++;
 			_Scene->demons.erase(std::remove(_Scene->demons.begin(), _Scene->demons.end(), pSpriteHittee), _Scene->demons.end());
 			pSpriteHitter->SetHidden(TRUE);
 
@@ -588,7 +481,7 @@ BOOL SpriteCollision(Sprite* pSpriteHitter, Sprite* pSpriteHittee) // All collis
 			//initiate death animation of spellcaster
 			SpellCaster* spellCaster = dynamic_cast<SpellCaster*>(pSpriteHittee);
 			spellCaster->die();
-
+			score++;
 			pSpriteHitter->SetHidden(TRUE);
 
 			_Scene->spCasters.erase(std::remove(_Scene->spCasters.begin(), _Scene->spCasters.end(), pSpriteHittee), _Scene->spCasters.end());
@@ -608,6 +501,7 @@ BOOL SpriteCollision(Sprite* pSpriteHitter, Sprite* pSpriteHittee) // All collis
 			if ((pChar->checkState(S_RATT) || pChar->checkState(S_LATT)) && pChar->lastFrame()) {//player saldırıyorsa düşamnı öldür
 				Character* dyingChar = dynamic_cast<Character*>(pSpriteHitter);
 				dyingChar->die(); // öldürme animasyonu ve hidden olma
+				score++;
 				if (instanceof<SpellCaster>(pSpriteHitter)) // scene vektöründen silme
 					_Scene->spCasters.erase(std::remove(_Scene->spCasters.begin(), _Scene->spCasters.end(), pSpriteHitter), _Scene->spCasters.end());
 				else
@@ -625,24 +519,28 @@ BOOL SpriteCollision(Sprite* pSpriteHitter, Sprite* pSpriteHittee) // All collis
 						if (_sCharacter->losingLifeTime == 0) {
 							_sCharacter->life--;
 							_sCharacter->losingLifeTime = 60;
+							PlaySound((LPCSTR)IDR_HIT_PLAYER, _hInstance, SND_ASYNC | SND_RESOURCE);
 						}
 					}
 				}
-				
+
 			}
 			return FALSE;
 		}
 		else if (instanceof<Tile>(pSpriteHitter)) {
-			
-				//blok ile beraber üste gitme kodu
-			if (pSpriteHitter->GetPosition().top-40 > pSpriteHittee->GetPosition().top) {
-				pSpriteHittee->SetVelocity(pSpriteHittee->GetVelocity().x , pSpriteHittee->GetVelocity().y - 10);
-				pSpriteHittee->SetPosition(pSpriteHittee->GetPosition().left + pSpriteHitter->GetVelocity().x, pSpriteHittee->GetPosition().top + pSpriteHitter->GetVelocity().y);
-				
+
+			//blok ile beraber hareket kodu
+			if (pSpriteHitter->GetPosition().top + 5 > pSpriteHittee->GetPosition().top) {
+
+				pSpriteHittee->SetVelocity(pSpriteHittee->GetVelocity().x, pSpriteHittee->GetVelocity().y - 10);
+
+				pSpriteHittee->SetPosition(pSpriteHittee->GetPosition().left + pSpriteHitter->GetVelocity().x, pSpriteHitter->GetPosition().top - pSpriteHittee->GetHeight() - 1);
+
 
 			}
-			
-			
+
+
+
 		}
 	}
 	else if (instanceof<PlayerCharacter>(pSpriteHitter)) {
@@ -657,33 +555,26 @@ BOOL SpriteCollision(Sprite* pSpriteHitter, Sprite* pSpriteHittee) // All collis
 					_Scene->demons.erase(std::remove(_Scene->demons.begin(), _Scene->demons.end(), pSpriteHittee), _Scene->demons.end());
 
 			}
-			// ölü olup olmadığını kontrol et
-			//	Demon* demon = dynamic_cast<Demon*>(pSpriteHittee);
-			//	STATE att_state = pChar->GetPosition().left > demon->GetPosition().left ? S_RATT : S_LATT;
-			//	if (demon->IsAnimDef()) {
-			//		demon->changeState(att_state);
-			//	}
-			//	else {
-			//		if (demon->lastFrame()) {
-			//			pChar->life--;
-			//		}
-			//	}
-
-			//}
+			
 			return FALSE;
 		}
 		else if (instanceof<Tile>(pSpriteHittee)) {
-			
-				//blok ile beraber üste gitme kodu
-				
-				if (pSpriteHittee->GetPosition().top-40 > pSpriteHitter->GetPosition().top) {
-					pSpriteHitter->SetVelocity(pSpriteHitter->GetVelocity().x , pSpriteHitter->GetVelocity().y - 10);
-					pSpriteHitter->SetPosition(pSpriteHitter->GetPosition().left+pSpriteHittee->GetVelocity().x, pSpriteHitter->GetPosition().top + pSpriteHittee->GetVelocity().y);
-					
-					
-				}
-				
-			
+
+
+			if (pSpriteHittee->GetPosition().top + 5 > pSpriteHitter->GetPosition().top) {
+
+				//blok ile beraber hareket kodu
+				pSpriteHitter->SetVelocity(pSpriteHitter->GetVelocity().x, pSpriteHitter->GetVelocity().y - 10);
+
+
+
+
+				pSpriteHitter->SetPosition(pSpriteHitter->GetPosition().left + pSpriteHittee->GetVelocity().x, pSpriteHittee->GetPosition().top - pSpriteHitter->GetHeight() - 1);
+
+
+
+			}
+
 		}
 	}
 	else {
@@ -723,15 +614,139 @@ BOOL SpriteCollision(Sprite* pSpriteHitter, Sprite* pSpriteHittee) // All collis
 
 }
 
+void drawHUD(HDC hDC) {
+	char buffer[50];
+	snprintf(buffer, sizeof(buffer), "Score  : %d\0", score);
+	HDC cDC = CreateCompatibleDC(hDC);
+	HBITMAP hBmp = CreateCompatibleBitmap(hDC, 800, 800);
+	HANDLE hOld = SelectObject(cDC, hBmp);
+	long lfHeight = -MulDiv(30, GetDeviceCaps(cDC, LOGPIXELSY), 72);
+	HFONT hFont = CreateFont(lfHeight, 40, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, "Impact");
+	SetTextColor(cDC, RGB(0, 150, 0));
+	SetBkMode(cDC, TRANSPARENT);
+	SelectObject(cDC, hFont);
+	RECT a = { 0,0,800,800 };
+	HBRUSH h = CreateSolidBrush(RGB(255, 0, 255));
+	FillRect(cDC, &a, h);
 
-void updateSpells() {
-	for (Spell* spell : _Scene->spells) {
-		int y = (spell->GetPosition().left - 340 == 10 || spell->GetPosition().left - 340 == -10) ? _sCharacter->GetPosition().top : _sCharacter->GetPosition().top + rand() % 10 - 5 + (_sCharacter->GetHeight() / 2);
-		spell->calcNextPos(y);
-		spell->lifeTime--;
-		if (spell->lifeTime < 0) {
-			_Scene->spells.erase(std::remove(_Scene->spells.begin(), _Scene->spells.end(), spell), _Scene->spells.end());
-			spell->SetHidden(TRUE);
+	//TextOut(cDC, 200, 20, buffer, -1);
+	RECT rect = { 200,20,400, 70 };
+	DrawTextA(cDC, buffer, -1, &rect, DT_SINGLELINE | DT_NOCLIP);
+	for (size_t i = 0; i < _sCharacter->life; i++) {
+
+		_pLife->Draw(cDC, 20 + i * 30, 20, TRUE);
+	}
+	for (size_t i = 0; i < _sCharacter->magazine; i++) {
+
+		_pFireIcon->Draw(cDC, 20 + i * 50, 51, TRUE);
+	}
+
+	TransparentBlt(hDC, 0, 0, 800, 800, cDC, 0, 0, 800, 800, RGB(255, 0, 255));
+	SelectObject(cDC, hOld);
+	DeleteObject(hBmp);
+	DeleteObject(cDC);
+	DeleteObject(h);
+	DeleteObject(hFont);
+}
+
+void drawEditMode(HDC hDC) {
+	if (editMod) {
+
+
+		RECT rect = { 0,0,0,0 };
+
+		POINT p = { 0,0 };
+		LPCSTR message = TEXT("Dev Mod Activated");
+		DrawTextA(hDC, message, -1, &rect, DT_SINGLELINE | DT_NOCLIP);
+
+		char buffer[50];
+		snprintf(buffer, sizeof(buffer), "Character's X coordinate : %d", x);
+		LPCSTR message1 = (buffer);
+		rect.top = 25;
+		DrawTextA(hDC, message1, -1, &rect, DT_SINGLELINE | DT_NOCLIP);
+
+
+		GetCursorPos(&p);
+		snprintf(buffer, sizeof(buffer), "Mouse X coordinate : %ld ", p.x);
+		message1 = (buffer);
+		rect.top = 50;
+		DrawTextA(hDC, message1, -1, &rect, DT_SINGLELINE | DT_NOCLIP);
+
+
+		snprintf(buffer, sizeof(buffer), "Mouse Y coordinate : %ld ", p.y);
+		message1 = (buffer);
+		rect.top = 75;
+		DrawTextA(hDC, message1, -1, &rect, DT_SINGLELINE | DT_NOCLIP);
+
+		if (maxSp < _sCharacter->GetVelocity().y) {
+			maxSp = _sCharacter->GetVelocity().y;
+		}
+
+		snprintf(buffer, sizeof(buffer), "Character velocity.y  : %d  ", maxSp);
+		message1 = (buffer);
+		rect.top = 100;
+		DrawTextA(hDC, message1, -1, &rect, DT_SINGLELINE | DT_NOCLIP);
+
+
+
+	}
+}
+
+void createScreenElements(int** map, HDC hDC) {
+	for (size_t i = 0; i < 32; i++)
+	{
+		for (size_t j = 0; j < 18; j++)
+		{
+			if (map[i][j] == 3)
+			{
+				Tile* tile = new Tile(hDC, _hInstance);
+				tile->type = 0;
+				tile->SetVelocity(0, -10);
+				tile->SetPosition((i * PLATFORM_S) + 20, j * PLATFORM_S);
+				_pGame->AddSprite(tile);
+				_Scene->addSpriteTile(tile); // may not be necessary
+
+			} // moving tile(vertical)   // moving tiles bounces back in case of collision with platform ( case 1 and 2 )
+
+			else if (map[i][j] == 4) {
+
+			}
+			else if (map[i][j] == 5) {
+				SpellCaster* sp = new SpellCaster(hDC, _hInstance);
+
+				sp->SetPosition(i * PLATFORM_S, j * PLATFORM_S - 40);
+
+				_pGame->AddSprite(sp);
+				_Scene->addSpellCaster(sp); // may not be necessary
+
+			}
+			else if (map[i][j] == 6) {
+				Demon* demon = new Demon(hDC, _hInstance);
+
+				demon->SetPosition(i * PLATFORM_S, j * PLATFORM_S - 40);
+				_pGame->AddSprite(demon);
+				_Scene->addDemon(demon); // may not be necessary
+
+			}
 		}
 	}
+}
+
+void addParallaxBgs(HDC hDC) {
+
+	_pBackground = new Bitmap(hDC, IDB_BG_LAYER1, _hInstance);
+	_Scene->addBackground(_pBackground);
+	_pBackground = new Bitmap(hDC, IDB_BG_LAYER2, _hInstance);
+	_Scene->addBackground(_pBackground);
+	_pBackground = new Bitmap(hDC, IDB_BG_LAYER3, _hInstance);
+	_Scene->addBackground(_pBackground);
+	_pBackground = new Bitmap(hDC, IDB_BG_LAYER4, _hInstance);
+	_Scene->addBackground(_pBackground);
+	_pBackground = new Bitmap(hDC, IDB_BG_LAYER5, _hInstance);
+	_Scene->addBackground(_pBackground);
+
+	_pLife = new Bitmap(hDC, IDB_LIFE, _hInstance);
+	_pGameOver = new Bitmap(hDC, IDB_GAMEOVER, _hInstance);
+	_pFireIcon = new Bitmap(hDC, IDB_FIREBURST_ICO, _hInstance);
+	char_null = new Bitmap(hDC, IDB_CHAR_NULL, _hInstance);
 }

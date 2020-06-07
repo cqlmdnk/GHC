@@ -65,7 +65,7 @@ protected:
   int                 m_iFrameDelay;
   BOOL                m_bSleep;
 
-
+  UINT				m_uiMIDIPlayerID;
   BOOL                CheckSpriteCollision(Sprite* pTestSprite);
 
 public:
@@ -85,6 +85,10 @@ public:
   void                UpdateSprites(int** map, int x, int vx);
   void                CleanupSprites();
   Sprite*             IsPointInSprite(int x, int y);
+  void				PlayMIDISong(LPTSTR szMIDIFileName = TEXT(""),
+      BOOL bRestart = TRUE);
+  void				PauseMIDISong();
+  void				CloseMIDIPlayer();
 
   // Accessor Methods
   HINSTANCE GetInstance() { return m_hInstance; };
