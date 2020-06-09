@@ -5,6 +5,7 @@ class FireBurst :
 {
 public:
 	FireBurst();
+	BOOL enemy;
 
 };
 

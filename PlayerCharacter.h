@@ -9,7 +9,7 @@ public:
 	void changeState(STATE state);
 	SPRITEACTION Update(int** map, int x);
 	void die();
-	FireBurst* fire();
+	FireBurst* fire(BOOL enemy);
 	int fireCounter;
 	int magazine = 3;
 	int life = 5;

@@ -293,6 +293,12 @@ void GameEngine::UpdateSprites(int** map, int x, int vx)
 	vector<Sprite*>::iterator siSprite;
 	for (siSprite = m_vSprites.begin(); siSprite != m_vSprites.end(); siSprite++)
 	{
+
+
+		if (instanceof<FireBurst>(*siSprite)) {
+			int c = 0;
+		}
+
 		(*siSprite)->SetVelocity((*siSprite)->GetVelocity().x, min(50, (*siSprite)->GetVelocity().y));  // artificial fall speed equilibrium between gravity and air resistance 
 
 		if ((*siSprite)->IsStateHalt()) {
@@ -367,19 +373,21 @@ void GameEngine::UpdateSprites(int** map, int x, int vx)
 
 
 	}
-	for (auto sprite : m_vSprites)
+	for (auto& sprite : m_vSprites)
 	{
 
 		if ((sprite->deathMark && sprite->IsAnimDef()) || sprite->IsHidden()) {
 			
 			delete sprite;
-			m_vSprites.erase(std::remove(m_vSprites.begin(), m_vSprites.end(), sprite), m_vSprites.end());
+			sprite = nullptr;
+			
 			
 		}
 		else {
 			if (instanceof<FireBurst>(sprite) && sprite->GetVelocity().x == 0) {
 				delete sprite;
-				m_vSprites.erase(std::remove(m_vSprites.begin(), m_vSprites.end(), sprite), m_vSprites.end());
+				sprite = nullptr;
+			
 
 				
 			}
@@ -387,6 +395,7 @@ void GameEngine::UpdateSprites(int** map, int x, int vx)
 
 
 	}
+	m_vSprites.erase(std::remove(m_vSprites.begin(), m_vSprites.end(), nullptr), m_vSprites.end());
 
 
 

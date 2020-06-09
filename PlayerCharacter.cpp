@@ -126,9 +126,10 @@ void PlayerCharacter::die()
 {
 }
 
-FireBurst* PlayerCharacter::fire()
+FireBurst* PlayerCharacter::fire(BOOL enemy)
 {
 	FireBurst* fb = new FireBurst();
+	fb->enemy = enemy;
 	if (_bCharState == S_LFIRE) {
 
 		fb->SetBitmap(_bCharFireBurstL);

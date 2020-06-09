@@ -6,8 +6,11 @@
 Scene::Scene(HDC hDC, HINSTANCE  _hInstance) {
 	tiles[0] = new Bitmap(hDC, IDB_TILE1, _hInstance);
 	tiles[1] = new Bitmap(hDC, IDB_TILE2, _hInstance);
-	tiles[2] = new Bitmap(hDC, IDB_TILE2, _hInstance); // tile tipleri buradan yüklenecek
 	memset(p_iPlatform, 0, sizeof(p_iPlatform));
+	_bSpell = new Bitmap(hDC, IDB_SPELL, _hInstance);
+
+	_bCharFireBurstR = new Bitmap(hDC, IDB_FIREBURST_R, _hInstance);
+	_bCharFireBurstL = new Bitmap(hDC, IDB_FIREBURST_L, _hInstance);
 }
 
 
@@ -240,10 +243,9 @@ std::vector<Sprite*> Scene::updateScene(int x, int charXPos, int charYPos, HDC h
 	if (rand() % 10 == 0 && !spCasters.empty()) {
 		for (SpellCaster* spcaster : spCasters) {
 			if (!spcaster->IsStateHalt() && spcaster->deathMark != TRUE) {
-				if (rand() % 100 < 20) {
-					Spell* sp = spcaster->fire(POINT{ charXPos, charYPos });
-					addSpell(sp);
-					newSprites.push_back(sp);
+				if (rand() % 100 < SPELL_RATE) {
+					Spell* spell = spellF(POINT{ charXPos, charYPos }, POINT{ spcaster->GetPosition().left, spcaster->GetPosition().top });
+					newSprites.push_back(spell);
 				}
 				spcaster->act(0);
 			}
@@ -252,13 +254,22 @@ std::vector<Sprite*> Scene::updateScene(int x, int charXPos, int charYPos, HDC h
 
 	}
 
-	for (Spell* spell : spells) {
-		spell->calcNextPos(charXPos + 30, charYPos + 30);
-		spell->lifeTime--;
-		if (spell->lifeTime < 0) {
-			spell->SetHidden(TRUE);
+	if (rand() % 10 == 0 && !demons.empty()) {
+		for (Demon* demon : demons) {
+			if (!demon->IsStateHalt() && demon->deathMark != TRUE) {
+				if (rand() % 100 < FIRE_RATE) {
+					int dir = (demon->GetVelocity().x < 0) ? 1 : 0;
+					FireBurst* fire = fireF(POINT{ charXPos, charYPos }, POINT{ demon->GetPosition().left, demon->GetPosition().top },dir);
+					newSprites.push_back(fire);
+				}
+				demon->act(0);
+			}
+
 		}
+
 	}
+
+	
 	
 
 	if (x/60 > p ) {
@@ -332,7 +343,7 @@ void Scene::createNextScreen(int x) // bir önceki batch in devamlılığı yok
 				j += spaceCount;
 				for (size_t k = 0; k < spaceCount*2; k++)
 				{
-					if (rand() % 30 == 0) {
+					if (rand() % 25 == 0) {
 						if (rand() % 2 == 0) {
 							p_iPlatform[j + startIndx + k][i-1] = 5;
 						}
@@ -375,3 +386,37 @@ void Scene::createNextScreen(int x) // bir önceki batch in devamlılığı yok
 		}
 	}
 }
+
+Spell* Scene::spellF(POINT target, POINT pos) {
+	Spell* spell = new Spell(_bSpell, target);
+	spell->SetPosition(pos.x , pos.y+20);
+	spell->calcNextPos(target.x, target.y);
+	return spell;
+}
+FireBurst* Scene::fireF(POINT target, POINT pos, int dir) {
+	FireBurst* fb = new FireBurst();
+	fb->enemy = TRUE;
+	if (dir == 1) {
+
+		fb->SetBitmap(_bCharFireBurstL);
+		fb->SetPosition(pos.x-20, pos.y + 30);
+
+		fb->SetVelocity(-30, 0);
+
+	}
+	else {
+
+		fb->SetBitmap(_bCharFireBurstR);
+		fb->SetPosition(pos.x+70, pos.y + 30);
+
+		fb->SetVelocity(30, 0);
+
+
+	}
+	fb->SetNumFrames(6);
+	fb->SetFrameDelay(1);
+	fb->SetBounds(RECT{ 50, 50, 1870, 1030 });
+	fb->SetBoundsAction(BA_DIE);
+	return fb;
+}
+

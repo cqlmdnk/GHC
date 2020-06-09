@@ -6,14 +6,20 @@
 //-----------------------------------------------------------------
 // Include Files
 //-----------------------------------------------------------------
-#include "GHC.h"
 
+#include "GHC.h"
+#include <vld.h>
+
+
+#define SPELL_RATE 20 // 0 -> NONE, UP TO 100
+#define FIRE_RATE 10  // 0 -> NONE, UP TO 100
 
 //-----GAME SPECIFIC FUNCTIONS-----//
 void drawHUD(HDC hDC);
 void drawEditMode(HDC hDC);
 void createScreenElements(int** map, HDC hDC);
 void addParallaxBgs(HDC hDC);
+void UpdateGame();
 //-----------------------------------------------------------------
 // Game Engine Functions
 //-----------------------------------------------------------------
@@ -63,12 +69,22 @@ void GameStart(HWND hWindow)
 void GameEnd()
 {
 	// Cleanup the background and saucer bitmaps
-	delete _pBackground;
 
 	DeleteObject(_hOffscreenBitmap);
 	DeleteDC(_hOffscreenDC);
 	// Cleanup the game engine
+	delete _pBackground;
+	delete _pLife;
+	delete _pGameOver;
+	delete _pFireIcon;
+	delete char_null;
+	delete _sCharacter;
+	delete _Scene;
 	delete _pGame;
+	
+	ais.clear();
+
+
 }
 
 void GameActivate(HWND hWindow)
@@ -128,18 +144,7 @@ void GameCycle()
 
 	}
 	_sCharacter->prevSpeed = _sCharacter->GetVelocity().y;
-
-	if (_sCharacter->GetPosition().left + vx > 500 && _sCharacter->GetPosition().left + vx < 800) {
-		_sCharacter->SetPosition(_sCharacter->GetPosition().left + vx, _sCharacter->GetPosition().top);
-		_pGame->UpdateSprites(_Scene->getMap(x), x, 0);
-
-	}
-	else {
-		_pGame->UpdateSprites(_Scene->getMap(x), x, vx);
-		x += vx;
-
-	}
-
+	
 	HWND  hWindow = _pGame->GetWindow();
 	HDC   hDC = GetDC(hWindow);
 	SetBkMode(hDC, TRANSPARENT);
@@ -148,6 +153,8 @@ void GameCycle()
 	for (auto nSprite : addedSprites) {
 		_pGame->AddSprite(nSprite);
 	}
+
+	UpdateGame();
 
 	GamePaint(_hOffscreenDC);
 
@@ -165,6 +172,7 @@ void GameCycle()
 	}
 	ReleaseDC(hWindow, hDC);
 	_sCharacter->SetBitmap(char_bitmap);
+
 
 }
 
@@ -250,11 +258,12 @@ void HandleKeys()
 	else if (GetAsyncKeyState(VK_SPACE) < 0 && _sCharacter->fireCounter == 0 && _sCharacter->magazine > 0) {
 		if (GetAsyncKeyState(VK_LEFT) < 0) {
 			_sCharacter->changeState(S_LFIRE);
-			_pGame->AddSprite(_sCharacter->fire());
+
+			_pGame->AddSprite(_sCharacter->fire(FALSE));
 		}
 		else {
 			_sCharacter->changeState(S_RFIRE);
-			_pGame->AddSprite(_sCharacter->fire());
+			_pGame->AddSprite(_sCharacter->fire(FALSE));
 
 		}
 		_sCharacter->fireCounter = 10;
@@ -465,13 +474,29 @@ BOOL SpriteCollision(Sprite* pSpriteHitter, Sprite* pSpriteHittee) // All collis
 			//vurulan playerın canını düşür
 
 		}
+		else if (instanceof<FireBurst>(pSpriteHitter) && instanceof<PlayerCharacter>(pSpriteHittee)) {
+			FireBurst* fireBurst = dynamic_cast<FireBurst*>(pSpriteHitter);
+			if (fireBurst->enemy) {
+				if (_sCharacter->losingLifeTime == 0) {
+					pSpriteHitter->SetHidden(TRUE);
+					_sCharacter->life--;
+					_sCharacter->losingLifeTime = 60;
+					PlaySound((LPCSTR)IDR_HIT_PLAYER, _hInstance, SND_ASYNC | SND_RESOURCE);
+				}
+
+			}
+		}
 		else if ((instanceof<Demon>(pSpriteHittee) && instanceof<FireBurst>(pSpriteHitter))) { // fireburst demona vurduğunda hasar ver (ya da öldür)
 			//initiate death animation of spellcaster
-			Demon* demon = dynamic_cast<Demon*>(pSpriteHittee);
-			demon->die();
-			score++;
-			_Scene->demons.erase(std::remove(_Scene->demons.begin(), _Scene->demons.end(), pSpriteHittee), _Scene->demons.end());
-			pSpriteHitter->SetHidden(TRUE);
+			FireBurst* fireBurst = dynamic_cast<FireBurst*>(pSpriteHitter);
+			if (!fireBurst->enemy) {
+				Demon* demon = dynamic_cast<Demon*>(pSpriteHittee);
+				demon->die();
+				score++;
+				_Scene->demons.erase(std::remove(_Scene->demons.begin(), _Scene->demons.end(), pSpriteHittee), _Scene->demons.end());
+				pSpriteHitter->SetHidden(TRUE);
+			}
+			
 
 
 
@@ -479,18 +504,23 @@ BOOL SpriteCollision(Sprite* pSpriteHitter, Sprite* pSpriteHittee) // All collis
 		}
 		else if ((instanceof<SpellCaster>(pSpriteHittee) && instanceof<FireBurst>(pSpriteHitter))) {// fireburst spellcaster vurduğunda hasar ver (ya da öldür)
 			//initiate death animation of spellcaster
-			SpellCaster* spellCaster = dynamic_cast<SpellCaster*>(pSpriteHittee);
-			spellCaster->die();
-			score++;
-			pSpriteHitter->SetHidden(TRUE);
+			FireBurst* fireBurst = dynamic_cast<FireBurst*>(pSpriteHitter);
+			if (!fireBurst->enemy) {
+				SpellCaster* spellCaster = dynamic_cast<SpellCaster*>(pSpriteHittee);
+				spellCaster->die();
+				score++;
+				pSpriteHitter->SetHidden(TRUE);
 
-			_Scene->spCasters.erase(std::remove(_Scene->spCasters.begin(), _Scene->spCasters.end(), pSpriteHittee), _Scene->spCasters.end());
-
+				_Scene->spCasters.erase(std::remove(_Scene->spCasters.begin(), _Scene->spCasters.end(), pSpriteHittee), _Scene->spCasters.end());
+			}
 
 		}
+		
 		else if (instanceof<FireBurst>(pSpriteHitter)) { //düşman harici bir yere çarpan fireburst silinir
-			pSpriteHitter->SetHidden(TRUE);
-
+			FireBurst* fireBurst = dynamic_cast<FireBurst*>(pSpriteHitter);
+			if (!fireBurst->enemy) {
+				pSpriteHitter->SetHidden(TRUE);
+			}
 		}
 
 		return FALSE;
@@ -525,8 +555,10 @@ BOOL SpriteCollision(Sprite* pSpriteHitter, Sprite* pSpriteHittee) // All collis
 				}
 
 			}
+			
 			return FALSE;
 		}
+		
 		else if (instanceof<Tile>(pSpriteHitter)) {
 
 			//blok ile beraber hareket kodu
@@ -621,7 +653,7 @@ void drawHUD(HDC hDC) {
 	HBITMAP hBmp = CreateCompatibleBitmap(hDC, 800, 800);
 	HANDLE hOld = SelectObject(cDC, hBmp);
 	long lfHeight = -MulDiv(30, GetDeviceCaps(cDC, LOGPIXELSY), 72);
-	HFONT hFont = CreateFont(lfHeight, 40, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, "Impact");
+	HFONT hFont = CreateFont(lfHeight, 30, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, "Impact");
 	SetTextColor(cDC, RGB(0, 150, 0));
 	SetBkMode(cDC, TRANSPARENT);
 	SelectObject(cDC, hFont);
@@ -749,4 +781,27 @@ void addParallaxBgs(HDC hDC) {
 	_pGameOver = new Bitmap(hDC, IDB_GAMEOVER, _hInstance);
 	_pFireIcon = new Bitmap(hDC, IDB_FIREBURST_ICO, _hInstance);
 	char_null = new Bitmap(hDC, IDB_CHAR_NULL, _hInstance);
+}
+
+void UpdateGame() {
+	int** map = _Scene->getMap(x);
+
+	if (_sCharacter->GetPosition().left + vx > 500 && _sCharacter->GetPosition().left + vx < 800) {
+		_sCharacter->SetPosition(_sCharacter->GetPosition().left + vx, _sCharacter->GetPosition().top);
+		_pGame->UpdateSprites(map, x, 0);
+
+	}
+	else {
+		_pGame->UpdateSprites(map, x, vx);
+		x += vx;
+
+	}
+	for (size_t i = 0; i < 38; i++)
+	{
+
+		delete map[i];
+
+
+	}
+	delete[] map;
 }

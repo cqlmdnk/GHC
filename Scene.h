@@ -9,10 +9,11 @@
 #include "SpellCaster.h"
 #include "Demon.h"
 #include "Tile.h"
-#include <time.h>       /* time */
+#include <time.h>       
 
-// Bu class daha yarým içine scenede olmasý gereken herþey olucak
-// Düþmanlarda dahil.
+#define SPELL_RATE 10 // 0 -> NONE, UP TO 100
+#define FIRE_RATE 10  // 0 -> NONE, UP TO 100
+
 
 class Scene
 {
@@ -35,8 +36,11 @@ public:
 	void createNextScreen(int x);
 	int testCollisionRight(int x, int y);
 	int testCollisionLeft(int x, int y);
+	Spell* spellF(POINT target, POINT pos);
+	FireBurst* fireF(POINT target, POINT pos, int dir);
 	int p = 0;
 	Bitmap* tiles[3];
+	Bitmap* _bSpell, * _bCharFireBurstR, * _bCharFireBurstL;
 	HBITMAP platform;
 	std::vector <SpellCaster*> spCasters;
 	std::vector <Spell*> spells;
