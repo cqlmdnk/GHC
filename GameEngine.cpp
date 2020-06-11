@@ -382,6 +382,7 @@ void GameEngine::UpdateSprites(int** map, int x, int vx)
 			sprite = nullptr;
 			
 			
+			
 		}
 		else {
 			if (instanceof<FireBurst>(sprite) && sprite->GetVelocity().x == 0) {

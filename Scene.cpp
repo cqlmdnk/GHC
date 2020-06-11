@@ -1,8 +1,7 @@
 ﻿#include "Scene.h"
+#include <algorithm>
 
 
-// Bu class daha yarým içine scenede olmasý gereken herþey olucak
-// Düþmanlarda dahil.
 Scene::Scene(HDC hDC, HINSTANCE  _hInstance) {
 	tiles[0] = new Bitmap(hDC, IDB_TILE1, _hInstance);
 	tiles[1] = new Bitmap(hDC, IDB_TILE2, _hInstance);
@@ -232,16 +231,31 @@ int Scene::testCollisionLeft(int x, int y) {
 
 std::vector<Sprite*> Scene::updateScene(int x, int charXPos, int charYPos, HDC hDC, HINSTANCE _hInstance)
 {
+
+
+	clearTiles();
+
 	std::vector<Sprite*> newSprites; 
 	////////////////////////////////
 	// --- AI Update Functions ---//
 	////////////////////////////////
 	for (Demon* demon : demons) {
+		if (demon->IsStateHalt()) {
+			demon->SetHidden(TRUE);
+			demons.erase(std::remove(demons.begin(), demons.end(), demon), demons.end());
+			continue;
+		}
 		demon->act(0);
 	}
 	//random spell for spellcasters 
 	if (rand() % 10 == 0 && !spCasters.empty()) {
 		for (SpellCaster* spcaster : spCasters) {
+			if (spcaster->IsStateHalt()) {
+				spcaster->SetHidden(TRUE);
+				spCasters.erase(std::remove(spCasters.begin(), spCasters.end(), spcaster), spCasters.end());
+				continue;
+			}
+
 			if (!spcaster->IsStateHalt() && spcaster->deathMark != TRUE) {
 				if (rand() % 100 < SPELL_RATE) {
 					Spell* spell = spellF(POINT{ charXPos, charYPos }, POINT{ spcaster->GetPosition().left, spcaster->GetPosition().top });
@@ -420,3 +434,12 @@ FireBurst* Scene::fireF(POINT target, POINT pos, int dir) {
 	return fb;
 }
 
+void Scene::clearTiles() {
+	for (Tile* tile : tilesSprites) {
+		if (tile->IsStateHalt()) {
+			tile->SetHidden(TRUE);
+			tilesSprites.erase(std::remove(tilesSprites.begin(), tilesSprites.end(), tile), tilesSprites.end());
+			continue;
+		}
+	}
+}

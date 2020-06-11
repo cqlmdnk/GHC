@@ -8,7 +8,6 @@
 //-----------------------------------------------------------------
 
 #include "GHC.h"
-#include <vld.h>
 
 
 #define SPELL_RATE 20 // 0 -> NONE, UP TO 100
@@ -786,7 +785,7 @@ void addParallaxBgs(HDC hDC) {
 void UpdateGame() {
 	int** map = _Scene->getMap(x);
 
-	if (_sCharacter->GetPosition().left + vx > 500 && _sCharacter->GetPosition().left + vx < 800) {
+	if ((_sCharacter->GetPosition().left + vx < 800) || vx < 0) {
 		_sCharacter->SetPosition(_sCharacter->GetPosition().left + vx, _sCharacter->GetPosition().top);
 		_pGame->UpdateSprites(map, x, 0);
 

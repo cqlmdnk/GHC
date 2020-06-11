@@ -160,7 +160,7 @@ SPRITEACTION Sprite::Update(int** map, int x)
 			
 			m_bStateHalt = TRUE; //sleep and wake functions can be written for this
 
-			SetAbsX(x); //in case of halt save x position;
+		
 		}
 		if (ptNewPosition.y < m_rcBounds.top ||
 			ptNewPosition.y >(m_rcBounds.bottom - ptSpriteSize.y))
@@ -225,18 +225,12 @@ SPRITEACTION Sprite::Update(int** map, int x)
 		if (ptNewPosition.x < m_rcBounds.left)
 		{
 			m_bStateHalt = TRUE; //sleep and wake functions can be written for this
-			m_ptVelocity.x = 10;
-			SetPosition(GetPosition().left - GetPosition().left % PLATFORM_S, GetPosition().top);
-
-			SetAbsX(x); //in case of halt save x position;
+			
 			
 		}
 		else if (ptNewPosition.x > (m_rcBounds.right - ptSpriteSize.x)) {
 			m_bStateHalt = TRUE; //sleep and wake functions can be written for this
-			m_ptVelocity.x = -10;
-
-			SetPosition(GetPosition().left - GetPosition().left%PLATFORM_S, GetPosition().top);
-			SetAbsX(x+1920); //in case of halt save x position;
+			
 		}
 		
 	}

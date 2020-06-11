@@ -34,6 +34,7 @@ public:
 	void saveLevel(char* levelName);
 	void loadLevel(char* levelName);
 	void createNextScreen(int x);
+	void clearTiles();
 	int testCollisionRight(int x, int y);
 	int testCollisionLeft(int x, int y);
 	Spell* spellF(POINT target, POINT pos);

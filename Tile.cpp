@@ -140,18 +140,12 @@ SPRITEACTION Tile::Update(int** map, int x) // always bounce&halt
 	if (ptNewPosition.x < m_rcBounds.left - 120)
 	{
 		m_bStateHalt = TRUE; //sleep and wake functions can be written for this
-		m_ptVelocity.x = 10;
-		SetPosition(GetPosition().left - GetPosition().left % PLATFORM_S, GetPosition().top);
-
-		SetAbsX(x); //in case of halt save x position;
+		
 
 	}
 	else if (ptNewPosition.x > (m_rcBounds.right + 120 - ptSpriteSize.x)) {
 		m_bStateHalt = TRUE; //sleep and wake functions can be written for this
-		m_ptVelocity.x = -10;
-
-		SetPosition(GetPosition().left - GetPosition().left % PLATFORM_S, GetPosition().top);
-		SetAbsX(x + 1920); //in case of halt save x position;
+	
 	}
 
 
